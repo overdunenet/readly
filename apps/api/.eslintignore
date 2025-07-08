@@ -1,0 +1,3 @@
+src/database/migration/**
+src/database/logging/migration/**
+src/**/*.spec.ts

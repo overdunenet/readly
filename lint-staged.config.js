@@ -15,7 +15,7 @@ module.exports = {
             filenames.map(filename => {
                 const match = filename.match(/packages\/([^\/]+)/);
                 return match ? match[1] : null;
-            }).filter(Boolean)
+            }).filter(Boolean).filter(pkg => pkg !== 'api-types')
         )];
 
         return packages.map(pkg => `yarn workspace ${pkg} run lint:fix`);
