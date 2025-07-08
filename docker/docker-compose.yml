@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  readly-postgresql:
+    build:
+      context: postgresql
+      dockerfile: postgresql/Dockerfile
+    container_name: readly-postgresql
+    ports:
+      - '54321:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=readly
+    volumes:
+      - ./postgresql/data:/var/lib/postgresql/data
+      - ./postgresql:/docker-entrypoint-initdb.d
+    restart: always

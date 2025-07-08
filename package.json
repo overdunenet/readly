@@ -1,0 +1,17 @@
+{
+  "name": "readly",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "prepare": "husky install",
+    "lint": "yarn workspaces run lint",
+    "lint:fix": "yarn workspaces run lint -- --fix"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.0"
+  }
+}

@@ -1,0 +1,14 @@
+'✨ Feature':
+  - head-branch: ['^feature', 'feature', 'feat', '^feat']
+
+'🐞 BugFix':
+  - head-branch: ['^fix', 'fix']
+
+'📃 Documentation':
+  - head-branch: ['^docs', 'docs']
+
+'🎨 Design':
+  - head-branch: ['^style', 'style']
+
+'🛠️ Refactoring':
+  - head-branch: ['^refactor', 'refactor']
