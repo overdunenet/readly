@@ -14,7 +14,7 @@ export class AutoRouterModule {
 
     const routers = await ModuleLoader.loadRouters(basePath, pattern);
 
-    console.log('Auto-loaded routers:', routers.map(r => r.name));
+    AutoRouterModule.logger.log(`Auto-loaded routers: ${routers.map(r => r.name).join(', ')}`);
 
     return {
       module: AutoRouterModule,
