@@ -5,7 +5,7 @@ module.exports = {
       type: 'postgres',
       host: '127.0.0.1',
       roHost: '127.0.0.1',
-      port: 54321,
+      port: 5432,
       username: 'postgres',
       password: 'postgres',
       database: 'readly',
