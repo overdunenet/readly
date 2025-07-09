@@ -72,6 +72,66 @@ yarn dev
 - Client/Editor: JWT 기반 사용자 인증
 - Backoffice: 별도 관리자 인증
 
+### Repository 패턴 (중요)
+**모든 데이터베이스 접근은 반드시 RepositoryProvider를 통해 이루어져야 합니다.**
+
+#### 1. Service에서 Repository 사용
+```typescript
+// ❌ 잘못된 방법 - @InjectRepository 직접 사용
+constructor(
+  @InjectRepository(Entity)
+  private repository: Repository<Entity>
+) {}
+
+// ✅ 올바른 방법 - RepositoryProvider 사용
+constructor(
+  private readonly repositoryProvider: RepositoryProvider
+) {}
+
+// 사용 예시
+const user = await this.repositoryProvider.UserRepository.findOne({ where: { id } });
+```
+
+#### 2. 새로운 Repository 추가
+```typescript
+// 1. repository 함수 생성 (src/module/domain/repositories/post.repository.ts)
+export const getPostRepository = (source?: TransactionService | EntityManager) =>
+  getEntityManager(source)
+    .getRepository(PostEntity)
+    .extend({
+      // 커스텀 메서드 추가
+      async findPublished() {
+        return this.find({ where: { status: 'published' } });
+      }
+    });
+
+// 2. RepositoryProvider에 추가
+export class RepositoryProvider {
+  get PostRepository() {
+    return getPostRepository(this.transaction);
+  }
+}
+```
+
+#### 3. Module 설정
+```typescript
+// TypeOrmModule.forFeature 제거하고 SharedModule import
+@Module({
+  imports: [
+    SharedModule, // RepositoryProvider 포함
+    // TypeOrmModule.forFeature([Entity]) ❌ 제거
+  ],
+  providers: [PostService],
+})
+export class PostModule {}
+```
+
+#### Repository 패턴의 장점
+- **트랜잭션 일관성**: 모든 DB 작업이 동일한 트랜잭션 컨텍스트에서 실행
+- **자동 트랜잭션 관리**: POST, PUT, PATCH, DELETE 요청에 대해 자동으로 트랜잭션 적용
+- **커스텀 메서드**: repository.extend()로 도메인 특화 메서드 추가 가능
+- **테스트 용이성**: RepositoryProvider를 쉽게 mocking 가능
+
 ## 코딩 컨벤션
 
 ### TypeScript
