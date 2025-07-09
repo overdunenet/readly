@@ -1,6 +1,8 @@
-import { Column, DeleteDateColumn } from 'typeorm';
+import { Column, DeleteDateColumn, EntityManager } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
+import { TransactionService } from '../shared/transaction/transaction.service';
+import {getEntityManager} from "@src/database/datasources";
 
 export class UserEntity extends BaseEntity {
   @Column({ unique: true, type: 'varchar' })
@@ -26,3 +28,18 @@ export class UserEntity extends BaseEntity {
     return bcrypt.compare(plainPassword, this.password);
   }
 }
+
+
+export const getUserRepository = (
+  source?: TransactionService | EntityManager
+) =>
+  getEntityManager(source)
+    .getRepository(UserEntity)
+    .extend({
+      async register(email: string, password: string): Promise<UserEntity> {
+        const admin = new UserEntity();
+        admin.email = email;
+        await admin.setPassword(password);
+        return this.save(admin);
+      },
+    });

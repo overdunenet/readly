@@ -1,9 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from '../domain/user.entity';
 import { ConfigProvider } from '@src/config';
+import { RepositoryProvider } from '../shared/transaction/repository.provider';
 
 export interface LoginCredentials {
   email: string;
@@ -24,8 +23,7 @@ export interface LoginResponse {
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    private readonly repositoryProvider: RepositoryProvider,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -47,7 +45,7 @@ export class UserService {
   }
 
   private async loginWithEmail(email: string, password: string): Promise<UserEntity> {
-    const user = await this.userRepository.findOne({
+    const user = await this.repositoryProvider.UserRepository.findOne({
       where: { email, deletedAt: null },
     });
 
@@ -69,7 +67,7 @@ export class UserService {
         secret: ConfigProvider.auth.jwt.user.refresh.secret,
       });
 
-      const user = await this.userRepository.findOne({
+      const user = await this.repositoryProvider.UserRepository.findOne({
         where: { id: payload.sub, deletedAt: null },
       });
 
@@ -99,7 +97,7 @@ export class UserService {
         secret: ConfigProvider.auth.jwt.user.access.secret,
       });
 
-      const user = await this.userRepository.findOne({
+      const user = await this.repositoryProvider.UserRepository.findOne({
         where: { id: payload.sub, deletedAt: null },
       });
 
