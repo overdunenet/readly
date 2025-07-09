@@ -20,12 +20,54 @@ export interface LoginResponse {
   };
 }
 
+export interface RegisterInput {
+  email: string;
+  password: string;
+  nickname: string;
+}
+
+export interface RegisterResponse {
+  user: {
+    id: string;
+    email: string;
+    nickname: string;
+  };
+}
+
 @Injectable()
 export class UserService {
   constructor(
     private readonly repositoryProvider: RepositoryProvider,
     private readonly jwtService: JwtService,
   ) {}
+
+  async register(input: RegisterInput): Promise<RegisterResponse> {
+    const { email, password, nickname } = input;
+
+    // 이메일 중복 체크
+    const existingUser = await this.repositoryProvider.UserRepository.findOne({
+      where: { email },
+    });
+
+    if (existingUser) {
+      throw new UnauthorizedException('Email already exists');
+    }
+
+    // 새 사용자 생성
+    const user = await this.repositoryProvider.UserRepository.register(email, password);
+    
+    // nickname 업데이트
+    user.nickname = nickname;
+    await this.repositoryProvider.UserRepository.save(user);
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+      },
+    };
+  }
 
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     const { email, password } = credentials;

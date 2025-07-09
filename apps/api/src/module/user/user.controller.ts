@@ -1,10 +1,15 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { UserService, LoginCredentials, LoginResponse } from './user.service';
+import { UserService, LoginCredentials, LoginResponse, RegisterInput, RegisterResponse } from './user.service';
 
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @MessagePattern('user.register')
+  async register(@Payload() input: RegisterInput): Promise<RegisterResponse> {
+    return this.userService.register(input);
+  }
 
   @MessagePattern('user.login')
   async login(@Payload() credentials: LoginCredentials): Promise<LoginResponse> {
