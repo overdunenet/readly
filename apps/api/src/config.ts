@@ -37,8 +37,7 @@ export const ConfigProvider = {
   auth: {
     jwt: {
       backoffice: config.get<AppJwtConfigType>('auth.jwt.backoffice'),
-      store: config.get<AppJwtConfigType>('auth.jwt.store'),
-      influencer: config.get<AppJwtConfigType>('auth.jwt.influencer')
+      user: config.get<AppJwtConfigType>('auth.jwt.user'),
     }
   },
   cors: config.get<CorsConfigType>('cors')

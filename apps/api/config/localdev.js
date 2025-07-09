@@ -23,20 +23,12 @@ module.exports = {
           secret: 'JWT_BACKOFFICE_REFRESH_SECRET_DEV',
         }
       },
-      store: {
+      user: {
         access: {
-          secret: 'JWT_STORE_ACCESS_SECRET_DEV',
+          secret: 'JWT_USER_ACCESS_SECRET_DEV',
         },
         refresh: {
-          secret: 'JWT_STORE_REFRESH_SECRET_DEV',
-        }
-      },
-      influencer: {
-        access: {
-          secret: 'JWT_INFLUENCER_ACCESS_SECRET_DEV',
-        },
-        refresh: {
-          secret: 'JWT_INFLUENCER_REFRESH_SECRET_DEV',
+          secret: 'JWT_USER_REFRESH_SECRET_DEV',
         }
       }
     }
