@@ -1,7 +1,7 @@
 module.exports = {
   name: '여기는 localdev.js 입니다.',
   database: {
-    yestravel: {
+    readly: {
       type: 'postgres',
       host: '127.0.0.1',
       roHost: '127.0.0.1',
