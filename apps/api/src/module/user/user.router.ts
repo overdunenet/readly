@@ -1,7 +1,8 @@
 import { z } from 'zod';
-import { Input, Query, Router, Mutation } from 'nestjs-trpc';
+import { Input, Query, Router, Mutation, UseMiddlewares, Ctx } from 'nestjs-trpc';
 import { BaseTrpcRouter } from '../trpc/baseTrpcRouter';
 import { TRPCError } from '@trpc/server';
+import { UserAuthMiddleware, UserAuthorizedContext } from './user.auth.middleware';
 
 const loginCredentialsSchema = z.object({
   email: z.string().email(),
@@ -24,8 +25,6 @@ const userSchema = z.object({
   email: z.string().email(),
   nickname: z.string(),
   profileImage: z.string().nullable(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
 });
 
 @Router({ alias: 'user' })
@@ -77,26 +76,22 @@ export class UserRouter extends BaseTrpcRouter {
   }
 
   /**
-   * 액세스 토큰 검증 및 사용자 정보 반환
+   * 현재 로그인한 사용자 정보 조회
    */
+  @UseMiddlewares(UserAuthMiddleware)
   @Query({
-    input: z.object({
-      token: z.string(),
-    }),
     output: userSchema,
   })
-  async validateToken(@Input('token') token: string) {
+  async me(@Ctx() ctx: UserAuthorizedContext) {
     try {
-      const result = await this.microserviceClient.send('user.validateToken', token);
-      return {
-        ...result,
-        createdAt: new Date(result.createdAt),
-        updatedAt: new Date(result.updatedAt),
-      };
+      const result = await this.microserviceClient.send('user.getMe', {
+        userId: ctx.user.sub,
+      });
+      return result;
     } catch (error) {
       throw new TRPCError({
-        code: 'UNAUTHORIZED',
-        message: error.message || 'Invalid token',
+        code: 'INTERNAL_SERVER_ERROR',
+        message: error.message || 'Failed to get user info',
       });
     }
   }

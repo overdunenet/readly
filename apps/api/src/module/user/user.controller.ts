@@ -1,7 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UserService, LoginCredentials, LoginResponse } from './user.service';
-import { UserEntity } from '../domain/user.entity';
 
 @Controller()
 export class UserController {
@@ -17,8 +16,13 @@ export class UserController {
     return this.userService.refreshToken(refreshToken);
   }
 
-  @MessagePattern('user.validateToken')
-  async validateToken(@Payload() token: string): Promise<UserEntity> {
-    return this.userService.validateToken(token);
+  @MessagePattern('user.getMe')
+  async getMe(@Payload() data: { userId: string }): Promise<{
+    id: string;
+    email: string;
+    nickname: string;
+    profileImage: string | null;
+  }> {
+    return this.userService.getMe(data.userId);
   }
 }

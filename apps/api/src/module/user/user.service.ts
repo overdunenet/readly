@@ -91,24 +91,26 @@ export class UserService {
     }
   }
 
-  async validateToken(token: string): Promise<UserEntity> {
-    try {
-      const payload = this.jwtService.verify(token, {
-        secret: ConfigProvider.auth.jwt.user.access.secret,
-      });
+  async getMe(userId: string): Promise<{
+    id: string;
+    email: string;
+    nickname: string;
+    profileImage: string | null;
+  }> {
+    const user = await this.repositoryProvider.UserRepository.findOne({
+      where: { id: userId, deletedAt: null },
+    });
 
-      const user = await this.repositoryProvider.UserRepository.findOne({
-        where: { id: payload.sub, deletedAt: null },
-      });
-
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
-
-      return user;
-    } catch (error) {
-      throw new UnauthorizedException('Invalid access token');
+    if (!user) {
+      throw new UnauthorizedException('User not found');
     }
+
+    return {
+      id: user.id,
+      email: user.email,
+      nickname: user.nickname,
+      profileImage: user.profileImage,
+    };
   }
 
   private async generateTokens(user: UserEntity): Promise<{ accessToken: string; refreshToken: string }> {
