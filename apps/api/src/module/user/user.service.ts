@@ -1,0 +1,136 @@
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { UserEntity } from '../domain/user.entity';
+import { ConfigProvider } from '@src/config';
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: {
+    id: string;
+    email: string;
+    nickname: string;
+    profileImage: string | null;
+  };
+}
+
+@Injectable()
+export class UserService {
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async login(credentials: LoginCredentials): Promise<LoginResponse> {
+    const { email, password } = credentials;
+
+    const user = await this.loginWithEmail(email, password);
+    const tokens = await this.generateTokens(user);
+
+    return {
+      ...tokens,
+      user: {
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+        profileImage: user.profileImage,
+      },
+    };
+  }
+
+  private async loginWithEmail(email: string, password: string): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({
+      where: { email, deletedAt: null },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const isPasswordValid = await user.checkPassword(password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    return user;
+  }
+
+  async refreshToken(refreshToken: string): Promise<LoginResponse> {
+    try {
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: ConfigProvider.auth.jwt.user.refresh.secret,
+      });
+
+      const user = await this.userRepository.findOne({
+        where: { id: payload.sub, deletedAt: null },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      const tokens = await this.generateTokens(user);
+
+      return {
+        ...tokens,
+        user: {
+          id: user.id,
+          email: user.email,
+          nickname: user.nickname,
+          profileImage: user.profileImage,
+        },
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
+  async validateToken(token: string): Promise<UserEntity> {
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: ConfigProvider.auth.jwt.user.access.secret,
+      });
+
+      const user = await this.userRepository.findOne({
+        where: { id: payload.sub, deletedAt: null },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      return user;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid access token');
+    }
+  }
+
+  private async generateTokens(user: UserEntity): Promise<{ accessToken: string; refreshToken: string }> {
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      type: 'user',
+    };
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: ConfigProvider.auth.jwt.user.access.secret,
+        expiresIn: ConfigProvider.auth.jwt.user.access.expiresIn,
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: ConfigProvider.auth.jwt.user.refresh.secret,
+        expiresIn: ConfigProvider.auth.jwt.user.refresh.expiresIn,
+      }),
+    ]);
+
+    return { accessToken, refreshToken };
+  }
+}
