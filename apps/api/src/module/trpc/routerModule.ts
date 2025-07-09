@@ -1,10 +1,12 @@
 // auto-router.module.ts
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Module, Logger } from '@nestjs/common';
 import * as path from 'path';
 import {ModuleLoader} from "@src/module/trpc/moduleLoader";
 
 @Module({})
 export class AutoRouterModule {
+  private static readonly logger = new Logger(AutoRouterModule.name);
+
   static async forRoot(options?: {
     basePath?: string;
     pattern?: string;
