@@ -1,0 +1,19 @@
+{
+  "name": "@readly/api-types",
+  "version": "1.0.0",
+  "description": "Generated API types from tRPC server",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@trpc/server": "11.4.3",
+    "zod": "^3.25.32"
+  }
+}
