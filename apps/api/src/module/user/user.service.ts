@@ -62,35 +62,26 @@ export class UserService {
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     const { email, password } = credentials;
 
-    const user = await this.loginWithEmail(email, password);
-    const tokens = await this.generateTokens(user);
-
-    return {
-      ...tokens,
-      user: {
-        id: user.id,
-        email: user.email,
-        nickname: user.nickname,
-        profileImage: user.profileImage,
-      },
-    };
-  }
-
-  private async loginWithEmail(email: string, password: string): Promise<UserEntity> {
-    const user = await this.repositoryProvider.UserRepository.findOne({
-      where: { email, deletedAt: null },
+    // 이메일로 사용자 조회
+    const user = await this.repositoryProvider.UserRepository.findOneByOrFail({
+      email,
+    }).catch(() => {
+      throw new UnauthorizedException('Invalid email or password');
     });
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-
+    // 비밀번호 검증
     const isPasswordValid = await user.checkPassword(password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    return user;
+    // 토큰 생성
+    const tokens = await this.generateTokens(user);
+
+    return {
+      ...tokens,
+      user,
+    };
   }
 
   async refreshToken(refreshToken: string): Promise<LoginResponse> {
