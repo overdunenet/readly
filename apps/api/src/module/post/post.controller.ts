@@ -51,9 +51,4 @@ export class PostController {
   async getMyPosts(@Payload() data: { authorId: string }): Promise<PostEntity[]> {
     return this.postService.getMyPosts(data.authorId);
   }
-
-  @MessagePattern('post.getAccessible')
-  async getAccessiblePosts(@Payload() data: { userId?: string }): Promise<PostEntity[]> {
-    return this.postService.getAccessiblePosts(data.userId);
-  }
 }

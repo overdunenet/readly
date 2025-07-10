@@ -6,16 +6,14 @@ import { UserAuthMiddleware, UserAuthorizedContext } from '../user/user.auth.mid
 
 const postAccessLevelSchema = z.enum(['public', 'subscriber', 'purchaser', 'private']);
 
-const createPostInputSchema = z.object({
-  title: z.string().min(1).max(200),
-  content: z.string().min(1),
+const editPostInputSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  content: z.string().min(1).optional(),
   excerpt: z.string().max(500).optional(),
   thumbnail: z.string().url().optional(),
   accessLevel: postAccessLevelSchema.optional(),
   price: z.number().int().min(0).optional(),
 });
-
-const updatePostInputSchema = createPostInputSchema.partial();
 
 const schedulePostInputSchema = z.object({
   scheduledAt: z.date(),
@@ -48,12 +46,12 @@ export class PostRouter extends BaseTrpcRouter {
    */
   @UseMiddlewares(UserAuthMiddleware)
   @Mutation({
-    input: createPostInputSchema,
+    input: editPostInputSchema.required({ title: true, content: true }),
     output: postResponseSchema,
   })
   async create(
     @Ctx() ctx: UserAuthorizedContext,
-    @Input() input: z.infer<typeof createPostInputSchema>,
+    @Input() input: z.infer<typeof editPostInputSchema> & { title: string; content: string },
   ) {
     try {
       const result = await this.microserviceClient.send('post.create', {
@@ -76,14 +74,14 @@ export class PostRouter extends BaseTrpcRouter {
   @Mutation({
     input: z.object({
       postId: z.string(),
-      data: updatePostInputSchema,
+      data: editPostInputSchema,
     }),
     output: postResponseSchema,
   })
   async update(
     @Ctx() ctx: UserAuthorizedContext,
     @Input('postId') postId: string,
-    @Input('data') data: z.infer<typeof updatePostInputSchema>,
+    @Input('data') data: z.infer<typeof editPostInputSchema>,
   ) {
     try {
       const result = await this.microserviceClient.send('post.update', {

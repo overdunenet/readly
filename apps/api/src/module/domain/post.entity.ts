@@ -66,16 +66,45 @@ export class PostEntity extends BaseEntity {
     price?: number;
     authorId: string;
   }): PostEntity {
+    const { authorId, ...postEditInput } = input;
+    
     const post = new PostEntity();
-    post.title = input.title;
-    post.content = input.content;
-    post.excerpt = input.excerpt || null;
-    post.thumbnail = input.thumbnail || null;
-    post.accessLevel = input.accessLevel || 'public';
     post.status = 'draft';
-    post.price = input.price || 0;
-    post.authorId = input.authorId;
+    post.authorId = authorId;
+    
+    // edit 메서드를 활용하여 나머지 필드 설정
+    post.edit(postEditInput);
+    
     return post;
+  }
+
+  // 포스트 수정
+  edit(input: {
+    title?: string;
+    content?: string;
+    excerpt?: string;
+    thumbnail?: string;
+    accessLevel?: PostAccessLevel;
+    price?: number;
+  }): void {
+    if (input.title !== undefined) {
+      this.title = input.title;
+    }
+    if (input.content !== undefined) {
+      this.content = input.content;
+    }
+    if (input.excerpt !== undefined) {
+      this.excerpt = input.excerpt || null;
+    }
+    if (input.thumbnail !== undefined) {
+      this.thumbnail = input.thumbnail || null;
+    }
+    if (input.accessLevel !== undefined) {
+      this.accessLevel = input.accessLevel || 'public';
+    }
+    if (input.price !== undefined) {
+      this.price = input.price || 0;
+    }
   }
 
   // 포스트 즉시 발행
@@ -140,11 +169,21 @@ export class PostEntity extends BaseEntity {
     return new Date() >= this.scheduledAt;
   }
 
-  // 접근 권한 검증
-  canBeAccessedBy(user: UserEntity | null): boolean {
-    // 작성자는 항상 접근 가능
+  // 수정/삭제 권한 검증
+  canBeEditedBy(authorId: string): boolean {
+    return this.authorId === authorId;
+  }
+
+  // 읽기 권한 검증
+  canBeReadBy(user: UserEntity | null): boolean {
+    // 작성자는 항상 접근 가능 (발행 상태 무관)
     if (user && user.id === this.authorId) {
       return true;
+    }
+
+    // 발행되지 않은 포스트는 작성자만 접근 가능
+    if (this.status !== 'published') {
+      return false;
     }
 
     // 비공개 포스트는 작성자만 접근 가능
@@ -190,20 +229,31 @@ export const getPostRepository = (
         return this.findBy({ status: 'published' });
       },
 
-      async findAccessiblePosts(userId?: string): Promise<PostEntity[]> {
-        const qb = this.createQueryBuilder('post')
-          .leftJoinAndSelect('post.author', 'author')
-          .where('post.status = :status', { status: 'published' });
-
-        if (userId) {
-          qb.andWhere(
-            '(post.accessLevel = :public OR post.authorId = :userId)',
-            { public: 'public', userId }
-          );
-        } else {
-          qb.andWhere('post.accessLevel = :public', { public: 'public' });
+      async findOneByIdForEdit(postId: string, authorId: string): Promise<PostEntity> {
+        const post = await this.findOneByOrFail({ id: postId });
+        
+        if (!post.canBeEditedBy(authorId)) {
+          throw new Error('You are not allowed to edit this post');
         }
+        
+        return post;
+      },
 
-        return qb.orderBy('post.publishedAt', 'DESC').getMany();
+      async findOneByIdForRead(postId: string, userId?: string): Promise<PostEntity> {
+        const post = await this.findOneOrFail({
+          where: { id: postId },
+          relations: ['author'],
+        });
+
+        // TODO: 추후 쿼리 속도 등 개선 필요
+        const user = userId 
+          ? await getEntityManager(source).getRepository(UserEntity).findOneBy({ id: userId })
+          : null;
+        
+        if (!post.canBeReadBy(user as any)) {
+          throw new Error('You are not allowed to read this post');
+        }
+        
+        return post;
       },
     });
