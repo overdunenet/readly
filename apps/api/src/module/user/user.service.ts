@@ -42,30 +42,20 @@ export class UserService {
   ) {}
 
   async register(input: RegisterInput): Promise<RegisterResponse> {
-    const { email, password, nickname } = input;
-
     // 이메일 중복 체크
-    const existingUser = await this.repositoryProvider.UserRepository.findOne({
-      where: { email },
+    const exists = await this.repositoryProvider.UserRepository.exist({
+      where: { email: input.email },
     });
-
-    if (existingUser) {
+    
+    if (exists) {
       throw new UnauthorizedException('Email already exists');
     }
 
     // 새 사용자 생성
-    const user = await this.repositoryProvider.UserRepository.register(email, password);
+    const user = await this.repositoryProvider.UserRepository.register(input);
     
-    // nickname 업데이트
-    user.nickname = nickname;
-    await this.repositoryProvider.UserRepository.save(user);
-
     return {
-      user: {
-        id: user.id,
-        email: user.email,
-        nickname: user.nickname,
-      },
+      user
     };
   }
 

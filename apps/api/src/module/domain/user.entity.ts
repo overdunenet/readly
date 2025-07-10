@@ -28,6 +28,14 @@ export class UserEntity extends BaseEntity {
   async checkPassword(plainPassword: string): Promise<boolean> {
     return bcrypt.compare(plainPassword, this.password);
   }
+
+  static async register(input: { email: string; password: string; nickname: string }): Promise<UserEntity> {
+    const user = new UserEntity();
+    user.email = input.email;
+    user.nickname = input.nickname;
+    await user.setPassword(input.password);
+    return user;
+  }
 }
 
 
@@ -37,10 +45,8 @@ export const getUserRepository = (
   getEntityManager(source)
     .getRepository(UserEntity)
     .extend({
-      async register(email: string, password: string): Promise<UserEntity> {
-        const admin = new UserEntity();
-        admin.email = email;
-        await admin.setPassword(password);
-        return this.save(admin);
+      async register(input: { email: string; password: string; nickname: string }): Promise<UserEntity> {
+        const user = await UserEntity.register(input);
+        return this.save(user);
       },
     });
