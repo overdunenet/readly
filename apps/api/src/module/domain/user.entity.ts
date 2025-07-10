@@ -1,9 +1,10 @@
-import { Column, DeleteDateColumn, EntityManager } from 'typeorm';
+import { Column, DeleteDateColumn, EntityManager, Entity } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import {getEntityManager} from "@src/database/datasources";
 
+@Entity('users')
 export class UserEntity extends BaseEntity {
   @Column({ unique: true, type: 'varchar' })
   email: string;
