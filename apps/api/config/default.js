@@ -27,23 +27,13 @@ module.exports = {
           expiresIn: '30d',
         }
       },
-      store: {
+      user: {
         access: {
-          secret: process.env.JWT_STORE_ACCESS_SECRET,
+          secret: process.env.JWT_USER_ACCESS_SECRET,
           expiresIn: '1h',
         },
         refresh: {
-          secret: process.env.JWT_STORE_REFRESH_SECRET,
-          expiresIn: '7d',
-        }
-      },
-      influencer: {
-        access: {
-          secret: process.env.JWT_INFLUENCER_ACCESS_SECRET,
-          expiresIn: '1h',
-        },
-        refresh: {
-          secret: process.env.JWT_INFLUENCER_REFRESH_SECRET,
+          secret: process.env.JWT_USER_ACCESS_SECRET,
           expiresIn: '7d',
         }
       }

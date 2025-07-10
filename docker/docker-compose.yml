@@ -4,10 +4,10 @@ services:
   readly-postgresql:
     build:
       context: postgresql
-      dockerfile: postgresql/Dockerfile
+      dockerfile: Dockerfile
     container_name: readly-postgresql
     ports:
-      - '54321:5432'
+      - '5432:5432'
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
