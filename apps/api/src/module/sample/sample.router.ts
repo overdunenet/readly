@@ -1,10 +1,9 @@
 import { Input, Query, Router } from 'nestjs-trpc';
 import { z } from 'zod';
-import {BaseTrpcRouter} from "@src/module/trpc/baseTrpcRouter";
+import { BaseTrpcRouter } from '@src/module/trpc/baseTrpcRouter';
 
 @Router({ alias: 'sample' })
 export class SampleRouter extends BaseTrpcRouter {
-
   @Query({
     input: z.object({
       name: z.string().optional(),

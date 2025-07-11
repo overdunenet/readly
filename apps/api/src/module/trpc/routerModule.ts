@@ -1,7 +1,7 @@
 // auto-router.module.ts
 import { DynamicModule, Module, Logger } from '@nestjs/common';
 import * as path from 'path';
-import {ModuleLoader} from "@src/module/trpc/moduleLoader";
+import { ModuleLoader } from '@src/module/trpc/moduleLoader';
 
 @Module({})
 export class AutoRouterModule {
@@ -16,7 +16,9 @@ export class AutoRouterModule {
 
     const routers = await ModuleLoader.loadRouters(basePath, pattern);
 
-    AutoRouterModule.logger.log(`Auto-loaded routers: ${routers.map(r => r.name).join(', ')}`);
+    AutoRouterModule.logger.log(
+      `Auto-loaded routers: ${routers.map(r => r.name).join(', ')}`
+    );
 
     return {
       module: AutoRouterModule,

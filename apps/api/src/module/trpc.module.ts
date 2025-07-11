@@ -1,18 +1,15 @@
-import {Global, Module} from "@nestjs/common";
-import {TRPCModule} from "nestjs-trpc";
-import {MicroserviceClient} from "@src/module/trpc/microserviceClient";
-import {AutoRouterModule} from "@src/module/trpc/routerModule";
-import {TRPCAppContext} from "@src/module/trpc/trpcAppContext";
+import { Global, Module } from '@nestjs/common';
+import { TRPCModule } from 'nestjs-trpc';
+import { MicroserviceClient } from '@src/module/trpc/microserviceClient';
+import { AutoRouterModule } from '@src/module/trpc/routerModule';
+import { TRPCAppContext } from '@src/module/trpc/trpcAppContext';
 
 @Global()
 @Module({
-  providers:[MicroserviceClient],
-  exports: [
-    MicroserviceClient,
-  ]
+  providers: [MicroserviceClient],
+  exports: [MicroserviceClient],
 })
-class TrpcModuleExport {
-}
+class TrpcModuleExport {}
 
 @Module({
   imports: [
@@ -26,11 +23,6 @@ class TrpcModuleExport {
       pattern: '../**/*.{router,middleware}.{ts,js}',
     }),
   ],
-  providers: [
-    TRPCAppContext
-  ],
+  providers: [TRPCAppContext],
 })
-export class TrpcModule {
-}
-
-
+export class TrpcModule {}

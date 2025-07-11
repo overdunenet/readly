@@ -1,8 +1,11 @@
 // in-memory-microservice.strategy.ts
 import { CustomTransportStrategy, Server } from '@nestjs/microservices';
-import {SharedEventBus} from "@src/module/trpc/eventBus";
+import { SharedEventBus } from '@src/module/trpc/eventBus';
 
-export class InMemoryMicroserviceStrategy extends Server implements CustomTransportStrategy {
+export class InMemoryMicroserviceStrategy
+  extends Server
+  implements CustomTransportStrategy
+{
   private handlers = new Map();
   private eventBus = SharedEventBus.instance;
 
@@ -14,7 +17,12 @@ export class InMemoryMicroserviceStrategy extends Server implements CustomTransp
           const result = await handler(data);
           this.eventBus.respond(requestId, result);
         } else {
-          this.eventBus.error(requestId, new Error(`Handler not found for pattern: ${JSON.stringify(pattern)}`));
+          this.eventBus.error(
+            requestId,
+            new Error(
+              `Handler not found for pattern: ${JSON.stringify(pattern)}`
+            )
+          );
         }
       } catch (error) {
         this.eventBus.error(requestId, error);

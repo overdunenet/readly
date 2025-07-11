@@ -1,8 +1,8 @@
 import { ConfigProvider } from '@src/config';
-import {DataSource, EntityManager} from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-import {TransactionService} from "@src/module/shared/transaction/transaction.service";
+import { TransactionService } from '@src/module/shared/transaction/transaction.service';
 
 export class DataSources {
   private static readlyInstance: DataSource;
@@ -32,9 +32,9 @@ export class DataSources {
   }
 }
 
-
-
-export function getEntityManager(source?: EntityManager | TransactionService | DataSource): EntityManager | DataSource {
+export function getEntityManager(
+  source?: EntityManager | TransactionService | DataSource
+): EntityManager | DataSource {
   if (source instanceof TransactionService) {
     return source.getTransaction() ?? DataSources.readly;
   }

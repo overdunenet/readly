@@ -1,8 +1,17 @@
 import { z } from 'zod';
-import { Input, Query, Router, Mutation, UseMiddlewares, Ctx } from 'nestjs-trpc';
+import {
+  Input,
+  Query,
+  Router,
+  Mutation,
+  UseMiddlewares,
+  Ctx,
+} from 'nestjs-trpc';
 import { BaseTrpcRouter } from '../trpc/baseTrpcRouter';
-import { TRPCError } from '@trpc/server';
-import { UserAuthMiddleware, UserAuthorizedContext } from './user.auth.middleware';
+import {
+  UserAuthMiddleware,
+  UserAuthorizedContext,
+} from './user.auth.middleware';
 
 const loginCredentialsSchema = z.object({
   email: z.string().email(),
@@ -53,27 +62,14 @@ export class UserRouter extends BaseTrpcRouter {
   async register(
     @Input('email') email: string,
     @Input('password') password: string,
-    @Input('nickname') nickname: string,
+    @Input('nickname') nickname: string
   ) {
-    try {
-      const result = await this.microserviceClient.send('user.register', {
-        email,
-        password,
-        nickname,
-      });
-      return result;
-    } catch (error) {
-      if (error.message?.includes('already exists')) {
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: '이미 사용 중인 이메일입니다.',
-        });
-      }
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || '회원가입 처리 중 오류가 발생했습니다.',
-      });
-    }
+    const result = await this.microserviceClient.send('user.register', {
+      email,
+      password,
+      nickname,
+    });
+    return result;
   }
 
   /**
@@ -85,20 +81,13 @@ export class UserRouter extends BaseTrpcRouter {
   })
   async login(
     @Input('email') email: string,
-    @Input('password') password: string,
+    @Input('password') password: string
   ) {
-    try {
-      const result = await this.microserviceClient.send('user.login', {
-        email,
-        password,
-      });
-      return result;
-    } catch (error) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED',
-        message: error.message || 'Login failed',
-      });
-    }
+    const result = await this.microserviceClient.send('user.login', {
+      email,
+      password,
+    });
+    return result;
   }
 
   /**
@@ -111,15 +100,11 @@ export class UserRouter extends BaseTrpcRouter {
     output: loginResponseSchema,
   })
   async refreshToken(@Input('refreshToken') refreshToken: string) {
-    try {
-      const result = await this.microserviceClient.send('user.refreshToken', refreshToken);
-      return result;
-    } catch (error) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED',
-        message: error.message || 'Failed to refresh token',
-      });
-    }
+    const result = await this.microserviceClient.send(
+      'user.refreshToken',
+      refreshToken
+    );
+    return result;
   }
 
   /**
@@ -130,16 +115,9 @@ export class UserRouter extends BaseTrpcRouter {
     output: userSchema,
   })
   async me(@Ctx() ctx: UserAuthorizedContext) {
-    try {
-      const result = await this.microserviceClient.send('user.getMe', {
-        userId: ctx.user.sub,
-      });
-      return result;
-    } catch (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || 'Failed to get user info',
-      });
-    }
+    const result = await this.microserviceClient.send('user.getMe', {
+      userId: ctx.user.sub,
+    });
+    return result;
   }
 }

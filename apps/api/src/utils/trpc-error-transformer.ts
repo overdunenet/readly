@@ -94,17 +94,3 @@ export function transformToTRPCError(error: unknown): TRPCError {
     message: 'An unexpected error occurred',
   });
 }
-
-/**
- * tRPC 미들웨어용 에러 핸들러
- */
-export const errorHandlingMiddleware = async (opts: {
-  ctx: any;
-  next: () => Promise<any>;
-}) => {
-  try {
-    return await opts.next();
-  } catch (error) {
-    throw transformToTRPCError(error);
-  }
-};

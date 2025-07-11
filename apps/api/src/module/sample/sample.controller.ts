@@ -1,13 +1,10 @@
-import {MessagePattern} from "@nestjs/microservices";
-import {SampleService} from "@src/module/sample/sample.service";
-import {Controller} from "@nestjs/common";
-
+import { MessagePattern } from '@nestjs/microservices';
+import { SampleService } from '@src/module/sample/sample.service';
+import { Controller } from '@nestjs/common';
 
 @Controller()
 export class SampleController {
-  constructor(
-    private readonly sampleService: SampleService,
-  ) {}
+  constructor(private readonly sampleService: SampleService) {}
 
   @MessagePattern('sample.getHello')
   getHello(name?: string): string {

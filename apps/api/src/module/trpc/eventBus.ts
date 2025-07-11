@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import {Observable} from "@trpc/server/observable";
 
 export class SharedEventBus extends EventEmitter {
   static instance = new SharedEventBus();

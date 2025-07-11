@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToOne, JoinColumn, DeleteDateColumn, EntityManager } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  JoinColumn,
+  DeleteDateColumn,
+  EntityManager,
+} from 'typeorm';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { UserEntity } from './user.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
@@ -15,10 +22,18 @@ export class PostEntity extends BaseEntity {
   @Column({ type: 'text', comment: '포스트 본문 내용' })
   content: string;
 
-  @Column({ type: 'text', nullable: true, comment: '포스트 요약/미리보기 텍스트' })
+  @Column({
+    type: 'text',
+    nullable: true,
+    comment: '포스트 요약/미리보기 텍스트',
+  })
   excerpt: string | null;
 
-  @Column({ type: 'varchar', nullable: true, comment: '포스트 썸네일 이미지 URL' })
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    comment: '포스트 썸네일 이미지 URL',
+  })
   thumbnail: string | null;
 
   @Column({
@@ -37,13 +52,21 @@ export class PostEntity extends BaseEntity {
   })
   status: PostStatus;
 
-  @Column({ type: 'int', default: 0, comment: '포스트 가격 (유료 포스트인 경우)' })
+  @Column({
+    type: 'int',
+    default: 0,
+    comment: '포스트 가격 (유료 포스트인 경우)',
+  })
   price: number;
 
   @Column({ type: 'timestamptz', nullable: true, comment: '포스트 발행 일시' })
   publishedAt: Date | null;
 
-  @Column({ type: 'timestamptz', nullable: true, comment: '예약 발행 예정 일시' })
+  @Column({
+    type: 'timestamptz',
+    nullable: true,
+    comment: '예약 발행 예정 일시',
+  })
   scheduledAt: Date | null;
 
   @Column({ type: 'uuid', comment: '작성자 사용자 ID' })
@@ -67,14 +90,14 @@ export class PostEntity extends BaseEntity {
     authorId: string;
   }): PostEntity {
     const { authorId, ...postEditInput } = input;
-    
+
     const post = new PostEntity();
     post.status = 'draft';
     post.authorId = authorId;
-    
+
     // edit 메서드를 활용하여 나머지 필드 설정
     post.edit(postEditInput);
-    
+
     return post;
   }
 
@@ -122,7 +145,7 @@ export class PostEntity extends BaseEntity {
     if (this.status === 'published') {
       throw new Error('Cannot schedule published post');
     }
-    
+
     const now = new Date();
     if (scheduledAt <= now) {
       throw new Error('Scheduled time must be in the future');
@@ -229,31 +252,39 @@ export const getPostRepository = (
         return this.findBy({ status: 'published' });
       },
 
-      async findOneByIdForEdit(postId: string, authorId: string): Promise<PostEntity> {
+      async findOneByIdForEdit(
+        postId: string,
+        authorId: string
+      ): Promise<PostEntity> {
         const post = await this.findOneByOrFail({ id: postId });
-        
+
         if (!post.canBeEditedBy(authorId)) {
           throw new Error('You are not allowed to edit this post');
         }
-        
+
         return post;
       },
 
-      async findOneByIdForRead(postId: string, userId?: string): Promise<PostEntity> {
+      async findOneByIdForRead(
+        postId: string,
+        userId?: string
+      ): Promise<PostEntity> {
         const post = await this.findOneOrFail({
           where: { id: postId },
           relations: ['author'],
         });
 
         // TODO: 추후 쿼리 속도 등 개선 필요
-        const user = userId 
-          ? await getEntityManager(source).getRepository(UserEntity).findOneBy({ id: userId })
+        const user = userId
+          ? await getEntityManager(source)
+              .getRepository(UserEntity)
+              .findOneBy({ id: userId })
           : null;
-        
+
         if (!post.canBeReadBy(user as any)) {
           throw new Error('You are not allowed to read this post');
         }
-        
+
         return post;
       },
     });

@@ -7,12 +7,7 @@ import { UserModule } from '@src/module/user/user.module';
 import { PostModule } from '@src/module/post/post.module';
 
 @Module({
-  imports: [
-    SharedModule,
-    SampleModule,
-    UserModule,
-    PostModule
-  ],
+  imports: [SharedModule, SampleModule, UserModule, PostModule],
   controllers: [AppController],
   providers: [AppService],
 })

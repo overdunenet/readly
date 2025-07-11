@@ -1,12 +1,13 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import { glob } from 'glob';
 
 export class ModuleLoader {
-  static async loadRouters(basePath: string, pattern: string = '**/*.router.{ts,js}'): Promise<any[]> {
+  static async loadRouters(
+    basePath: string,
+    pattern: string = '**/*.router.{ts,js}'
+  ): Promise<any[]> {
     const files = glob.sync(pattern, {
       cwd: basePath,
-      absolute: true
+      absolute: true,
     });
 
     const routers: any[] = [];

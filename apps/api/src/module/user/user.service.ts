@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from '../domain/user.entity';
 import { ConfigProvider } from '@src/config';
@@ -38,7 +43,7 @@ export interface RegisterResponse {
 export class UserService {
   constructor(
     private readonly repositoryProvider: RepositoryProvider,
-    private readonly jwtService: JwtService,
+    private readonly jwtService: JwtService
   ) {}
 
   async register(input: RegisterInput): Promise<RegisterResponse> {
@@ -46,16 +51,16 @@ export class UserService {
     const exists = await this.repositoryProvider.UserRepository.exist({
       where: { email: input.email },
     });
-    
+
     if (exists) {
-      throw new UnauthorizedException('Email already exists');
+      throw new ConflictException('Email already exists');
     }
 
     // 새 사용자 생성
     const user = await this.repositoryProvider.UserRepository.register(input);
-    
+
     return {
-      user
+      user,
     };
   }
 
@@ -95,7 +100,7 @@ export class UserService {
       });
 
       if (!user) {
-        throw new UnauthorizedException('User not found');
+        throw new NotFoundException('User not found');
       }
 
       const tokens = await this.generateTokens(user);
@@ -125,7 +130,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new NotFoundException('User not found');
     }
 
     return {
@@ -136,7 +141,9 @@ export class UserService {
     };
   }
 
-  private async generateTokens(user: UserEntity): Promise<{ accessToken: string; refreshToken: string }> {
+  private async generateTokens(
+    user: UserEntity
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const payload = {
       sub: user.id,
       email: user.email,
