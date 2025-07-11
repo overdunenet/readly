@@ -1,10 +1,24 @@
 import { z } from 'zod';
-import { Input, Query, Router, Mutation, UseMiddlewares, Ctx } from 'nestjs-trpc';
+import {
+  Input,
+  Query,
+  Router,
+  Mutation,
+  UseMiddlewares,
+  Ctx,
+} from 'nestjs-trpc';
 import { BaseTrpcRouter } from '../trpc/baseTrpcRouter';
-import { TRPCError } from '@trpc/server';
-import { UserAuthMiddleware, UserAuthorizedContext } from '../user/user.auth.middleware';
+import {
+  UserAuthMiddleware,
+  UserAuthorizedContext,
+} from '../user/user.auth.middleware';
 
-const postAccessLevelSchema = z.enum(['public', 'subscriber', 'purchaser', 'private']);
+const postAccessLevelSchema = z.enum([
+  'public',
+  'subscriber',
+  'purchaser',
+  'private',
+]);
 
 const editPostInputSchema = z.object({
   title: z.string().min(1).max(200).optional(),
@@ -51,20 +65,17 @@ export class PostRouter extends BaseTrpcRouter {
   })
   async create(
     @Ctx() ctx: UserAuthorizedContext,
-    @Input() input: z.infer<typeof editPostInputSchema> & { title: string; content: string },
-  ) {
-    try {
-      const result = await this.microserviceClient.send('post.create', {
-        authorId: ctx.user.sub,
-        input,
-      });
-      return result;
-    } catch (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || 'Failed to create post',
-      });
+    @Input()
+    input: z.infer<typeof editPostInputSchema> & {
+      title: string;
+      content: string;
     }
+  ) {
+    const result = await this.microserviceClient.send('post.create', {
+      authorId: ctx.user.sub,
+      input,
+    });
+    return result;
   }
 
   /**
@@ -81,27 +92,13 @@ export class PostRouter extends BaseTrpcRouter {
   async update(
     @Ctx() ctx: UserAuthorizedContext,
     @Input('postId') postId: string,
-    @Input('data') data: z.infer<typeof editPostInputSchema>,
+    @Input('data') data: z.infer<typeof editPostInputSchema>
   ) {
-    try {
-      const result = await this.microserviceClient.send('post.update', {
-        postId,
-        authorId: ctx.user.sub,
-        input: data,
-      });
-      return result;
-    } catch (error) {
-      if (error.message?.includes('not allowed')) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: error.message,
-        });
-      }
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || 'Failed to update post',
-      });
-    }
+    return await this.microserviceClient.send('post.update', {
+      postId,
+      authorId: ctx.user.sub,
+      input: data,
+    });
   }
 
   /**
@@ -116,26 +113,12 @@ export class PostRouter extends BaseTrpcRouter {
   })
   async publish(
     @Ctx() ctx: UserAuthorizedContext,
-    @Input('postId') postId: string,
+    @Input('postId') postId: string
   ) {
-    try {
-      const result = await this.microserviceClient.send('post.publish', {
-        postId,
-        authorId: ctx.user.sub,
-      });
-      return result;
-    } catch (error) {
-      if (error.message?.includes('not allowed')) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: error.message,
-        });
-      }
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || 'Failed to publish post',
-      });
-    }
+    return await this.microserviceClient.send('post.publish', {
+      postId,
+      authorId: ctx.user.sub,
+    });
   }
 
   /**
@@ -150,26 +133,12 @@ export class PostRouter extends BaseTrpcRouter {
   })
   async unpublish(
     @Ctx() ctx: UserAuthorizedContext,
-    @Input('postId') postId: string,
+    @Input('postId') postId: string
   ) {
-    try {
-      const result = await this.microserviceClient.send('post.unpublish', {
-        postId,
-        authorId: ctx.user.sub,
-      });
-      return result;
-    } catch (error) {
-      if (error.message?.includes('not allowed')) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: error.message,
-        });
-      }
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || 'Failed to unpublish post',
-      });
-    }
+    return await this.microserviceClient.send('post.unpublish', {
+      postId,
+      authorId: ctx.user.sub,
+    });
   }
 
   /**
@@ -186,35 +155,15 @@ export class PostRouter extends BaseTrpcRouter {
   async schedule(
     @Ctx() ctx: UserAuthorizedContext,
     @Input('postId') postId: string,
-    @Input('scheduledAt') scheduledAt: string,
+    @Input('scheduledAt') scheduledAt: string
   ) {
-    try {
-      const result = await this.microserviceClient.send('post.schedule', {
-        postId,
-        authorId: ctx.user.sub,
-        input: {
-          scheduledAt: new Date(scheduledAt),
-        },
-      });
-      return result;
-    } catch (error) {
-      if (error.message?.includes('not allowed')) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: error.message,
-        });
-      }
-      if (error.message?.includes('must be in the future')) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Scheduled time must be in the future',
-        });
-      }
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || 'Failed to schedule post',
-      });
-    }
+    return await this.microserviceClient.send('post.schedule', {
+      postId,
+      authorId: ctx.user.sub,
+      input: {
+        scheduledAt: new Date(scheduledAt),
+      },
+    });
   }
 
   /**
@@ -229,32 +178,12 @@ export class PostRouter extends BaseTrpcRouter {
   })
   async cancelSchedule(
     @Ctx() ctx: UserAuthorizedContext,
-    @Input('postId') postId: string,
+    @Input('postId') postId: string
   ) {
-    try {
-      const result = await this.microserviceClient.send('post.cancelSchedule', {
-        postId,
-        authorId: ctx.user.sub,
-      });
-      return result;
-    } catch (error) {
-      if (error.message?.includes('not allowed')) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: error.message,
-        });
-      }
-      if (error.message?.includes('not scheduled')) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Post is not scheduled',
-        });
-      }
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || 'Failed to cancel schedule',
-      });
-    }
+    return await this.microserviceClient.send('post.cancelSchedule', {
+      postId,
+      authorId: ctx.user.sub,
+    });
   }
 
   /**
@@ -269,26 +198,13 @@ export class PostRouter extends BaseTrpcRouter {
   })
   async delete(
     @Ctx() ctx: UserAuthorizedContext,
-    @Input('postId') postId: string,
+    @Input('postId') postId: string
   ) {
-    try {
-      await this.microserviceClient.send('post.delete', {
-        postId,
-        authorId: ctx.user.sub,
-      });
-      return true;
-    } catch (error) {
-      if (error.message?.includes('not allowed')) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: error.message,
-        });
-      }
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || 'Failed to delete post',
-      });
-    }
+    await this.microserviceClient.send('post.delete', {
+      postId,
+      authorId: ctx.user.sub,
+    });
+    return true;
   }
 
   /**
@@ -300,35 +216,12 @@ export class PostRouter extends BaseTrpcRouter {
     }),
     output: postResponseSchema,
   })
-  async getOne(
-    @Ctx() ctx: any,
-    @Input('postId') postId: string,
-  ) {
-    try {
-      const userId = ctx.user?.sub;
-      const result = await this.microserviceClient.send('post.getOne', {
-        postId,
-        userId,
-      });
-      return result;
-    } catch (error) {
-      if (error.message?.includes('not found')) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Post not found',
-        });
-      }
-      if (error.message?.includes('not allowed')) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'You do not have permission to access this post',
-        });
-      }
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || 'Failed to get post',
-      });
-    }
+  async getOne(@Ctx() ctx: any, @Input('postId') postId: string) {
+    const userId = ctx.user?.sub;
+    return await this.microserviceClient.send('post.getOne', {
+      postId,
+      userId,
+    });
   }
 
   /**
@@ -339,17 +232,9 @@ export class PostRouter extends BaseTrpcRouter {
     output: z.array(postResponseSchema),
   })
   async getMy(@Ctx() ctx: UserAuthorizedContext) {
-    try {
-      const result = await this.microserviceClient.send('post.getMy', {
-        authorId: ctx.user.sub,
-      });
-      return result;
-    } catch (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || 'Failed to get posts',
-      });
-    }
+    return await this.microserviceClient.send('post.getMy', {
+      authorId: ctx.user.sub,
+    });
   }
 
   /**
@@ -359,18 +244,9 @@ export class PostRouter extends BaseTrpcRouter {
     output: z.array(postResponseSchema),
   })
   async getAccessible(@Ctx() ctx: any) {
-    try {
-      const userId = ctx.user?.sub;
-      const result = await this.microserviceClient.send('post.getAccessible', {
-        userId,
-      });
-      return result;
-    } catch (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || 'Failed to get posts',
-      });
-    }
+    const userId = ctx.user?.sub;
+    return await this.microserviceClient.send('post.getAccessible', {
+      userId,
+    });
   }
-
 }

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { PostEntity, PostAccessLevel } from '../domain/post.entity';
 
@@ -24,25 +28,34 @@ export interface SchedulePostInput {
   scheduledAt: Date;
 }
 
-
 @Injectable()
 export class PostService {
-  constructor(
-    private readonly repositoryProvider: RepositoryProvider,
-  ) {
-  }
+  constructor(private readonly repositoryProvider: RepositoryProvider) {}
 
-  async createPost(authorId: string, input: CreatePostInput): Promise<PostEntity> {
+  async createPost(
+    authorId: string,
+    input: CreatePostInput
+  ): Promise<PostEntity> {
     return this.repositoryProvider.PostRepository.createPost({
       ...input,
       authorId,
     });
   }
 
-  async updatePost(postId: string, authorId: string, input: UpdatePostInput): Promise<PostEntity> {
-    const post = await this.repositoryProvider.PostRepository.findOneByIdForEdit(postId, authorId).catch(() => {
-      throw new ForbiddenException('Post not found or you are not allowed to update this post');
-    });
+  async updatePost(
+    postId: string,
+    authorId: string,
+    input: UpdatePostInput
+  ): Promise<PostEntity> {
+    const post =
+      await this.repositoryProvider.PostRepository.findOneByIdForEdit(
+        postId,
+        authorId
+      ).catch(() => {
+        throw new ForbiddenException(
+          'Post not found or you are not allowed to update this post'
+        );
+      });
 
     // 업데이트
     post.edit(input);
@@ -50,9 +63,15 @@ export class PostService {
   }
 
   async publishPost(postId: string, authorId: string): Promise<PostEntity> {
-    const post = await this.repositoryProvider.PostRepository.findOneByIdForEdit(postId, authorId).catch(() => {
-      throw new ForbiddenException('Post not found or you are not allowed to publish this post');
-    });
+    const post =
+      await this.repositoryProvider.PostRepository.findOneByIdForEdit(
+        postId,
+        authorId
+      ).catch(() => {
+        throw new ForbiddenException(
+          'Post not found or you are not allowed to publish this post'
+        );
+      });
 
     // 발행
     post.publish();
@@ -60,19 +79,35 @@ export class PostService {
   }
 
   async unpublishPost(postId: string, authorId: string): Promise<PostEntity> {
-    const post = await this.repositoryProvider.PostRepository.findOneByIdForEdit(postId, authorId).catch(() => {
-      throw new ForbiddenException('Post not found or you are not allowed to unpublish this post');
-    });
+    const post =
+      await this.repositoryProvider.PostRepository.findOneByIdForEdit(
+        postId,
+        authorId
+      ).catch(() => {
+        throw new ForbiddenException(
+          'Post not found or you are not allowed to unpublish this post'
+        );
+      });
 
     // 임시저장으로 변경
     post.unpublish();
     return this.repositoryProvider.PostRepository.save(post);
   }
 
-  async schedulePost(postId: string, authorId: string, input: SchedulePostInput): Promise<PostEntity> {
-    const post = await this.repositoryProvider.PostRepository.findOneByIdForEdit(postId, authorId).catch(() => {
-      throw new ForbiddenException('Post not found or you are not allowed to schedule this post');
-    });
+  async schedulePost(
+    postId: string,
+    authorId: string,
+    input: SchedulePostInput
+  ): Promise<PostEntity> {
+    const post =
+      await this.repositoryProvider.PostRepository.findOneByIdForEdit(
+        postId,
+        authorId
+      ).catch(() => {
+        throw new ForbiddenException(
+          'Post not found or you are not allowed to schedule this post'
+        );
+      });
 
     // 예약 발행 설정
     post.schedulePublish(input.scheduledAt);
@@ -80,9 +115,15 @@ export class PostService {
   }
 
   async cancelSchedule(postId: string, authorId: string): Promise<PostEntity> {
-    const post = await this.repositoryProvider.PostRepository.findOneByIdForEdit(postId, authorId).catch(() => {
-      throw new ForbiddenException('Post not found or you are not allowed to cancel schedule for this post');
-    });
+    const post =
+      await this.repositoryProvider.PostRepository.findOneByIdForEdit(
+        postId,
+        authorId
+      ).catch(() => {
+        throw new ForbiddenException(
+          'Post not found or you are not allowed to cancel schedule for this post'
+        );
+      });
 
     // 예약 발행 취소
     post.cancelSchedule();
@@ -90,16 +131,27 @@ export class PostService {
   }
 
   async deletePost(postId: string, authorId: string): Promise<void> {
-    const post = await this.repositoryProvider.PostRepository.findOneByIdForEdit(postId, authorId).catch(() => {
-      throw new ForbiddenException('Post not found or you are not allowed to delete this post');
-    });
+    const post =
+      await this.repositoryProvider.PostRepository.findOneByIdForEdit(
+        postId,
+        authorId
+      ).catch(() => {
+        throw new ForbiddenException(
+          'Post not found or you are not allowed to delete this post'
+        );
+      });
 
     await this.repositoryProvider.PostRepository.softRemove(post);
   }
 
   async getPost(postId: string, userId?: string): Promise<PostEntity> {
-    return this.repositoryProvider.PostRepository.findOneByIdForRead(postId, userId).catch(() => {
-      throw new ForbiddenException('Post not found or you are not allowed to read this post');
+    return this.repositoryProvider.PostRepository.findOneByIdForRead(
+      postId,
+      userId
+    ).catch(() => {
+      throw new NotFoundException(
+        'Post not found or you are not allowed to read this post'
+      );
     });
   }
 

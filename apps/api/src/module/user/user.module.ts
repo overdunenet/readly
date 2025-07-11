@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { UserRouter } from './user.router';
 import { UserAuthMiddleware } from './user.auth.middleware';
 import { ConfigProvider } from '@src/config';
 import { SharedModule } from '../shared/shared.module';
