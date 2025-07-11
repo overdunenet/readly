@@ -17,7 +17,7 @@ export class ErrorHandlingMiddleware implements TRPCMiddleware {
 
     try {
       // Continue to the next middleware or procedure
-      return await next({ ctx });
+      return await next({ ctx: ctx as Record<string, unknown> });
     } catch (error) {
       // Transform any error to TRPCError
       throw transformToTRPCError(error);
