@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    // 공통 TypeScript 설정
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["ES2020"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": true,
+
+    // 데코레이터 지원 (NestJS용)
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    // 모듈 해석
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true
+  },
+  "exclude": ["node_modules", "dist", "build", "coverage"]
+}
