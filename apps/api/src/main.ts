@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DataSources } from '@src/database/datasources';
-import { TrpcModule } from '@src/module/trpc.module';
+import { TrpcModule } from '@src/trpc.module';
 import { MicroserviceOptions } from '@nestjs/microservices';
 import { InMemoryMicroserviceStrategy } from '@src/module/trpc/inmemoryMicroserviceStrategy';
 import { ConfigProvider } from '@src/config';
