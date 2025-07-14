@@ -25,3 +25,4 @@ dist-ssr
 
 
 routeTree.gen.*
+.tanstack
