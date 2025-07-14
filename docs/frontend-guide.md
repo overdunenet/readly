@@ -7,16 +7,19 @@ Readly의 프론트엔드는 React, Vite, Tailwind CSS를 기반으로 구축된
 ## 애플리케이션 구조
 
 ### 1. Client (팔로워용)
+
 - **URL**: https://readly.com
 - **대상**: 일반 사용자, 콘텐츠 소비자
 - **주요 기능**: 포스트 열람, 구매, 구독
 
 ### 2. Editor (에디터용)
+
 - **URL**: https://editor.readly.com
 - **대상**: 콘텐츠 제작자
 - **주요 기능**: 포스트 작성, 수익 관리, 분석
 
 ### 3. Backoffice (관리자용)
+
 - **URL**: https://admin.readly.com
 - **대상**: 플랫폼 관리자
 - **주요 기능**: 사용자 관리, 콘텐츠 모더레이션, 시스템 설정
@@ -28,15 +31,16 @@ apps/
 ├── client/
 │   ├── src/
 │   │   ├── components/       # UI 컴포넌트
-│   │   ├── pages/           # 페이지 컴포넌트
+│   │   │   ├── layout/      # 레이아웃 컴포넌트 (Header, Layout)
+│   │   │   └── feed/        # 피드 관련 컴포넌트 (FeedCard)
+│   │   ├── routes/          # TanStack Router 페이지 (파일 기반 라우팅)
 │   │   ├── hooks/           # Custom hooks
 │   │   ├── stores/          # Zustand stores
 │   │   ├── utils/           # 유틸리티 함수
-│   │   ├── api/             # tRPC 클라이언트
 │   │   ├── styles/          # 글로벌 스타일
-│   │   └── main.tsx         # 앱 진입점
+│   │   └── App.tsx          # 앱 진입점 (Router 설정)
 │   ├── public/              # 정적 파일
-│   └── index.html          
+│   └── index.html
 ├── editor/                  # Editor 앱 (동일 구조)
 └── backoffice/             # Backoffice 앱 (동일 구조)
 ```
@@ -103,16 +107,14 @@ export const PostCard: FC<PostCardProps> = ({ post, onPurchase }) => {
           <time>{formatDate(post.createdAt)}</time>
         </div>
       </header>
-      
-      <p className="mt-4 text-gray-700 line-clamp-3">
-        {post.excerpt}
-      </p>
-      
+
+      <p className="mt-4 text-gray-700 line-clamp-3">{post.excerpt}</p>
+
       <footer className="mt-4 flex items-center justify-between">
         {post.accessType === 'paid' && (
           <span className="font-semibold">{formatPrice(post.price)}</span>
         )}
-        
+
         <button
           onClick={handlePurchase}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -180,7 +182,12 @@ const postSchema = z.object({
 type PostFormData = z.infer<typeof postSchema>;
 
 export const PostForm = () => {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<PostFormData>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<PostFormData>({
     resolver: zodResolver(postSchema),
   });
 
@@ -199,9 +206,7 @@ export const PostForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
-        <label className="block text-sm font-medium mb-2">
-          제목
-        </label>
+        <label className="block text-sm font-medium mb-2">제목</label>
         <input
           {...register('title')}
           className="w-full px-3 py-2 border rounded-md"
@@ -213,10 +218,11 @@ export const PostForm = () => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">
-          접근 권한
-        </label>
-        <select {...register('accessType')} className="w-full px-3 py-2 border rounded-md">
+        <label className="block text-sm font-medium mb-2">접근 권한</label>
+        <select
+          {...register('accessType')}
+          className="w-full px-3 py-2 border rounded-md"
+        >
           <option value="public">전체 공개</option>
           <option value="subscriber">구독자 전용</option>
           <option value="paid">유료</option>
@@ -226,9 +232,7 @@ export const PostForm = () => {
 
       {accessType === 'paid' && (
         <div>
-          <label className="block text-sm font-medium mb-2">
-            가격
-          </label>
+          <label className="block text-sm font-medium mb-2">가격</label>
           <input
             {...register('price', { valueAsNumber: true })}
             type="number"
@@ -276,11 +280,11 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    set => ({
       user: null,
       token: null,
-      setUser: (user) => set({ user }),
-      setToken: (token) => set({ token }),
+      setUser: user => set({ user }),
+      setToken: token => set({ token }),
       logout: () => set({ user: null, token: null }),
     }),
     {
@@ -316,7 +320,7 @@ interface PostsState {
 }
 
 export const usePostsStore = create<PostsState>()(
-  subscribeWithSelector((set) => ({
+  subscribeWithSelector(set => ({
     posts: [],
     filters: {},
     pagination: {
@@ -324,77 +328,103 @@ export const usePostsStore = create<PostsState>()(
       limit: 20,
       total: 0,
     },
-    setPosts: (posts) => set({ posts }),
-    addPost: (post) => set((state) => ({ 
-      posts: [post, ...state.posts] 
-    })),
-    updatePost: (id, updates) => set((state) => ({
-      posts: state.posts.map(post => 
-        post.id === id ? { ...post, ...updates } : post
-      ),
-    })),
-    setFilters: (filters) => set({ filters, pagination: { page: 1, limit: 20, total: 0 } }),
-    setPagination: (pagination) => set((state) => ({
-      pagination: { ...state.pagination, ...pagination },
-    })),
+    setPosts: posts => set({ posts }),
+    addPost: post =>
+      set(state => ({
+        posts: [post, ...state.posts],
+      })),
+    updatePost: (id, updates) =>
+      set(state => ({
+        posts: state.posts.map(post =>
+          post.id === id ? { ...post, ...updates } : post
+        ),
+      })),
+    setFilters: filters =>
+      set({ filters, pagination: { page: 1, limit: 20, total: 0 } }),
+    setPagination: pagination =>
+      set(state => ({
+        pagination: { ...state.pagination, ...pagination },
+      })),
   }))
 );
 
 // 선택자
 export const useFilteredPosts = () => {
-  return usePostsStore((state) => {
+  return usePostsStore(state => {
     const { posts, filters } = state;
     return posts.filter(post => {
       if (filters.category && post.category !== filters.category) return false;
-      if (filters.accessType && post.accessType !== filters.accessType) return false;
+      if (filters.accessType && post.accessType !== filters.accessType)
+        return false;
       return true;
     });
   });
 };
 ```
 
-## 라우팅
+## 라우팅 (TanStack Router)
 
-### 1. 라우터 설정
+### 1. 파일 기반 라우팅
+
+TanStack Router의 파일 기반 라우팅을 사용합니다:
+
+```
+src/routes/
+├── __root.tsx         # 루트 레이아웃
+├── index.tsx         # 홈 페이지 (/)
+├── posts/
+│   ├── index.tsx     # 포스트 목록 (/posts)
+│   └── $postId.tsx   # 포스트 상세 (/posts/:postId)
+└── editor/
+    ├── index.tsx     # 에디터 대시보드 (/editor)
+    └── new.tsx       # 새 포스트 작성 (/editor/new)
+```
+
+### 2. 라우터 설정
 
 ```tsx
-// src/router.tsx
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Layout } from '@/components/Layout';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
+// src/App.tsx
+import { createRouter, RouterProvider } from '@tanstack/react-router';
+import { routeTree } from './routeTree.gen';
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Layout />,
-    children: [
-      {
-        index: true,
-        lazy: () => import('./pages/Home'),
-      },
-      {
-        path: 'posts/:id',
-        lazy: () => import('./pages/PostDetail'),
-      },
-      {
-        path: 'editor',
-        element: <ProtectedRoute requiredRole="editor" />,
-        children: [
-          {
-            path: 'dashboard',
-            lazy: () => import('./pages/editor/Dashboard'),
-          },
-          {
-            path: 'posts/new',
-            lazy: () => import('./pages/editor/NewPost'),
-          },
-        ],
-      },
-    ],
-  },
-]);
+const router = createRouter({ routeTree });
 
-export const AppRouter = () => <RouterProvider router={router} />;
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
+}
+
+export function App() {
+  return <RouterProvider router={router} />;
+}
+```
+
+### 3. 라우트 정의
+
+```tsx
+// src/routes/index.tsx
+import { createFileRoute } from '@tanstack/react-router';
+import Layout from '../components/layout/Layout';
+import FeedCard from '../components/feed/FeedCard';
+
+export const Route = createFileRoute('/')({
+  component: HomePage,
+});
+
+function HomePage() {
+  return (
+    <Layout>
+      <FeedContainer>{/* 컴포넌트 내용 */}</FeedContainer>
+    </Layout>
+  );
+}
+
+// Styled Components
+const FeedContainer = tw.div`
+  min-h-screen
+  bg-white
+`;
 ```
 
 ### 2. 보호된 라우트
@@ -512,102 +542,100 @@ export const Posts = () => {
 };
 ```
 
-## Tailwind CSS 활용
+## Tailwind CSS & tw-styled-components
 
-### 1. 커스텀 컴포넌트
+### 1. tw-styled-components 사용법
 
 ```tsx
-// src/components/ui/Button.tsx
-import { ButtonHTMLAttributes, FC } from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/utils/cn';
+// src/components/ui/Card.tsx
+import tw from 'tailwind-styled-components';
 
-const buttonVariants = cva(
-  'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50',
-  {
-    variants: {
-      variant: {
-        default: 'bg-blue-600 text-white hover:bg-blue-700',
-        outline: 'border border-gray-300 bg-white hover:bg-gray-50',
-        ghost: 'hover:bg-gray-100',
-        danger: 'bg-red-600 text-white hover:bg-red-700',
-      },
-      size: {
-        sm: 'h-8 px-3',
-        md: 'h-10 px-4',
-        lg: 'h-12 px-6',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'md',
-    },
-  }
-);
+interface CardProps {
+  children: React.ReactNode;
+  title?: string;
+}
 
-interface ButtonProps 
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
-
-export const Button: FC<ButtonProps> = ({ 
-  className, 
-  variant, 
-  size, 
-  ...props 
-}) => {
+const Card = ({ children, title }: CardProps) => {
   return (
-    <button
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
+    <CardContainer>
+      {title && <CardTitle>{title}</CardTitle>}
+      <CardContent>{children}</CardContent>
+    </CardContainer>
   );
 };
+
+export default Card;
+
+// Styled Components
+const CardContainer = tw.div`
+  bg-white
+  rounded-lg
+  shadow-sm
+  hover:shadow-md
+  transition-shadow
+  p-6
+`;
+
+const CardTitle = tw.h3`
+  text-xl
+  font-semibold
+  mb-4
+  text-gray-900
+`;
+
+const CardContent = tw.div`
+  text-gray-700
+`;
 ```
 
-### 2. 반응형 디자인
+### 2. 모바일 우선 디자인
 
 ```tsx
-// src/components/PostGrid.tsx
-export const PostGrid = ({ posts }: { posts: Post[] }) => {
+// src/components/layout/Layout.tsx
+import tw from 'tailwind-styled-components';
+
+const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {posts.map(post => (
-        <PostCard key={post.id} post={post} />
-      ))}
-    </div>
+    <LayoutContainer>
+      <Header />
+      <MainContent>{children}</MainContent>
+    </LayoutContainer>
   );
 };
+
+// Styled Components
+const LayoutContainer = tw.div`
+  min-h-screen
+  bg-gray-50
+`;
+
+const MainContent = tw.main`
+  pt-14
+  md:max-w-md
+  md:mx-auto
+  min-h-screen
+  bg-white
+`;
 ```
 
-### 3. 다크 모드
+### 3. 코딩 컨벤션
+
+- **Styled Components 위치**: 파일 하단에 `// Styled Components` 주석과 함께 배치
+- **명명 규칙**: PascalCase 사용 (예: CardContainer, HeaderTitle)
+- **가독성**: 한 줄에 하나의 클래스씩 작성
 
 ```tsx
-// tailwind.config.js
-module.exports = {
-  darkMode: 'class',
-  // ...
-};
+// ❌ 나쁜 예
+const Button = tw.button`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700`;
 
-// src/hooks/useTheme.ts
-export const useTheme = () => {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [theme]);
-
-  return { theme, setTheme };
-};
-
-// 컴포넌트에서 사용
-<div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-  콘텐츠
-</div>
+// ✅ 좋은 예
+const Button = tw.button`
+  px-4
+  py-2
+  bg-blue-600
+  text-white
+  rounded-md
+  hover:bg-blue-700
 ```
 
 ## 성능 최적화
@@ -623,7 +651,7 @@ const HeavyComponent = lazy(() => import('./components/HeavyComponent'));
 
 <Suspense fallback={<Loading />}>
   <HeavyComponent />
-</Suspense>
+</Suspense>;
 ```
 
 ### 2. 메모이제이션
@@ -639,7 +667,7 @@ interface ListProps {
 
 export const ExpensiveList = memo<ListProps>(({ items, filter }) => {
   const filteredItems = useMemo(() => {
-    return items.filter(item => 
+    return items.filter(item =>
       item.name.toLowerCase().includes(filter.toLowerCase())
     );
   }, [items, filter]);
@@ -664,7 +692,11 @@ interface OptimizedImageProps {
   className?: string;
 }
 
-export const OptimizedImage = ({ src, alt, className }: OptimizedImageProps) => {
+export const OptimizedImage = ({
+  src,
+  alt,
+  className,
+}: OptimizedImageProps) => {
   return (
     <img
       src={src}
@@ -705,7 +737,7 @@ describe('PostCard', () => {
 
   it('renders post information', () => {
     render(<PostCard post={mockPost} />);
-    
+
     expect(screen.getByText('테스트 포스트')).toBeInTheDocument();
     expect(screen.getByText('작성자')).toBeInTheDocument();
     expect(screen.getByText('₩5,000')).toBeInTheDocument();
@@ -714,7 +746,7 @@ describe('PostCard', () => {
   it('calls onPurchase when button clicked', () => {
     const handlePurchase = jest.fn();
     render(<PostCard post={mockPost} onPurchase={handlePurchase} />);
-    
+
     fireEvent.click(screen.getByText('구매하기'));
     expect(handlePurchase).toHaveBeenCalledWith('1');
   });
@@ -731,9 +763,9 @@ import { useAuth } from '../useAuth';
 describe('useAuth', () => {
   it('loads user on mount', async () => {
     const { result } = renderHook(() => useAuth());
-    
+
     expect(result.current.isAuthenticated).toBe(false);
-    
+
     await waitFor(() => {
       expect(result.current.user).toBeDefined();
       expect(result.current.isAuthenticated).toBe(true);
@@ -798,21 +830,25 @@ export const env = config[import.meta.env.MODE] || config.development;
 ## 모범 사례
 
 ### 1. 컴포넌트 구조
+
 - 하나의 컴포넌트는 하나의 책임만
 - Props 타입 명시적 정의
 - 컴포넌트 파일과 동일한 이름의 export
 
 ### 2. 상태 관리
+
 - 로컬 상태는 useState 사용
 - 전역 상태는 Zustand 사용
 - 서버 상태는 React Query (tRPC) 사용
 
 ### 3. 스타일링
+
 - Tailwind 유틸리티 클래스 우선 사용
 - 복잡한 스타일은 컴포넌트로 추상화
 - 일관된 spacing과 color 사용
 
 ### 4. 성능
+
 - 불필요한 리렌더링 방지
 - 큰 리스트는 가상화 고려
 - 이미지와 폰트 최적화
