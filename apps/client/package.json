@@ -23,6 +23,7 @@
     ]
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.1.1",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-router": "^1.102.3",
@@ -40,6 +41,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@readly/api-types": "*",
     "@tanstack/router-devtools": "^1.125.3",
     "@tanstack/router-plugin": "^1.102.3",
     "@types/react": "^19.0.8",
@@ -47,7 +49,6 @@
     "@typescript-eslint/eslint-plugin": "^8.24.0",
     "@typescript-eslint/parser": "^8.24.0",
     "@vitejs/plugin-react": "^4.3.4",
-    "@readly/api-types": "*",
     "eslint": "^9.20.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-import": "^2.31.0",
