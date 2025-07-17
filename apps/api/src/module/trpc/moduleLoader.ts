@@ -21,7 +21,10 @@ export class ModuleLoader {
           routers.push(exportedClass);
         });
       } catch (error) {
-        console.warn(`Failed to load router from ${file}:`, error.message);
+        console.warn(
+          `Failed to load router from ${file}:`,
+          (error as any).message
+        );
       }
     }
 
