@@ -7,25 +7,30 @@ import { useAuthStore } from '../../stores/auth';
 // Token refresh function
 const refreshAccessToken = async (): Promise<string | null> => {
   try {
-    const response = await fetch('http://localhost:3000/trpc/user.refresh', {
-      method: 'POST',
-      credentials: 'include', // 쿠키 포함
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      'http://localhost:3000/trpc/user.refreshToken',
+      {
+        method: 'POST',
+        credentials: 'include', // 쿠키 포함
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
       },
-      body: JSON.stringify({}),
-    });
+    );
 
     if (!response.ok) {
       throw new Error('Token refresh failed');
     }
 
     const data = await response.json();
-    const newAccessToken = data.result?.data?.accessToken;
+    const result = data.result?.data;
+    const newAccessToken = result?.accessToken;
 
-    if (newAccessToken) {
-      // AuthStore에 새 토큰 저장
+    if (newAccessToken && result?.user) {
+      // AuthStore에 새 토큰과 사용자 정보 저장
       useAuthStore.getState().setAccessToken(newAccessToken);
+      useAuthStore.getState().setUser(result.user);
       return newAccessToken;
     }
 

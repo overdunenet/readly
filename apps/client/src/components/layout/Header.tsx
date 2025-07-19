@@ -2,17 +2,15 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import tw from 'tailwind-styled-components';
 
-import { useAuthStore } from '../../stores/auth';
+import { useAuth } from '../../hooks/useAuth';
 
 const Header = () => {
-  const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
     setShowUserMenu(false);
-    navigate({ to: '/' });
+    await logout();
   };
 
   return (

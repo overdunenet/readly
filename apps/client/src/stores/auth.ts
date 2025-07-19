@@ -11,7 +11,6 @@ interface User {
 interface AuthState {
   user: User | null;
   accessToken: string | null;
-  get isAuthenticated(): boolean;
   setUser: (user: User | null) => void;
   setAccessToken: (accessToken: string) => void;
   login: (data: { accessToken: string; user: User }) => void;
@@ -21,9 +20,6 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   accessToken: null,
-  get isAuthenticated() {
-    return !!get().user;
-  },
   setUser: (user) => set({ user }),
   setAccessToken: (accessToken) => set({ accessToken }),
   login: (data) =>

@@ -4,9 +4,9 @@ import { useAuthStore } from '../stores/auth';
 
 export const Route = createFileRoute('/_auth')({
   beforeLoad: async ({ location }) => {
-    const { isAuthenticated } = useAuthStore.getState();
+    const { user } = useAuthStore.getState();
 
-    if (!isAuthenticated) {
+    if (!user) {
       throw redirect({
         to: '/login',
         search: {

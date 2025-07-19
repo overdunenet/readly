@@ -10,12 +10,12 @@ export const useAuth = () => {
   const {
     user,
     accessToken,
-    isAuthenticated,
     login: storeLogin,
     logout: storeLogout,
+    setUser,
   } = useAuthStore();
 
-  // 사용자 정보 조회
+  // 사용자 정보 조회 (accessToken이 있지만 user 정보가 없는 경우)
   const { data: userData, isLoading } = trpc.user.me.useQuery(undefined, {
     enabled: !!accessToken && !user,
     retry: false,
@@ -29,9 +29,9 @@ export const useAuth = () => {
 
   useEffect(() => {
     if (userData && !user) {
-      useAuthStore.getState().setUser(userData);
+      setUser(userData);
     }
-  }, [userData, user]);
+  }, [userData, user, setUser]);
 
   const handleLogin = async (email: string, password: string) => {
     const response = await loginMutation.mutateAsync({ email, password });
@@ -59,7 +59,7 @@ export const useAuth = () => {
 
   return {
     user,
-    isAuthenticated,
+    isAuthenticated: !!user,
     isLoading,
     login: handleLogin,
     logout: handleLogout,
