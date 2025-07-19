@@ -34,7 +34,6 @@ const registerResponseSchema = z.object({
 
 const loginResponseSchema = z.object({
   accessToken: z.string(),
-  refreshToken: z.string(),
   user: z.object({
     id: z.string(),
     email: z.string().email(),
@@ -81,30 +80,63 @@ export class UserRouter extends BaseTrpcRouter {
   })
   async login(
     @Input('email') email: string,
-    @Input('password') password: string
+    @Input('password') password: string,
+    @Ctx() ctx: any
   ) {
     const result = await this.microserviceClient.send('user.login', {
       email,
       password,
     });
-    return result;
+
+    // Set refreshToken as httpOnly cookie
+    this.cookieService.setRefreshTokenCookie(ctx.res, result.refreshToken);
+
+    // Return response without refreshToken
+    return {
+      accessToken: result.accessToken,
+      user: result.user,
+    };
   }
 
   /**
    * 리프레시 토큰을 사용하여 액세스 토큰 갱신
    */
   @Mutation({
-    input: z.object({
-      refreshToken: z.string(),
-    }),
+    input: z.object({}),
     output: loginResponseSchema,
   })
-  async refreshToken(@Input('refreshToken') refreshToken: string) {
+  async refreshToken(@Ctx() ctx: any) {
+    const refreshToken = this.cookieService.getRefreshTokenFromCookie(ctx.req);
+    if (!refreshToken) {
+      throw new Error('Refresh token not found');
+    }
+
     const result = await this.microserviceClient.send(
       'user.refreshToken',
       refreshToken
     );
-    return result;
+
+    // Set new refreshToken as httpOnly cookie
+    this.cookieService.setRefreshTokenCookie(ctx.res, result.refreshToken);
+
+    // Return response without refreshToken
+    return {
+      accessToken: result.accessToken,
+      user: result.user,
+    };
+  }
+
+  /**
+   * 로그아웃 (쿠키 삭제)
+   */
+  @Mutation({
+    input: z.object({}),
+    output: z.boolean(),
+  })
+  async logout(@Ctx() ctx: any) {
+    // Clear refreshToken cookie
+    this.cookieService.clearRefreshTokenCookie(ctx.res);
+    return true;
   }
 
   /**
