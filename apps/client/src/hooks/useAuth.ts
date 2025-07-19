@@ -24,6 +24,9 @@ export const useAuth = () => {
   // 로그인 mutation
   const loginMutation = trpc.user.login.useMutation();
 
+  // 로그아웃 mutation
+  const logoutMutation = trpc.user.logout.useMutation();
+
   useEffect(() => {
     if (userData && !user) {
       useAuthStore.getState().setUser(userData);
@@ -43,9 +46,15 @@ export const useAuth = () => {
     return response;
   };
 
-  const handleLogout = () => {
-    storeLogout();
-    navigate({ to: '/' });
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync({});
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      storeLogout();
+      navigate({ to: '/' });
+    }
   };
 
   return {
