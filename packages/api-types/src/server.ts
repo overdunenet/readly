@@ -320,7 +320,6 @@ const appRouter = t.router({
       .output(
         z.object({
           accessToken: z.string(),
-          refreshToken: z.string(),
           user: z.object({
             id: z.string(),
             email: z.string().email(),
@@ -331,15 +330,10 @@ const appRouter = t.router({
       )
       .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
     refreshToken: publicProcedure
-      .input(
-        z.object({
-          refreshToken: z.string(),
-        })
-      )
+      .input(z.object({}))
       .output(
         z.object({
           accessToken: z.string(),
-          refreshToken: z.string(),
           user: z.object({
             id: z.string(),
             email: z.string().email(),
@@ -348,6 +342,10 @@ const appRouter = t.router({
           }),
         })
       )
+      .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
+    logout: publicProcedure
+      .input(z.object({}))
+      .output(z.boolean())
       .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
     me: publicProcedure
       .output(

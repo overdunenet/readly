@@ -4,12 +4,13 @@ import { MicroserviceClient } from '@src/module/trpc/microserviceClient';
 import { AutoRouterModule } from '@src/module/trpc/routerModule';
 import { TRPCAppContext } from '@src/module/trpc/trpcAppContext';
 import { AppController } from '@src/app.controller';
+import { CookieService } from '@src/module/trpc/services/cookie.service';
 
 @Global()
 @Module({
   controllers: [AppController],
-  providers: [MicroserviceClient],
-  exports: [MicroserviceClient],
+  providers: [MicroserviceClient, CookieService],
+  exports: [MicroserviceClient, CookieService],
 })
 class TrpcModuleExport {}
 
