@@ -6,6 +6,7 @@ import App from './App.tsx';
 import { TRPCProvider } from '@/shared';
 
 import './index.css';
+import 'react-quill-new/dist/quill.snow.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

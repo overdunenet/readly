@@ -34,6 +34,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.57.0",
+    "react-quill-new": "^3.4.6",
     "tailwind-styled-components": "^2.2.0",
     "tailwindcss": "^4.0.6",
     "zod": "^3.24.2",

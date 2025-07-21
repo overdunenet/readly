@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import ReactQuill from 'react-quill-new';
 import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
@@ -10,42 +11,6 @@ import { trpc } from '../../../../shared/trpc';
 export const Route = createFileRoute('/_auth/editor/posts/create')({
   component: CreatePostPage,
 });
-
-// Form validation schema
-const createPostSchema = z.object({
-  title: z
-    .string()
-    .min(1, '제목을 입력해주세요')
-    .max(200, '제목은 200자 이하로 입력해주세요'),
-  content: z.string().min(1, '내용을 입력해주세요'),
-  excerpt: z.string().max(500, '요약은 500자 이하로 입력해주세요').optional(),
-  thumbnail: z
-    .string()
-    .url('올바른 URL을 입력해주세요')
-    .optional()
-    .or(z.literal('')),
-  accessLevel: z.enum(['public', 'subscriber', 'purchaser', 'private'], {
-    required_error: '접근 권한을 선택해주세요',
-  }),
-  price: z.number().min(0, '가격은 0원 이상이어야 합니다').optional(),
-});
-
-type CreatePostForm = z.infer<typeof createPostSchema>;
-
-const accessLevelOptions = [
-  { value: 'public', label: '전체 공개', description: '누구나 볼 수 있습니다' },
-  {
-    value: 'subscriber',
-    label: '구독자 전용',
-    description: '구독자만 볼 수 있습니다',
-  },
-  {
-    value: 'purchaser',
-    label: '구매자 전용',
-    description: '개별 구매한 사람만 볼 수 있습니다',
-  },
-  { value: 'private', label: '비공개', description: '작성자만 볼 수 있습니다' },
-] as const;
 
 function CreatePostPage() {
   const navigate = useNavigate();
@@ -86,8 +51,6 @@ function CreatePostPage() {
     defaultValues: {
       title: '',
       content: '',
-      excerpt: '',
-      thumbnail: '',
       accessLevel: 'public',
       price: 0,
     },
@@ -107,8 +70,6 @@ function CreatePostPage() {
       // Create post
       const post = await createPostMutation.mutateAsync({
         ...data,
-        thumbnail: data.thumbnail || undefined,
-        excerpt: data.excerpt || undefined,
         price: data.accessLevel === 'purchaser' ? data.price : undefined,
       });
 
@@ -199,55 +160,20 @@ function CreatePostPage() {
               name="content"
               control={control}
               render={({ field }) => (
-                <ContentTextarea
-                  {...field}
-                  placeholder="포스트 내용을 작성하세요"
-                  rows={15}
-                  hasError={!!errors.content}
-                />
+                <EditorWrapper hasError={!!errors.content}>
+                  <ReactQuill
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="포스트 내용을 작성하세요"
+                    modules={quillModules}
+                    formats={quillFormats}
+                    theme="snow"
+                  />
+                </EditorWrapper>
               )}
             />
             {errors.content && (
               <ErrorMessage>{errors.content.message}</ErrorMessage>
-            )}
-          </FormField>
-
-          <FormField>
-            <Label>요약</Label>
-            <Controller
-              name="excerpt"
-              control={control}
-              render={({ field }) => (
-                <ExcerptTextarea
-                  {...field}
-                  placeholder="포스트 요약을 입력하세요 (선택사항)"
-                  rows={3}
-                  hasError={!!errors.excerpt}
-                />
-              )}
-            />
-            {errors.excerpt && (
-              <ErrorMessage>{errors.excerpt.message}</ErrorMessage>
-            )}
-            <FieldHint>최대 500자까지 입력 가능합니다</FieldHint>
-          </FormField>
-
-          <FormField>
-            <Label>썸네일 이미지</Label>
-            <Controller
-              name="thumbnail"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="url"
-                  placeholder="https://example.com/image.jpg"
-                  hasError={!!errors.thumbnail}
-                />
-              )}
-            />
-            {errors.thumbnail && (
-              <ErrorMessage>{errors.thumbnail.message}</ErrorMessage>
             )}
           </FormField>
         </FormSection>
@@ -304,7 +230,9 @@ function CreatePostPage() {
                       min="0"
                       step="1000"
                       placeholder="0"
-                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        field.onChange(Number(e.target.value))
+                      }
                       hasError={!!errors.price}
                     />
                     <PriceUnit>원</PriceUnit>
@@ -322,6 +250,62 @@ function CreatePostPage() {
     </Container>
   );
 }
+
+// Form validation schema
+const createPostSchema = z.object({
+  title: z
+    .string()
+    .min(1, '제목을 입력해주세요')
+    .max(200, '제목은 200자 이하로 입력해주세요'),
+  content: z.string().min(1, '내용을 입력해주세요'),
+  accessLevel: z.enum(['public', 'subscriber', 'purchaser', 'private'], {
+    required_error: '접근 권한을 선택해주세요',
+  }),
+  price: z.number().min(0, '가격은 0원 이상이어야 합니다').optional(),
+});
+
+type CreatePostForm = z.infer<typeof createPostSchema>;
+
+// ReactQuill configuration
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    ['blockquote', 'code-block'],
+    ['link', 'image'],
+    ['clean'],
+  ],
+};
+
+const quillFormats = [
+  'header',
+  'bold',
+  'italic',
+  'underline',
+  'strike',
+  'list',
+  'bullet',
+  'blockquote',
+  'code-block',
+  'link',
+  'image',
+];
+
+const accessLevelOptions = [
+  { value: 'public', label: '전체 공개', description: '누구나 볼 수 있습니다' },
+  {
+    value: 'subscriber',
+    label: '구독자 전용',
+    description: '구독자만 볼 수 있습니다',
+  },
+  {
+    value: 'purchaser',
+    label: '구매자 전용',
+    description: '개별 구매한 사람만 볼 수 있습니다',
+  },
+  { value: 'private', label: '비공개', description: '작성자만 볼 수 있습니다' },
+] as const;
 
 // Styled Components
 const Container = tw.div`
@@ -448,34 +432,10 @@ const TitleInput = tw(Input)`
   font-medium
 `;
 
-const ContentTextarea = tw.textarea<{ hasError?: boolean }>`
-  w-full
-  px-3
-  py-2
-  border
-  ${(p) => (p.hasError ? 'border-red-300' : 'border-gray-300')}
+const EditorWrapper = tw.div<{ hasError?: boolean }>`
+  ${(p) => (p.hasError ? 'border border-red-300' : 'border border-gray-300')}
   rounded-lg
-  focus:outline-none
-  focus:ring-2
-  focus:ring-blue-500
-  focus:border-transparent
-  resize-vertical
-  font-mono
-  text-sm
-`;
-
-const ExcerptTextarea = tw.textarea<{ hasError?: boolean }>`
-  w-full
-  px-3
-  py-2
-  border
-  ${(p) => (p.hasError ? 'border-red-300' : 'border-gray-300')}
-  rounded-lg
-  focus:outline-none
-  focus:ring-2
-  focus:ring-blue-500
-  focus:border-transparent
-  resize-vertical
+  overflow-hidden
 `;
 
 const AccessLevelGrid = tw.div`
