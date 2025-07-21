@@ -70,14 +70,69 @@ yarn dev
 
 ### 프론트엔드 페이지 추가
 
-1. 해당 앱의 `src/pages`에 컴포넌트 생성
-2. 라우터에 경로 등록
+1. `src/routes/` 디렉토리에 파일 기반 라우팅으로 페이지 생성
+2. `createFileRoute` 함수로 라우트 정의
 3. 필요한 API 호출은 tRPC 클라이언트 사용
+
+```typescript
+// 예시: src/routes/_auth/editor/posts/create.tsx
+import { createFileRoute } from '@tanstack/react-router';
+import { trpc } from '../../../../shared/trpc';
+
+export const Route = createFileRoute('/_auth/editor/posts/create')({
+  component: CreatePostPage,
+});
+
+function CreatePostPage() {
+  const createPostMutation = trpc.post.create.useMutation();
+  // ...
+}
+```
 
 ### 인증 처리
 
-- Client/Editor: JWT 기반 사용자 인증
-- Backoffice: 별도 관리자 인증
+- **Client/Editor**: JWT 기반 사용자 인증 + 쿠키 기반 refreshToken
+- **Backoffice**: 별도 관리자 인증
+
+#### 쿠키 기반 인증 패턴
+
+```typescript
+// CookieService를 통한 중앙 집중식 쿠키 관리
+@Injectable()
+export class CookieService {
+  setRefreshTokenCookie(res: Response, refreshToken: string): void {
+    this.setCookie(res, 'refreshToken', refreshToken, {
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+    });
+  }
+}
+
+// Router에서 사용
+async login(@Input('email') email: string, @Ctx() ctx: any) {
+  const result = await this.microserviceClient.send('user.login', { email, password });
+
+  // refreshToken은 쿠키로 설정
+  this.cookieService.setRefreshTokenCookie(ctx.res, result.refreshToken);
+
+  // accessToken만 응답으로 반환
+  return {
+    accessToken: result.accessToken,
+    user: result.user,
+  };
+}
+```
+
+#### 프론트엔드 인증 초기화
+
+```typescript
+// beforeLoad에서 자동 인증 체크
+beforeLoad: async () => {
+  const { user } = useAuthStore.getState();
+  if (user) return;
+
+  await refreshAuth(); // refreshToken 쿠키로 자동 로그인 시도
+},
+```
 
 ### Repository 패턴 (중요)
 
@@ -397,12 +452,93 @@ const Container = tw.div`
 - **파일 기반 라우팅**: `src/routes/` 디렉토리 구조
 - **레이아웃 컴포넌트**: 공통 레이아웃은 별도 컴포넌트로 분리
 - **라우트 정의**: createFileRoute 사용
+- **인증 라우트**: `_auth` prefix로 인증이 필요한 페이지 그룹화
+
+```typescript
+// 레이아웃 라우트 예시: src/routes/_auth/editor.tsx
+export const Route = createFileRoute('/_auth/editor')({
+  component: EditorLayout,
+});
+
+function EditorLayout() {
+  return (
+    <>
+      <EditorHeader />
+      <Container>
+        <EditorLeftMenu />
+        <MainContent>
+          <Outlet />
+        </MainContent>
+      </Container>
+    </>
+  );
+}
+
+// 자식 라우트: src/routes/_auth/editor/posts/create.tsx
+export const Route = createFileRoute('/_auth/editor/posts/create')({
+  component: CreatePostPage,
+});
+```
+
+### 폼 검증 (React Hook Form + Zod)
+
+**모든 폼은 React Hook Form과 Zod를 사용한 타입 안전한 검증을 적용합니다.**
+
+```typescript
+// 1. Zod 스키마 정의
+const createPostSchema = z.object({
+  title: z.string().min(1, '제목을 입력해주세요').max(200, '제목은 200자 이하로 입력해주세요'),
+  content: z.string().min(1, '내용을 입력해주세요'),
+  accessLevel: z.enum(['public', 'subscriber', 'purchaser', 'private']),
+  price: z.number().min(0, '가격은 0원 이상이어야 합니다').optional(),
+});
+
+type CreatePostForm = z.infer<typeof createPostSchema>;
+
+// 2. useForm 설정
+const {
+  control,
+  handleSubmit,
+  watch,
+  formState: { errors, isValid },
+} = useForm<CreatePostForm>({
+  resolver: zodResolver(createPostSchema),
+  defaultValues: {
+    title: '',
+    content: '',
+    accessLevel: 'public',
+    price: 0,
+  },
+  mode: 'onChange', // 실시간 검증
+});
+
+// 3. Controller로 필드 래핑
+<Controller
+  name="title"
+  control={control}
+  render={({ field }) => (
+    <TitleInput
+      {...field}
+      placeholder="포스트 제목을 입력하세요"
+      hasError={!!errors.title}
+    />
+  )}
+/>
+{errors.title && <ErrorMessage>{errors.title.message}</ErrorMessage>}
+
+// 4. 조건부 필드
+const watchedAccessLevel = watch('accessLevel');
+{watchedAccessLevel === 'purchaser' && (
+  <PriceField />
+)}
+```
 
 ### API
 
 - RESTful 원칙 준수
 - 에러 처리 표준화
 - 입력 검증 필수
+- tRPC를 통한 타입 안전한 API 호출
 
 ## 폴더 구조
 
