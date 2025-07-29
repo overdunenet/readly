@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { SnappyModalProvider } from 'react-snappy-modal';
 
 import App from './App.tsx';
 
@@ -11,7 +12,9 @@ import 'react-quill-new/dist/quill.snow.css';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <TRPCProvider>
-      <App />
+      <SnappyModalProvider>
+        <App />
+      </SnappyModalProvider>
     </TRPCProvider>
   </StrictMode>,
 );
