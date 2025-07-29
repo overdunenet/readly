@@ -1,16 +1,18 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import tw from 'tailwind-styled-components';
 
-export const Route = createFileRoute('/_auth/editor/posts')({
+export const Route = createFileRoute('/_auth/editor/posts/')({
   component: PostsPage,
 });
 
 function PostsPage() {
+  const navigate = useNavigate();
+
   return (
     <Container>
       <Header>
         <Title>포스트 관리</Title>
-        <CreateButton>
+        <CreateButton onClick={() => navigate({ to: '/editor/posts/create' })}>
           <svg
             width="20"
             height="20"

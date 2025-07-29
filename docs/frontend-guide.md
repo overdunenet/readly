@@ -162,136 +162,301 @@ export const useAuth = () => {
 };
 ```
 
-### 3. 폼 처리
+### 3. 폼 처리 (React Hook Form + Zod)
+
+React Hook Form과 Zod를 사용한 타입 안전한 폼 구현:
 
 ```tsx
-// src/components/PostForm.tsx
-import { useForm } from 'react-hook-form';
+// src/routes/_auth/editor/posts/create.tsx
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { api } from '@/api';
+import tw from 'tailwind-styled-components';
+import { trpc } from '../../../../shared/trpc';
 
-const postSchema = z.object({
-  title: z.string().min(1, '제목을 입력해주세요').max(200),
+// Zod 스키마 정의
+const createPostSchema = z.object({
+  title: z
+    .string()
+    .min(1, '제목을 입력해주세요')
+    .max(200, '제목은 200자 이하로 입력해주세요'),
   content: z.string().min(1, '내용을 입력해주세요'),
-  category: z.string().min(1, '카테고리를 선택해주세요'),
-  accessType: z.enum(['public', 'subscriber', 'paid', 'private']),
-  price: z.number().min(0).optional(),
+  excerpt: z.string().max(500, '요약은 500자 이하로 입력해주세요').optional(),
+  accessLevel: z.enum(['public', 'subscriber', 'purchaser', 'private']),
+  price: z.number().min(0, '가격은 0원 이상이어야 합니다').optional(),
 });
 
-type PostFormData = z.infer<typeof postSchema>;
+type CreatePostForm = z.infer<typeof createPostSchema>;
 
 export const PostForm = () => {
   const {
-    register,
+    control,
     handleSubmit,
     watch,
-    formState: { errors },
-  } = useForm<PostFormData>({
-    resolver: zodResolver(postSchema),
+    formState: { errors, isValid },
+  } = useForm<CreatePostForm>({
+    resolver: zodResolver(createPostSchema),
+    defaultValues: {
+      title: '',
+      content: '',
+      accessLevel: 'public',
+      price: 0,
+    },
+    mode: 'onChange', // 실시간 검증
   });
 
-  const accessType = watch('accessType');
-  const createPost = api.posts.create.useMutation();
+  const watchedAccessLevel = watch('accessLevel');
+  const createPostMutation = trpc.post.create.useMutation();
 
-  const onSubmit = async (data: PostFormData) => {
+  const onSubmit = async (data: CreatePostForm) => {
     try {
-      await createPost.mutateAsync(data);
-      // 성공 처리
+      await createPostMutation.mutateAsync({
+        ...data,
+        price: data.accessLevel === 'purchaser' ? data.price : undefined,
+      });
     } catch (error) {
-      // 에러 처리
+      console.error('Post creation failed:', error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium mb-2">제목</label>
-        <input
-          {...register('title')}
-          className="w-full px-3 py-2 border rounded-md"
-          placeholder="포스트 제목을 입력하세요"
-        />
-        {errors.title && (
-          <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-2">접근 권한</label>
-        <select
-          {...register('accessType')}
-          className="w-full px-3 py-2 border rounded-md"
-        >
-          <option value="public">전체 공개</option>
-          <option value="subscriber">구독자 전용</option>
-          <option value="paid">유료</option>
-          <option value="private">비공개</option>
-        </select>
-      </div>
-
-      {accessType === 'paid' && (
-        <div>
-          <label className="block text-sm font-medium mb-2">가격</label>
-          <input
-            {...register('price', { valueAsNumber: true })}
-            type="number"
-            className="w-full px-3 py-2 border rounded-md"
-            placeholder="0"
+    <Form>
+      <FormSection>
+        <FormField>
+          <Label>제목 *</Label>
+          <Controller
+            name="title"
+            control={control}
+            render={({ field }) => (
+              <TitleInput
+                {...field}
+                placeholder="포스트 제목을 입력하세요"
+                hasError={!!errors.title}
+              />
+            )}
           />
-        </div>
-      )}
+          {errors.title && <ErrorMessage>{errors.title.message}</ErrorMessage>}
+        </FormField>
 
-      <button
-        type="submit"
-        disabled={createPost.isLoading}
-        className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-      >
-        {createPost.isLoading ? '저장 중...' : '포스트 발행'}
-      </button>
-    </form>
+        {/* 접근 권한 라디오 버튼 */}
+        <FormField>
+          <Label>접근 권한 *</Label>
+          <Controller
+            name="accessLevel"
+            control={control}
+            render={({ field }) => (
+              <AccessLevelGrid>
+                {accessLevelOptions.map(option => (
+                  <AccessLevelOption key={option.value}>
+                    <AccessLevelRadio
+                      {...field}
+                      type="radio"
+                      value={option.value}
+                      id={option.value}
+                      checked={field.value === option.value}
+                    />
+                    <AccessLevelLabel
+                      htmlFor={option.value}
+                      isSelected={field.value === option.value}
+                    >
+                      <AccessLevelTitle>{option.label}</AccessLevelTitle>
+                      <AccessLevelDescription>
+                        {option.description}
+                      </AccessLevelDescription>
+                    </AccessLevelLabel>
+                  </AccessLevelOption>
+                ))}
+              </AccessLevelGrid>
+            )}
+          />
+        </FormField>
+
+        {/* 조건부 가격 필드 */}
+        {watchedAccessLevel === 'purchaser' && (
+          <FormField>
+            <Label>판매 가격 *</Label>
+            <Controller
+              name="price"
+              control={control}
+              render={({ field }) => (
+                <PriceInputWrapper>
+                  <PriceInput
+                    {...field}
+                    type="number"
+                    onChange={e => field.onChange(Number(e.target.value))}
+                    hasError={!!errors.price}
+                  />
+                  <PriceUnit>원</PriceUnit>
+                </PriceInputWrapper>
+              )}
+            />
+          </FormField>
+        )}
+      </FormSection>
+
+      <ActionButtons>
+        <SaveButton
+          onClick={() => handleSubmit(onSubmit)()}
+          disabled={!isValid}
+          type="button"
+        >
+          임시저장
+        </SaveButton>
+        <PublishButton
+          onClick={() => handleSubmit(onSubmit)()}
+          disabled={!isValid}
+          type="button"
+        >
+          발행
+        </PublishButton>
+      </ActionButtons>
+    </Form>
   );
 };
+
+// Styled Components
+const Form = tw.div`
+  space-y-8
+`;
+
+const FormSection = tw.div`
+  bg-white
+  rounded-lg
+  border
+  border-gray-200
+  p-6
+  space-y-6
+`;
+
+const FormField = tw.div`
+  space-y-2
+`;
+
+const Label = tw.label`
+  block
+  text-sm
+  font-medium
+  text-gray-700
+`;
+
+const TitleInput = tw.input<{ hasError?: boolean }>`
+  w-full
+  px-3
+  py-2
+  border
+  ${p => (p.hasError ? 'border-red-300' : 'border-gray-300')}
+  rounded-lg
+  focus:outline-none
+  focus:ring-2
+  focus:ring-blue-500
+  focus:border-transparent
+  text-lg
+  font-medium
+`;
+
+const AccessLevelGrid = tw.div`
+  grid
+  grid-cols-1
+  md:grid-cols-2
+  gap-4
+`;
+
+const AccessLevelOption = tw.div`
+  relative
+`;
+
+const AccessLevelRadio = tw.input`
+  sr-only
+`;
+
+const AccessLevelLabel = tw.label<{ isSelected: boolean }>`
+  block
+  p-4
+  border
+  ${p => (p.isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200')}
+  rounded-lg
+  cursor-pointer
+  transition-colors
+`;
+
+const ErrorMessage = tw.p`
+  text-sm
+  text-red-600
+`;
 ```
 
 ## 상태 관리 (Zustand)
 
-### 1. Store 정의
+### 1. Store 정의 (쿠키 기반 인증)
 
 ```tsx
 // src/stores/auth.ts
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 interface User {
   id: string;
   email: string;
-  name: string;
-  role: 'user' | 'editor' | 'admin';
+  nickname: string;
+  profileImage: string | null;
 }
 
 interface AuthState {
   user: User | null;
-  token: string | null;
-  setUser: (user: User) => void;
-  setToken: (token: string) => void;
+  accessToken: string | null;
+  setUser: (user: User | null) => void;
+  setAccessToken: (token: string | null) => void;
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    set => ({
-      user: null,
-      token: null,
-      setUser: user => set({ user }),
-      setToken: token => set({ token }),
-      logout: () => set({ user: null, token: null }),
-    }),
-    {
-      name: 'auth-storage',
+// persist 제거 - accessToken은 메모리에만 저장, refreshToken은 쿠키에 저장
+export const useAuthStore = create<AuthState>((set, get) => ({
+  user: null,
+  accessToken: null,
+
+  setUser: user => set({ user }),
+  setAccessToken: accessToken => set({ accessToken }),
+
+  logout: () => {
+    set({ user: null, accessToken: null });
+    // 로그아웃 API 호출로 쿠키 제거
+    fetch('/trpc/user.logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
+  },
+
+  // computed value로 인증 상태 확인
+  get isAuthenticated() {
+    return !!get().user;
+  },
+}));
+
+// 인증 관련 유틸리티 함수
+export const refreshAuth = async (): Promise<boolean> => {
+  try {
+    const response = await fetch('/trpc/user.refreshToken', {
+      method: 'POST',
+      credentials: 'include', // 쿠키 포함
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+
+    if (!response.ok) return false;
+
+    const data = await response.json();
+    const result = data.result?.data;
+
+    if (result?.accessToken && result?.user) {
+      useAuthStore.getState().setAccessToken(result.accessToken);
+      useAuthStore.getState().setUser(result.user);
+      return true;
     }
-  )
-);
+
+    return false;
+  } catch {
+    return false;
+  }
+};
 ```
 
 ### 2. 복잡한 상태 관리
@@ -370,15 +535,27 @@ TanStack Router의 파일 기반 라우팅을 사용합니다:
 
 ```
 src/routes/
-├── __root.tsx         # 루트 레이아웃
-├── index.tsx         # 홈 페이지 (/)
-├── posts/
-│   ├── index.tsx     # 포스트 목록 (/posts)
-│   └── $postId.tsx   # 포스트 상세 (/posts/:postId)
-└── editor/
-    ├── index.tsx     # 에디터 대시보드 (/editor)
-    └── new.tsx       # 새 포스트 작성 (/editor/new)
+├── __root.tsx              # 루트 레이아웃
+├── index.tsx              # 홈 페이지 (/)
+├── login.tsx              # 로그인 페이지 (/login)
+├── register.tsx           # 회원가입 페이지 (/register)
+└── _auth/                 # 인증이 필요한 라우트 그룹
+    ├── editor.tsx         # 에디터 레이아웃 (/editor)
+    └── editor/
+        ├── index.tsx      # 대시보드 (/editor)
+        ├── posts.tsx      # 포스트 관리 (/editor/posts)
+        ├── posts/
+        │   └── create.tsx # 포스트 작성 (/editor/posts/create)
+        ├── analytics.tsx  # 분석 (/editor/analytics)
+        ├── revenue.tsx    # 수익 관리 (/editor/revenue)
+        └── settings.tsx   # 설정 (/editor/settings)
 ```
+
+#### 인증 라우트 패턴
+
+- `_auth` prefix: 인증이 필요한 라우트 그룹
+- beforeLoad hook에서 자동 인증 체크
+- 레이아웃 라우트로 공통 UI 구성
 
 ### 2. 라우터 설정
 
@@ -400,30 +577,91 @@ export function App() {
 }
 ```
 
-### 3. 라우트 정의
+### 3. 라우트 정의 및 인증 처리
 
 ```tsx
-// src/routes/index.tsx
-import { createFileRoute } from '@tanstack/react-router';
-import Layout from '../components/layout/Layout';
-import FeedCard from '../components/feed/FeedCard';
+// src/routes/__root.tsx - 루트 레이아웃
+import { createRootRoute, Outlet } from '@tanstack/react-router';
+import { refreshAuth } from '../utils/auth';
+import { useAuthStore } from '../stores/auth';
 
-export const Route = createFileRoute('/')({
-  component: HomePage,
+export const Route = createRootRoute({
+  // 전역 beforeLoad에서 인증 체크
+  beforeLoad: async () => {
+    const { user } = useAuthStore.getState();
+    if (user) return;
+
+    await refreshAuth(); // refreshToken 쿠키로 자동 로그인 시도
+  },
+  component: RootComponent,
 });
 
-function HomePage() {
+function RootComponent() {
+  return <Outlet />;
+}
+
+// src/routes/_auth/editor.tsx - 레이아웃 라우트
+import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { useState } from 'react';
+import tw from 'tailwind-styled-components';
+import EditorHeader from '../../components/editor/EditorHeader';
+import EditorLeftMenu from '../../components/editor/EditorLeftMenu';
+
+export const Route = createFileRoute('/_auth/editor')({
+  component: EditorLayout,
+});
+
+function EditorLayout() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
-    <Layout>
-      <FeedContainer>{/* 컴포넌트 내용 */}</FeedContainer>
-    </Layout>
+    <>
+      <EditorHeader />
+      <Container>
+        <EditorLeftMenu
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+        />
+        <MainContent>
+          <Outlet />
+        </MainContent>
+      </Container>
+    </>
   );
 }
 
 // Styled Components
-const FeedContainer = tw.div`
+const Container = tw.div`
+  flex
   min-h-screen
-  bg-white
+  bg-gray-50
+  pt-14
+`;
+
+const MainContent = tw.main`
+  flex-1
+  lg:ml-auto
+  min-h-[calc(100vh-3.5rem)]
+`;
+
+// src/routes/_auth/editor/posts/create.tsx - 자식 라우트
+import { createFileRoute } from '@tanstack/react-router';
+import tw from 'tailwind-styled-components';
+
+export const Route = createFileRoute('/_auth/editor/posts/create')({
+  component: CreatePostPage,
+});
+
+function CreatePostPage() {
+  return <Container>{/* 포스트 생성 폼 */}</Container>;
+}
+
+// Styled Components
+const Container = tw.div`
+  max-w-4xl
+  mx-auto
+  p-6
+  lg:p-8
 `;
 ```
 

@@ -34,47 +34,154 @@ apps/api/
 
 ## tRPC 라우터 개발
 
-### 1. 기본 라우터 생성
+### 1. 포스트 관리 API
+
+Readly의 핵심 기능인 포스트 관리 API 구현:
 
 ```typescript
-// src/server/routers/posts.router.ts
-import { z } from 'zod';
-import { router, publicProcedure, protectedProcedure } from '../trpc';
+// packages/api-types/src/server.ts (자동 생성된 타입 정의)
+const appRouter = t.router({
+  post: t.router({
+    // 포스트 생성
+    create: publicProcedure
+      .input(
+        z
+          .object({
+            title: z.string().min(1).max(200).required(),
+            content: z.string().min(1).required(),
+            excerpt: z.string().max(500).optional(),
+            thumbnail: z.string().url().optional(),
+            accessLevel: z
+              .enum(['public', 'subscriber', 'purchaser', 'private'])
+              .optional(),
+            price: z.number().int().min(0).optional(),
+          })
+          .required({ title: true, content: true })
+      )
+      .output(
+        z.object({
+          id: z.string(),
+          title: z.string(),
+          content: z.string(),
+          excerpt: z.string().nullable(),
+          thumbnail: z.string().nullable(),
+          accessLevel: z.enum(['public', 'subscriber', 'purchaser', 'private']),
+          status: z.enum(['draft', 'published', 'scheduled']),
+          price: z.number(),
+          publishedAt: z.date().nullable(),
+          scheduledAt: z.date().nullable(),
+          createdAt: z.date(),
+          updatedAt: z.date(),
+          author: z.object({
+            id: z.string(),
+            nickname: z.string(),
+            profileImage: z.string().nullable(),
+          }),
+        })
+      )
+      .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
 
-export const postsRouter = router({
-  // 공개 엔드포인트
-  list: publicProcedure
-    .input(z.object({
-      page: z.number().min(1).default(1),
-      limit: z.number().min(1).max(100).default(20),
-      category: z.string().optional(),
-    }))
-    .query(async ({ input, ctx }) => {
-      const { page, limit, category } = input;
-      
-      return ctx.postService.findAll({
-        page,
-        limit,
-        category,
+    // 포스트 발행
+    publish: publicProcedure
+      .input(z.object({ postId: z.string() }))
+      .output(/* Post 객체 */),
+
+    // 포스트 수정
+    update: publicProcedure.input(
+      z.object({
+        postId: z.string(),
+        data: z.object({
+          title: z.string().min(1).max(200).optional(),
+          content: z.string().min(1).optional(),
+          excerpt: z.string().max(500).optional(),
+          thumbnail: z.string().url().optional(),
+          accessLevel: z
+            .enum(['public', 'subscriber', 'purchaser', 'private'])
+            .optional(),
+          price: z.number().int().min(0).optional(),
+        }),
+      })
+    ),
+
+    // 내 포스트 조회
+    getMy: publicProcedure.output(z.array(/* Post 객체 */)),
+
+    // 접근 가능한 포스트 조회 (클라이언트용)
+    getAccessible: publicProcedure.output(z.array(/* Post 객체 */)),
+  }),
+});
+```
+
+### 2. 실제 Router 구현 (NestJS + tRPC)
+
+```typescript
+// apps/api/src/module/user/user.router.ts
+@Router({ alias: 'post' })
+export class PostRouter extends BaseTrpcRouter {
+  constructor(private readonly microserviceClient: ClientProxy) {
+    super();
+  }
+
+  @Mutation({
+    input: createPostSchema,
+    output: postResponseSchema,
+  })
+  async create(
+    @Input('title') title: string,
+    @Input('content') content: string,
+    @Input('excerpt') excerpt?: string,
+    @Input('thumbnail') thumbnail?: string,
+    @Input('accessLevel') accessLevel?: string,
+    @Input('price') price?: number,
+    @Ctx() ctx: any
+  ) {
+    try {
+      const result = await this.microserviceClient.send('post.create', {
+        title,
+        content,
+        excerpt,
+        thumbnail,
+        accessLevel: accessLevel || 'public',
+        price,
+        authorId: ctx.user.id, // JWT에서 추출한 사용자 ID
       });
-    }),
 
-  // 보호된 엔드포인트
-  create: protectedProcedure
-    .input(z.object({
-      title: z.string().min(1).max(200),
-      content: z.string().min(1),
-      category: z.string(),
-      accessType: z.enum(['public', 'subscriber', 'paid', 'private']),
-      price: z.number().min(0).optional(),
-    }))
-    .mutation(async ({ input, ctx }) => {
-      return ctx.postService.create({
-        ...input,
+      return result;
+    } catch (error) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: error.message || 'Post creation failed',
+      });
+    }
+  }
+
+  @Mutation({
+    input: z.object({ postId: z.string() }),
+    output: postResponseSchema,
+  })
+  async publish(@Input('postId') postId: string, @Ctx() ctx: any) {
+    try {
+      return await this.microserviceClient.send('post.publish', {
+        postId,
         authorId: ctx.user.id,
       });
-    }),
-});
+    } catch (error) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'Publishing failed',
+      });
+    }
+  }
+
+  @Query({
+    output: z.array(postResponseSchema),
+  })
+  async getMy(@Ctx() ctx: any) {
+    return await this.microserviceClient.send('post.getMy', {
+      authorId: ctx.user.id,
+    });
+  }
+}
 ```
 
 ### 2. 입력 검증
@@ -108,14 +215,14 @@ export const postRouter = router({
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
       const post = await ctx.postService.findById(input.id);
-      
+
       if (!post) {
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: '포스트를 찾을 수 없습니다.',
         });
       }
-      
+
       // 접근 권한 확인
       if (!post.canAccess(ctx.user)) {
         throw new TRPCError({
@@ -123,7 +230,7 @@ export const postRouter = router({
           message: '이 포스트에 접근할 권한이 없습니다.',
         });
       }
-      
+
       return post;
     }),
 });
@@ -135,14 +242,14 @@ export const postRouter = router({
 // src/server/middleware/rateLimit.ts
 export const rateLimitMiddleware = middleware(async ({ ctx, next }) => {
   const identifier = ctx.user?.id || ctx.ip;
-  
+
   if (await isRateLimited(identifier)) {
     throw new TRPCError({
       code: 'TOO_MANY_REQUESTS',
       message: '너무 많은 요청입니다. 잠시 후 다시 시도해주세요.',
     });
   }
-  
+
   return next();
 });
 
@@ -167,17 +274,18 @@ import { Post } from './entities/post.entity';
 export class PostsService {
   constructor(
     @InjectRepository(Post)
-    private postsRepository: Repository<Post>,
+    private postsRepository: Repository<Post>
   ) {}
 
   async findAll(options: FindPostsOptions) {
-    const qb = this.postsRepository.createQueryBuilder('post')
+    const qb = this.postsRepository
+      .createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
       .where('post.accessType = :accessType', { accessType: 'public' });
 
     if (options.category) {
-      qb.andWhere('post.category = :category', { 
-        category: options.category 
+      qb.andWhere('post.category = :category', {
+        category: options.category,
       });
     }
 
@@ -205,7 +313,13 @@ export class PostsService {
 
 ```typescript
 // src/modules/posts/entities/post.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  CreateDateColumn,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 @Entity('posts')
@@ -219,10 +333,10 @@ export class Post {
   @Column('text')
   content: string;
 
-  @Column({ 
-    type: 'enum', 
+  @Column({
+    type: 'enum',
     enum: ['public', 'subscriber', 'paid', 'private'],
-    default: 'public'
+    default: 'public',
   })
   accessType: string;
 
@@ -239,9 +353,9 @@ export class Post {
   canAccess(user?: User): boolean {
     if (this.accessType === 'public') return true;
     if (!user) return false;
-    
+
     if (this.author.id === user.id) return true;
-    
+
     switch (this.accessType) {
       case 'subscriber':
         return user.isSubscribedTo(this.author.id);
@@ -258,7 +372,14 @@ export class Post {
 
 ```typescript
 // src/modules/posts/dto/create-post.dto.ts
-import { IsString, IsEnum, IsOptional, IsNumber, Min, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsOptional,
+  IsNumber,
+  Min,
+  MaxLength,
+} from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
@@ -281,31 +402,140 @@ export class CreatePostDto {
 }
 ```
 
-## 인증 및 권한 관리
+## 쿠키 기반 인증 시스템
 
-### 1. JWT 인증 설정
+### 1. CookieService를 통한 중앙 집중식 쿠키 관리
 
 ```typescript
-// src/modules/auth/jwt.strategy.ts
-import { Injectable } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-
+// apps/api/src/module/trpc/services/cookie.service.ts
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.JWT_SECRET,
+export class CookieService {
+  private readonly isProduction = process.env.NODE_ENV === 'production';
+
+  setCookie(
+    res: Response,
+    name: string,
+    value: string,
+    options: CookieOptions = {}
+  ): void {
+    const defaultOptions: CookieOptions = {
+      httpOnly: true,
+      secure: this.isProduction,
+      sameSite: this.isProduction ? 'strict' : 'lax',
+      path: '/',
+    };
+
+    res.cookie(name, value, { ...defaultOptions, ...options });
+  }
+
+  setRefreshTokenCookie(res: Response, refreshToken: string): void {
+    this.setCookie(res, 'refreshToken', refreshToken, {
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
     });
   }
 
-  async validate(payload: JwtPayload) {
-    return { 
-      id: payload.sub, 
-      email: payload.email,
-      role: payload.role,
-    };
+  clearRefreshTokenCookie(res: Response): void {
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: this.isProduction,
+      sameSite: this.isProduction ? 'strict' : 'lax',
+      path: '/',
+    });
+  }
+}
+```
+
+### 2. 쿠키 기반 인증 Router 구현
+
+```typescript
+// apps/api/src/module/user/user.router.ts
+@Router({ alias: 'user' })
+export class UserRouter extends BaseTrpcRouter {
+  constructor(
+    private readonly microserviceClient: ClientProxy,
+    private readonly cookieService: CookieService
+  ) {
+    super();
+  }
+
+  @Mutation({
+    input: loginCredentialsSchema,
+    output: loginResponseSchema,
+  })
+  async login(
+    @Input('email') email: string,
+    @Input('password') password: string,
+    @Ctx() ctx: any
+  ) {
+    try {
+      const result = await this.microserviceClient.send('user.login', {
+        email,
+        password,
+      });
+
+      // refreshToken은 쿠키로 설정
+      this.cookieService.setRefreshTokenCookie(ctx.res, result.refreshToken);
+
+      // accessToken만 응답으로 반환
+      return {
+        accessToken: result.accessToken,
+        user: result.user,
+      };
+    } catch (error) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: error.message || 'Login failed',
+      });
+    }
+  }
+
+  @Mutation({
+    input: z.object({}),
+    output: refreshTokenResponseSchema,
+  })
+  async refreshToken(@Ctx() ctx: any) {
+    const refreshToken = ctx.req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'No refresh token provided',
+      });
+    }
+
+    try {
+      const result = await this.microserviceClient.send('user.refreshToken', {
+        refreshToken,
+      });
+
+      // 새로운 refreshToken으로 쿠키 업데이트
+      if (result.refreshToken) {
+        this.cookieService.setRefreshTokenCookie(ctx.res, result.refreshToken);
+      }
+
+      return {
+        accessToken: result.accessToken,
+        user: result.user,
+      };
+    } catch (error) {
+      // 유효하지 않은 refreshToken인 경우 쿠키 제거
+      this.cookieService.clearRefreshTokenCookie(ctx.res);
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'Invalid refresh token',
+      });
+    }
+  }
+
+  @Mutation({
+    input: z.object({}),
+    output: z.boolean(),
+  })
+  async logout(@Ctx() ctx: any) {
+    // refreshToken 쿠키 제거
+    this.cookieService.clearRefreshTokenCookie(ctx.res);
+
+    return true;
   }
 }
 ```
@@ -389,9 +619,9 @@ export class PaymentsService {
 
       // 2. 사용자 포인트 차감
       await queryRunner.manager.decrement(
-        User, 
-        { id: userId }, 
-        'points', 
+        User,
+        { id: userId },
+        'points',
         amount
       );
 
@@ -476,14 +706,16 @@ export const multerConfig: MulterOptions = {
 // tRPC에서 파일 업로드 처리
 export const uploadRouter = router({
   image: protectedProcedure
-    .input(z.object({ 
-      base64: z.string(),
-      filename: z.string(),
-    }))
+    .input(
+      z.object({
+        base64: z.string(),
+        filename: z.string(),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
       const buffer = Buffer.from(input.base64, 'base64');
       const path = await ctx.fileService.saveImage(buffer, input.filename);
-      
+
       return { url: path };
     }),
 });
@@ -495,7 +727,11 @@ export const uploadRouter = router({
 
 ```typescript
 // src/modules/realtime/realtime.gateway.ts
-import { WebSocketGateway, SubscribeMessage, WebSocketServer } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  SubscribeMessage,
+  WebSocketServer,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
@@ -603,7 +839,7 @@ describe('Posts API (e2e)', () => {
     return request(app.getHttpServer())
       .get('/api/trpc/posts.list')
       .expect(200)
-      .expect((res) => {
+      .expect(res => {
         expect(res.body.result.data).toBeDefined();
         expect(Array.isArray(res.body.result.data.posts)).toBe(true);
       });
@@ -637,28 +873,26 @@ const posts = await this.postsRepository
 // Redis 캐싱
 @Injectable()
 export class PostsService {
-  constructor(
-    private cacheManager: Cache,
-  ) {}
+  constructor(private cacheManager: Cache) {}
 
   async findById(id: string): Promise<Post> {
     const cacheKey = `post:${id}`;
-    
+
     // 캐시 확인
     const cached = await this.cacheManager.get<Post>(cacheKey);
     if (cached) return cached;
-    
+
     // DB 조회
     const post = await this.postsRepository.findOne({
       where: { id },
       relations: ['author'],
     });
-    
+
     // 캐시 저장 (TTL: 1시간)
     if (post) {
       await this.cacheManager.set(cacheKey, post, 3600);
     }
-    
+
     return post;
   }
 }
@@ -706,7 +940,7 @@ export const logger = WinstonModule.createLogger({
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.colorize(),
-        winston.format.simple(),
+        winston.format.simple()
       ),
     }),
     new winston.transports.File({
