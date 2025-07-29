@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import tw from 'tailwind-styled-components';
@@ -18,6 +18,7 @@ export const Route = createFileRoute('/_auth/editor/posts/create')({
 });
 
 function CreatePostPage() {
+  const navigate = useNavigate();
   const [isPublishing, setIsPublishing] = useState(false);
   const [isDrafting, setIsDrafting] = useState(false);
 
@@ -69,11 +70,12 @@ function CreatePostPage() {
       if (shouldPublish) {
         await publishPostMutation.mutateAsync({ postId: post.id });
       }
+
+      navigate({ to: '/editor/posts' });
     } catch (error) {
-      console.error('Post creation failed:', error);
-    } finally {
       setIsPublishing(false);
       setIsDrafting(false);
+      console.error('Post creation failed:', error);
     }
   };
 
