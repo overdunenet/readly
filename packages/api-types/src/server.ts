@@ -35,11 +35,6 @@ const appRouter = t.router({
           scheduledAt: z.date().nullable().optional(),
           createdAt: z.date(),
           updatedAt: z.date(),
-          author: z.object({
-            id: z.string(),
-            nickname: z.string(),
-            profileImage: z.string().nullable().optional(),
-          }),
         })
       )
       .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
@@ -73,11 +68,6 @@ const appRouter = t.router({
           scheduledAt: z.date().nullable().optional(),
           createdAt: z.date(),
           updatedAt: z.date(),
-          author: z.object({
-            id: z.string(),
-            nickname: z.string(),
-            profileImage: z.string().nullable().optional(),
-          }),
         })
       )
       .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
@@ -101,11 +91,6 @@ const appRouter = t.router({
           scheduledAt: z.date().nullable().optional(),
           createdAt: z.date(),
           updatedAt: z.date(),
-          author: z.object({
-            id: z.string(),
-            nickname: z.string(),
-            profileImage: z.string().nullable().optional(),
-          }),
         })
       )
       .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
@@ -129,11 +114,6 @@ const appRouter = t.router({
           scheduledAt: z.date().nullable().optional(),
           createdAt: z.date(),
           updatedAt: z.date(),
-          author: z.object({
-            id: z.string(),
-            nickname: z.string(),
-            profileImage: z.string().nullable().optional(),
-          }),
         })
       )
       .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
@@ -165,11 +145,6 @@ const appRouter = t.router({
           scheduledAt: z.date().nullable().optional(),
           createdAt: z.date(),
           updatedAt: z.date(),
-          author: z.object({
-            id: z.string(),
-            nickname: z.string(),
-            profileImage: z.string().nullable().optional(),
-          }),
         })
       )
       .query(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
@@ -194,11 +169,6 @@ const appRouter = t.router({
             scheduledAt: z.date().nullable().optional(),
             createdAt: z.date(),
             updatedAt: z.date(),
-            author: z.object({
-              id: z.string(),
-              nickname: z.string(),
-              profileImage: z.string().nullable().optional(),
-            }),
           })
         )
       )
@@ -224,11 +194,6 @@ const appRouter = t.router({
             scheduledAt: z.date().nullable().optional(),
             createdAt: z.date(),
             updatedAt: z.date(),
-            author: z.object({
-              id: z.string(),
-              nickname: z.string(),
-              profileImage: z.string().nullable().optional(),
-            }),
           })
         )
       )

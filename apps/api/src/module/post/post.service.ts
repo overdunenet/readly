@@ -36,13 +36,9 @@ export class PostService {
     authorId: string,
     input: CreatePostInput
   ): Promise<PostEntity> {
-    const { id } = await this.repositoryProvider.PostRepository.createPost({
+    return await this.repositoryProvider.PostRepository.createPost({
       ...input,
       authorId,
-    });
-    return this.repositoryProvider.PostRepository.findOne({
-      relations: ['author'],
-      where: { id },
     });
   }
 

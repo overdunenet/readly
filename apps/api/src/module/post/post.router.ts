@@ -46,13 +46,9 @@ const postResponseSchema = z.object({
   scheduledAt: z.date().nullable().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  author: z.object({
-    id: z.string(),
-    nickname: z.string(),
-    profileImage: z.string().nullable().optional(),
-  }),
 });
 
+// Editor 페이지에서 포스트 관리를 위한 Router
 @Router({ alias: 'post' })
 export class PostRouter extends BaseTrpcRouter {
   /**
