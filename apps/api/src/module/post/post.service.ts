@@ -36,9 +36,13 @@ export class PostService {
     authorId: string,
     input: CreatePostInput
   ): Promise<PostEntity> {
-    return this.repositoryProvider.PostRepository.createPost({
+    const { id } = await this.repositoryProvider.PostRepository.createPost({
       ...input,
       authorId,
+    });
+    return this.repositoryProvider.PostRepository.findOne({
+      relations: ['author'],
+      where: { id },
     });
   }
 
@@ -91,42 +95,6 @@ export class PostService {
 
     // 임시저장으로 변경
     post.unpublish();
-    return this.repositoryProvider.PostRepository.save(post);
-  }
-
-  async schedulePost(
-    postId: string,
-    authorId: string,
-    input: SchedulePostInput
-  ): Promise<PostEntity> {
-    const post =
-      await this.repositoryProvider.PostRepository.findOneByIdForEdit(
-        postId,
-        authorId
-      ).catch(() => {
-        throw new ForbiddenException(
-          'Post not found or you are not allowed to schedule this post'
-        );
-      });
-
-    // 예약 발행 설정
-    post.schedulePublish(input.scheduledAt);
-    return this.repositoryProvider.PostRepository.save(post);
-  }
-
-  async cancelSchedule(postId: string, authorId: string): Promise<PostEntity> {
-    const post =
-      await this.repositoryProvider.PostRepository.findOneByIdForEdit(
-        postId,
-        authorId
-      ).catch(() => {
-        throw new ForbiddenException(
-          'Post not found or you are not allowed to cancel schedule for this post'
-        );
-      });
-
-    // 예약 발행 취소
-    post.cancelSchedule();
     return this.repositoryProvider.PostRepository.save(post);
   }
 

@@ -26,19 +26,19 @@ const appRouter = t.router({
           id: z.string(),
           title: z.string(),
           content: z.string(),
-          excerpt: z.string().nullable(),
-          thumbnail: z.string().nullable(),
+          excerpt: z.string().nullable().optional(),
+          thumbnail: z.string().nullable().optional(),
           accessLevel: z.enum(['public', 'subscriber', 'purchaser', 'private']),
           status: z.enum(['draft', 'published', 'scheduled']),
           price: z.number(),
-          publishedAt: z.date().nullable(),
-          scheduledAt: z.date().nullable(),
+          publishedAt: z.date().nullable().optional(),
+          scheduledAt: z.date().nullable().optional(),
           createdAt: z.date(),
           updatedAt: z.date(),
           author: z.object({
             id: z.string(),
             nickname: z.string(),
-            profileImage: z.string().nullable(),
+            profileImage: z.string().nullable().optional(),
           }),
         })
       )
@@ -64,19 +64,19 @@ const appRouter = t.router({
           id: z.string(),
           title: z.string(),
           content: z.string(),
-          excerpt: z.string().nullable(),
-          thumbnail: z.string().nullable(),
+          excerpt: z.string().nullable().optional(),
+          thumbnail: z.string().nullable().optional(),
           accessLevel: z.enum(['public', 'subscriber', 'purchaser', 'private']),
           status: z.enum(['draft', 'published', 'scheduled']),
           price: z.number(),
-          publishedAt: z.date().nullable(),
-          scheduledAt: z.date().nullable(),
+          publishedAt: z.date().nullable().optional(),
+          scheduledAt: z.date().nullable().optional(),
           createdAt: z.date(),
           updatedAt: z.date(),
           author: z.object({
             id: z.string(),
             nickname: z.string(),
-            profileImage: z.string().nullable(),
+            profileImage: z.string().nullable().optional(),
           }),
         })
       )
@@ -92,19 +92,19 @@ const appRouter = t.router({
           id: z.string(),
           title: z.string(),
           content: z.string(),
-          excerpt: z.string().nullable(),
-          thumbnail: z.string().nullable(),
+          excerpt: z.string().nullable().optional(),
+          thumbnail: z.string().nullable().optional(),
           accessLevel: z.enum(['public', 'subscriber', 'purchaser', 'private']),
           status: z.enum(['draft', 'published', 'scheduled']),
           price: z.number(),
-          publishedAt: z.date().nullable(),
-          scheduledAt: z.date().nullable(),
+          publishedAt: z.date().nullable().optional(),
+          scheduledAt: z.date().nullable().optional(),
           createdAt: z.date(),
           updatedAt: z.date(),
           author: z.object({
             id: z.string(),
             nickname: z.string(),
-            profileImage: z.string().nullable(),
+            profileImage: z.string().nullable().optional(),
           }),
         })
       )
@@ -120,76 +120,19 @@ const appRouter = t.router({
           id: z.string(),
           title: z.string(),
           content: z.string(),
-          excerpt: z.string().nullable(),
-          thumbnail: z.string().nullable(),
+          excerpt: z.string().nullable().optional(),
+          thumbnail: z.string().nullable().optional(),
           accessLevel: z.enum(['public', 'subscriber', 'purchaser', 'private']),
           status: z.enum(['draft', 'published', 'scheduled']),
           price: z.number(),
-          publishedAt: z.date().nullable(),
-          scheduledAt: z.date().nullable(),
+          publishedAt: z.date().nullable().optional(),
+          scheduledAt: z.date().nullable().optional(),
           createdAt: z.date(),
           updatedAt: z.date(),
           author: z.object({
             id: z.string(),
             nickname: z.string(),
-            profileImage: z.string().nullable(),
-          }),
-        })
-      )
-      .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
-    schedule: publicProcedure
-      .input(
-        z.object({
-          postId: z.string(),
-          scheduledAt: z.string().datetime(),
-        })
-      )
-      .output(
-        z.object({
-          id: z.string(),
-          title: z.string(),
-          content: z.string(),
-          excerpt: z.string().nullable(),
-          thumbnail: z.string().nullable(),
-          accessLevel: z.enum(['public', 'subscriber', 'purchaser', 'private']),
-          status: z.enum(['draft', 'published', 'scheduled']),
-          price: z.number(),
-          publishedAt: z.date().nullable(),
-          scheduledAt: z.date().nullable(),
-          createdAt: z.date(),
-          updatedAt: z.date(),
-          author: z.object({
-            id: z.string(),
-            nickname: z.string(),
-            profileImage: z.string().nullable(),
-          }),
-        })
-      )
-      .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
-    cancelSchedule: publicProcedure
-      .input(
-        z.object({
-          postId: z.string(),
-        })
-      )
-      .output(
-        z.object({
-          id: z.string(),
-          title: z.string(),
-          content: z.string(),
-          excerpt: z.string().nullable(),
-          thumbnail: z.string().nullable(),
-          accessLevel: z.enum(['public', 'subscriber', 'purchaser', 'private']),
-          status: z.enum(['draft', 'published', 'scheduled']),
-          price: z.number(),
-          publishedAt: z.date().nullable(),
-          scheduledAt: z.date().nullable(),
-          createdAt: z.date(),
-          updatedAt: z.date(),
-          author: z.object({
-            id: z.string(),
-            nickname: z.string(),
-            profileImage: z.string().nullable(),
+            profileImage: z.string().nullable().optional(),
           }),
         })
       )
@@ -213,19 +156,19 @@ const appRouter = t.router({
           id: z.string(),
           title: z.string(),
           content: z.string(),
-          excerpt: z.string().nullable(),
-          thumbnail: z.string().nullable(),
+          excerpt: z.string().nullable().optional(),
+          thumbnail: z.string().nullable().optional(),
           accessLevel: z.enum(['public', 'subscriber', 'purchaser', 'private']),
           status: z.enum(['draft', 'published', 'scheduled']),
           price: z.number(),
-          publishedAt: z.date().nullable(),
-          scheduledAt: z.date().nullable(),
+          publishedAt: z.date().nullable().optional(),
+          scheduledAt: z.date().nullable().optional(),
           createdAt: z.date(),
           updatedAt: z.date(),
           author: z.object({
             id: z.string(),
             nickname: z.string(),
-            profileImage: z.string().nullable(),
+            profileImage: z.string().nullable().optional(),
           }),
         })
       )
@@ -237,8 +180,8 @@ const appRouter = t.router({
             id: z.string(),
             title: z.string(),
             content: z.string(),
-            excerpt: z.string().nullable(),
-            thumbnail: z.string().nullable(),
+            excerpt: z.string().nullable().optional(),
+            thumbnail: z.string().nullable().optional(),
             accessLevel: z.enum([
               'public',
               'subscriber',
@@ -247,14 +190,14 @@ const appRouter = t.router({
             ]),
             status: z.enum(['draft', 'published', 'scheduled']),
             price: z.number(),
-            publishedAt: z.date().nullable(),
-            scheduledAt: z.date().nullable(),
+            publishedAt: z.date().nullable().optional(),
+            scheduledAt: z.date().nullable().optional(),
             createdAt: z.date(),
             updatedAt: z.date(),
             author: z.object({
               id: z.string(),
               nickname: z.string(),
-              profileImage: z.string().nullable(),
+              profileImage: z.string().nullable().optional(),
             }),
           })
         )
@@ -267,8 +210,8 @@ const appRouter = t.router({
             id: z.string(),
             title: z.string(),
             content: z.string(),
-            excerpt: z.string().nullable(),
-            thumbnail: z.string().nullable(),
+            excerpt: z.string().nullable().optional(),
+            thumbnail: z.string().nullable().optional(),
             accessLevel: z.enum([
               'public',
               'subscriber',
@@ -277,14 +220,14 @@ const appRouter = t.router({
             ]),
             status: z.enum(['draft', 'published', 'scheduled']),
             price: z.number(),
-            publishedAt: z.date().nullable(),
-            scheduledAt: z.date().nullable(),
+            publishedAt: z.date().nullable().optional(),
+            scheduledAt: z.date().nullable().optional(),
             createdAt: z.date(),
             updatedAt: z.date(),
             author: z.object({
               id: z.string(),
               nickname: z.string(),
-              profileImage: z.string().nullable(),
+              profileImage: z.string().nullable().optional(),
             }),
           })
         )

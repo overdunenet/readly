@@ -37,19 +37,19 @@ const postResponseSchema = z.object({
   id: z.string(),
   title: z.string(),
   content: z.string(),
-  excerpt: z.string().nullable(),
-  thumbnail: z.string().nullable(),
+  excerpt: z.string().nullable().optional(),
+  thumbnail: z.string().nullable().optional(),
   accessLevel: postAccessLevelSchema,
   status: z.enum(['draft', 'published', 'scheduled']),
   price: z.number(),
-  publishedAt: z.date().nullable(),
-  scheduledAt: z.date().nullable(),
+  publishedAt: z.date().nullable().optional(),
+  scheduledAt: z.date().nullable().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
   author: z.object({
     id: z.string(),
     nickname: z.string(),
-    profileImage: z.string().nullable(),
+    profileImage: z.string().nullable().optional(),
   }),
 });
 
@@ -75,7 +75,7 @@ export class PostRouter extends BaseTrpcRouter {
       authorId: ctx.user.sub,
       input,
     });
-    return result;
+    return postResponseSchema.parse(result);
   }
 
   /**
@@ -136,51 +136,6 @@ export class PostRouter extends BaseTrpcRouter {
     @Input('postId') postId: string
   ) {
     return await this.microserviceClient.send('post.unpublish', {
-      postId,
-      authorId: ctx.user.sub,
-    });
-  }
-
-  /**
-   * 포스트 예약 발행
-   */
-  @UseMiddlewares(UserAuthMiddleware)
-  @Mutation({
-    input: z.object({
-      postId: z.string(),
-      scheduledAt: z.string().datetime(),
-    }),
-    output: postResponseSchema,
-  })
-  async schedule(
-    @Ctx() ctx: UserAuthorizedContext,
-    @Input('postId') postId: string,
-    @Input('scheduledAt') scheduledAt: string
-  ) {
-    return await this.microserviceClient.send('post.schedule', {
-      postId,
-      authorId: ctx.user.sub,
-      input: {
-        scheduledAt: new Date(scheduledAt),
-      },
-    });
-  }
-
-  /**
-   * 포스트 예약 발행 취소
-   */
-  @UseMiddlewares(UserAuthMiddleware)
-  @Mutation({
-    input: z.object({
-      postId: z.string(),
-    }),
-    output: postResponseSchema,
-  })
-  async cancelSchedule(
-    @Ctx() ctx: UserAuthorizedContext,
-    @Input('postId') postId: string
-  ) {
-    return await this.microserviceClient.send('post.cancelSchedule', {
       postId,
       authorId: ctx.user.sub,
     });
