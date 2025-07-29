@@ -37,16 +37,14 @@ export class PostEntity extends BaseEntity {
   thumbnail: string | null;
 
   @Column({
-    type: 'enum',
-    enum: ['public', 'subscriber', 'purchaser', 'private'],
+    type: 'varchar',
     default: 'public',
     comment: '포스트 접근 권한 레벨 (공개/구독자/구매자/비공개)',
   })
   accessLevel: PostAccessLevel;
 
   @Column({
-    type: 'enum',
-    enum: ['draft', 'published', 'scheduled'],
+    type: 'varchar',
     default: 'draft',
     comment: '포스트 상태 (임시저장/발행됨/예약발행)',
   })
@@ -61,13 +59,6 @@ export class PostEntity extends BaseEntity {
 
   @Column({ type: 'timestamptz', nullable: true, comment: '포스트 발행 일시' })
   publishedAt: Date | null;
-
-  @Column({
-    type: 'timestamptz',
-    nullable: true,
-    comment: '예약 발행 예정 일시',
-  })
-  scheduledAt: Date | null;
 
   @Column({ type: 'uuid', comment: '작성자 사용자 ID' })
   authorId: string;
@@ -137,41 +128,6 @@ export class PostEntity extends BaseEntity {
     }
     this.status = 'published';
     this.publishedAt = new Date();
-    this.scheduledAt = null;
-  }
-
-  // 포스트 예약 발행
-  schedulePublish(scheduledAt: Date): void {
-    if (this.status === 'published') {
-      throw new Error('Cannot schedule published post');
-    }
-
-    const now = new Date();
-    if (scheduledAt <= now) {
-      throw new Error('Scheduled time must be in the future');
-    }
-
-    this.status = 'scheduled';
-    this.scheduledAt = scheduledAt;
-    this.publishedAt = null;
-  }
-
-  // 예약 발행 취소
-  cancelSchedule(): void {
-    if (this.status !== 'scheduled') {
-      throw new Error('Post is not scheduled');
-    }
-    this.status = 'draft';
-    this.scheduledAt = null;
-  }
-
-  // 예약된 포스트를 발행 (스케줄러에서 호출)
-  publishScheduled(): void {
-    if (this.status !== 'scheduled') {
-      throw new Error('Post is not scheduled');
-    }
-    this.status = 'published';
-    this.publishedAt = new Date();
   }
 
   // 포스트 임시저장으로 변경
@@ -181,15 +137,6 @@ export class PostEntity extends BaseEntity {
     }
     this.status = 'draft';
     this.publishedAt = null;
-    this.scheduledAt = null;
-  }
-
-  // 예약 발행 시간 체크
-  isScheduledForPublishing(): boolean {
-    if (this.status !== 'scheduled' || !this.scheduledAt) {
-      return false;
-    }
-    return new Date() >= this.scheduledAt;
   }
 
   // 수정/삭제 권한 검증
