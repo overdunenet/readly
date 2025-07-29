@@ -2,16 +2,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import SnappyModal from 'react-snappy-modal';
 import tw from 'tailwind-styled-components';
 
-import { FormEditorSection } from '../../../../components/posts/create/FormEditorSection';
-import { HeaderSection } from '../../../../components/posts/create/HeaderSection';
-import { PermissionPriceSection } from '../../../../components/posts/create/PermissionPriceSection';
+import { FormEditorSection } from '@/components/posts/create/FormEditorSection.tsx';
+import { HeaderSection } from '@/components/posts/create/HeaderSection.tsx';
+import { PermissionPriceSection } from '@/components/posts/create/PermissionPriceSection.tsx';
 import {
   createPostSchema,
   CreatePostForm,
-} from '../../../../components/posts/create/types';
-import { trpc } from '../../../../shared/trpc';
+} from '@/components/posts/create/types.ts';
+import { trpc } from '@/shared';
+import { AlertModal } from '@/shared/modal/AlertModal.tsx';
 
 export const Route = createFileRoute('/_auth/editor/posts/create')({
   component: CreatePostPage,
@@ -24,13 +26,17 @@ function CreatePostPage() {
 
   const createPostMutation = trpc.post.create.useMutation({
     onError: (error) => {
-      alert(`포스트 작성 실패: ${error.message}`);
+      SnappyModal.show(
+        <AlertModal title="포스트 작성 실패" message={error.message} />,
+      );
     },
   });
 
   const publishPostMutation = trpc.post.publish.useMutation({
     onError: (error) => {
-      alert(`포스트 발행 실패: ${error.message}`);
+      SnappyModal.show(
+        <AlertModal title="포스트 발행 실패" message={error.message} />,
+      );
     },
   });
 
