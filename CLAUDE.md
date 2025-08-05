@@ -533,6 +533,105 @@ const watchedAccessLevel = watch('accessLevel');
 )}
 ```
 
+### 모달 시스템 (react-snappy-modal)
+
+**프로젝트에서는 react-snappy-modal을 사용하여 일관된 모달 UI를 제공합니다.**
+
+#### 기본 설정
+
+```typescript
+// main.tsx - 앱 최상위에 Provider 설정
+import { SnappyModalProvider } from 'react-snappy-modal';
+
+<SnappyModalProvider>
+  <App />
+</SnappyModalProvider>
+```
+
+#### 모달 컴포넌트 구조
+
+- **BaseModal**: 기본 모달 레이아웃과 공통 스타일 컴포넌트 제공
+- **AlertModal**: 알림용 모달 (확인 버튼 1개)
+- **ConfirmModal**: 확인/취소 모달 (버튼 2개)
+
+#### AlertModal 사용법
+
+```typescript
+import SnappyModal from 'react-snappy-modal';
+import { AlertModal } from '@/shared/modal/AlertModal';
+
+// 기본 사용
+SnappyModal.show(
+  <AlertModal
+    title="알림"
+    message="작업이 완료되었습니다."
+  />
+).then((result) => {
+  // result는 항상 true (확인 버튼 클릭)
+  if (result) {
+    console.log('확인됨');
+  }
+});
+
+// 에러 처리에서 사용
+const createPostMutation = trpc.post.create.useMutation({
+  onError: (error) => {
+    SnappyModal.show(
+      <AlertModal
+        title="포스트 작성 실패"
+        message={error.message}
+      />
+    );
+  },
+});
+```
+
+#### ConfirmModal 사용법
+
+```typescript
+import { ConfirmModal } from '@/shared/modal/ConfirmModal';
+
+// 삭제 확인
+SnappyModal.show(
+  <ConfirmModal
+    title="삭제 확인"
+    message="정말 삭제하시겠습니까?"
+    confirmText="삭제"
+    cancelText="취소"
+  />
+).then((result) => {
+  if (result === true) {
+    // 확인 버튼 클릭 - 삭제 진행
+    deleteItem();
+  } else if (result === false) {
+    // 취소 버튼 클릭 - 아무것도 하지 않음
+    console.log('삭제 취소');
+  }
+});
+```
+
+#### 커스텀 모달
+
+```typescript
+import { BaseModal } from '@/shared/modal/BaseModal';
+
+SnappyModal.show(
+  <BaseModal title="커스텀 모달" maxWidth="lg">
+    <div>커스텀 내용</div>
+    <button onClick={SnappyModal.close}>닫기</button>
+  </BaseModal>
+);
+```
+
+#### 모달 모범 사례
+
+- **명확한 제목과 메시지**: 사용자가 쉽게 이해할 수 있도록
+- **적절한 버튼 텍스트**: "삭제", "저장", "취소" 등 액션을 명확히 표현
+- **결과 처리**: ConfirmModal은 반드시 `.then()`으로 결과 처리
+- **일관된 사용**: 프로젝트 전반에 걸쳐 동일한 패턴 사용
+
+자세한 사용법은 [`/src/shared/modal/README.md`](./apps/client/src/shared/modal/README.md)를 참조하세요.
+
 ### API
 
 - RESTful 원칙 준수
