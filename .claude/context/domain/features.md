@@ -1,3 +1,10 @@
+---
+name: Features
+description: Readly 기능 명세. 사용자 유형, 접근 권한 시스템, 결제.
+keywords: [기능, 사용자, 팔로워, 에디터, 접근권한, 결제]
+estimated_tokens: ~300
+---
+
 # 기능 명세
 
 ## 사용자 유형

@@ -61,10 +61,16 @@ PART 1.5: CONTEXT 확인
 
 필요시 Context 문서를 참조하세요 (Subagent로 위임 권장):
 
+**Context 인덱스:** `.claude/context/INDEX.md`
+
 | Context | 경로 | 설명 |
 |---------|------|------|
 | 시스템 아키텍처 | `.claude/context/architecture/INDEX.md` | 전체 구조, 통신 흐름 |
-| 도메인/기능 | `.claude/context/domain/features.md` | 접근 권한, 기능 명세 |
+| 백엔드 상세 | `.claude/context/architecture/backend.md` | Microservice + tRPC, Transaction |
+| 프론트엔드 상세 | `.claude/context/architecture/frontend.md` | TanStack Router, 인증 흐름 |
+| 기능 명세 | `.claude/context/domain/features.md` | 사용자 유형, 접근 권한 |
+| User 도메인 | `.claude/context/domain/user.md` | UserEntity, JWT 인증 |
+| Post 도메인 | `.claude/context/domain/post.md` | PostEntity, 접근 권한 로직 |
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 PART 2: AGENT 평가 (필수 - Context 절약)

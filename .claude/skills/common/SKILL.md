@@ -1,3 +1,10 @@
+---
+name: Common-Patterns
+description: 공통 개발 패턴. 네이밍 컨벤션, Git 규칙, 에러 처리.
+keywords: [컨벤션, 네이밍, Git, 커밋, TypeScript, 에러처리]
+estimated_tokens: ~400
+---
+
 # 공통 개발 패턴
 
 ## TypeScript 규칙

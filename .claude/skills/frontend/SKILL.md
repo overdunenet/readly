@@ -1,8 +1,17 @@
+---
+name: Frontend-Development
+description: 프론트엔드 개발 가이드. React, TanStack Router, 폼, 모달.
+keywords: [Frontend, React, TanStack Router, Zustand, tRPC, 폼, 모달]
+estimated_tokens: ~1000
+---
+
 # Frontend 개발 스킬
 
 ## 개요
 
-Readly의 프론트엔드는 React, Vite, Tailwind CSS 기반의 3개 앱으로 구성됩니다.
+Readly의 프론트엔드는 React, Vite, Tailwind CSS 기반입니다.
+
+> 상세 아키텍처는 `.claude/context/architecture/frontend.md` 참조
 
 ## 프로젝트 구조
 
@@ -217,10 +226,56 @@ const createMutation = trpc.post.create.useMutation({
 2. **클래스 작성**: 한 줄에 하나씩
 3. **모바일 우선**: `md:max-w-md md:mx-auto`
 
+## 에디터 (Rich Text)
+
+**react-quill-new 사용**
+
+```typescript
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
+
+<Controller
+  name="content"
+  control={control}
+  render={({ field }) => (
+    <ReactQuill
+      theme="snow"
+      value={field.value}
+      onChange={field.onChange}
+      modules={{
+        toolbar: [
+          [{ header: [1, 2, 3, false] }],
+          ['bold', 'italic', 'underline'],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          ['link', 'image'],
+        ],
+      }}
+    />
+  )}
+/>
+```
+
 ## 체크리스트
+
+### 컴포넌트 작성
 
 - [ ] tailwind-styled-components 사용
 - [ ] Styled Components 파일 하단 배치
-- [ ] React Hook Form + Zod 폼 검증
-- [ ] 모달은 react-snappy-modal 사용
-- [ ] 인증 라우트 `_auth` prefix 사용
+- [ ] 한 줄에 하나의 클래스 작성
+
+### 라우팅
+
+- [ ] 인증 필요 페이지는 `_auth/` 하위에 배치
+- [ ] 레이아웃은 `<Outlet />` 포함
+
+### 폼
+
+- [ ] React Hook Form + Zod 검증
+- [ ] Controller로 필드 연결
+- [ ] mode: 'onChange' 실시간 검증
+
+### API
+
+- [ ] trpc hook 사용
+- [ ] onError에서 AlertModal 표시
+- [ ] 성공 시 queryClient.invalidateQueries

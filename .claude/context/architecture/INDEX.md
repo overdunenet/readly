@@ -1,3 +1,10 @@
+---
+name: System-Architecture
+description: Readly 시스템 아키텍처 개요. 기술 스택, 디렉토리 구조.
+keywords: [아키텍처, tRPC, NestJS, React, PostgreSQL, 모노레포]
+estimated_tokens: ~500
+---
+
 # 시스템 아키텍처
 
 ## 개요
@@ -6,38 +13,31 @@ Readly는 모노레포 구조의 풀스택 애플리케이션입니다. tRPC를 
 
 ## 아키텍처 다이어그램
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                          Frontend Apps                           │
-├─────────────────┬─────────────────┬─────────────────────────────┤
-│     Client      │     Editor      │        Backoffice           │
-│   (팔로워용)     │   (에디터용)      │        (관리자용)           │
-└────────┬────────┴────────┬────────┴────────┬────────────────────┘
-         │                 │                 │
-         └─────────────────┴─────────────────┘
-                          │
-                    tRPC Client
-                          │
-┌─────────────────────────┴─────────────────────────────────────────┐
-│                        API Gateway                                 │
-│                    (tRPC Server + NestJS)                         │
-├───────────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
-│  │    Auth     │  │    Post     │  │   Payment   │              │
-│  │   Module    │  │   Module    │  │   Module    │              │
-│  └─────────────┘  └─────────────┘  └─────────────┘              │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
-│  │    User     │  │ Subscription│  │   Admin     │              │
-│  │   Module    │  │   Module    │  │   Module    │              │
-│  └─────────────┘  └─────────────┘  └─────────────┘              │
-└───────────────────────────────────────────────────────────────────┘
-                          │
-         ┌────────────────┴────────────────┐
-         │                                 │
-┌────────┴────────┐              ┌────────┴────────┐
-│   PostgreSQL    │              │      Redis      │
-│   (Primary DB)  │              │     (Cache)     │
-└─────────────────┘              └─────────────────┘
+```mermaid
+flowchart TB
+    subgraph Frontend["Frontend Apps"]
+        Client["Client<br/>(팔로워용)"]
+        Editor["Editor<br/>(에디터용)"]
+        Backoffice["Backoffice<br/>(관리자용)"]
+    end
+
+    subgraph API["API Gateway (tRPC + NestJS)"]
+        Auth["Auth Module"]
+        User["User Module"]
+        Post["Post Module"]
+        Payment["Payment Module"]
+        Subscription["Subscription Module"]
+        Admin["Admin Module"]
+    end
+
+    subgraph Storage["Storage"]
+        PostgreSQL[(PostgreSQL)]
+        Redis[(Redis)]
+    end
+
+    Frontend -->|tRPC Client| API
+    API --> PostgreSQL
+    API --> Redis
 ```
 
 ## 기술 스택
