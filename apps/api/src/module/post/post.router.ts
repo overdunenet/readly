@@ -71,7 +71,8 @@ export class PostRouter extends BaseTrpcRouter {
       authorId: ctx.user.sub,
       input,
     });
-    return postResponseSchema.parse(result);
+    return {};
+    // return postResponseSchema.parse(result);
   }
 
   /**
