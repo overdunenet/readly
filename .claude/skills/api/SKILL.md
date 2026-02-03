@@ -1,8 +1,8 @@
 ---
 name: API-Development
-description: 백엔드 API 개발 가이드. tRPC Router, Repository 패턴, DDD.
-keywords: [API, tRPC, NestJS, Repository, Entity, DDD, 인증]
-estimated_tokens: ~900
+description: 백엔드 API 개발 가이드. tRPC Router, Repository, DDD, 트랜잭션.
+keywords: [API, tRPC, NestJS, Repository, Entity, DDD, Transaction]
+estimated_tokens: ~500
 ---
 
 # API 개발 스킬
@@ -12,6 +12,14 @@ estimated_tokens: ~900
 Readly API는 tRPC와 NestJS를 결합한 **Microservice + tRPC 하이브리드** 아키텍처입니다.
 
 > 상세 아키텍처는 `.claude/context/architecture/backend.md` 참조
+
+## 상세 문서
+
+| 문서                               | 설명                               |
+| ---------------------------------- | ---------------------------------- |
+| [repository.md](./repository.md)   | Repository 패턴, 쿼리 작성 가이드  |
+| [transaction.md](./transaction.md) | 트랜잭션 관리, @Transactional      |
+| [ddd.md](./ddd.md)                 | DDD 패턴, Entity/Service 책임 분리 |
 
 ## 프로젝트 구조
 
@@ -45,6 +53,7 @@ export class PostRouter extends BaseTrpcRouter {
     input: createPostSchema,
     output: postResponseSchema,
   })
+  @Transactional() // Mutation 필수!
   async create(
     @Input('title') title: string,
     @Input('content') content: string,
@@ -64,82 +73,6 @@ export class PostRouter extends BaseTrpcRouter {
     return await this.microserviceClient.send('post.getMy', {
       authorId: ctx.user.id,
     });
-  }
-}
-```
-
-## Repository 패턴 (필수)
-
-**모든 DB 접근은 RepositoryProvider를 통해야 합니다.**
-
-### 올바른 사용법
-
-```typescript
-// ✅ RepositoryProvider 사용
-constructor(
-  private readonly repositoryProvider: RepositoryProvider
-) {}
-
-const user = await this.repositoryProvider.UserRepository.findOneBy({ id });
-```
-
-### 잘못된 사용법
-
-```typescript
-// ❌ @InjectRepository 직접 사용 금지
-constructor(
-  @InjectRepository(Entity)
-  private repository: Repository<Entity>
-) {}
-```
-
-### Repository 추가 방법
-
-```typescript
-// 1. Repository 함수 생성
-export const getPostRepository = (
-  source?: TransactionService | EntityManager
-) =>
-  getEntityManager(source)
-    .getRepository(PostEntity)
-    .extend({
-      async findPublished() {
-        return this.find({ where: { status: 'published' } });
-      },
-    });
-
-// 2. RepositoryProvider에 추가
-export class RepositoryProvider {
-  get PostRepository() {
-    return getPostRepository(this.transaction);
-  }
-}
-```
-
-## Entity 설계 (DDD 패턴)
-
-```typescript
-@Entity('posts')
-export class PostEntity extends BaseEntity {
-  @Column({ type: 'varchar' })
-  title: string;
-
-  @Column({ type: 'text' })
-  content: string;
-
-  // ✅ Static Factory Method
-  static create(input: CreatePostInput): PostEntity {
-    const post = new PostEntity();
-    post.title = input.title;
-    post.content = input.content;
-    return post;
-  }
-
-  // ✅ 비즈니스 로직 캡슐화
-  canAccess(user?: UserEntity): boolean {
-    if (this.accessLevel === 'public') return true;
-    if (!user) return false;
-    return this.authorId === user.id;
   }
 }
 ```
@@ -207,10 +140,8 @@ export class PostService {
   constructor(private repositoryProvider: RepositoryProvider) {}
 
   async createPost(authorId: string, input: CreateInput) {
-    return this.repositoryProvider.PostRepository.createPost({
-      ...input,
-      authorId,
-    });
+    const post = PostEntity.create({ ...input, authorId });
+    return this.repositoryProvider.PostRepository.save(post);
   }
 }
 ```
@@ -221,6 +152,7 @@ export class PostService {
 @Router({ alias: 'post' })
 export class PostRouter extends BaseTrpcRouter {
   @Mutation({ input: schema, output: schema })
+  @Transactional()
   async create(@Input('title') title: string, @Ctx() ctx: any) {
     return this.microserviceClient.send('post.create', { ... });
   }
@@ -241,9 +173,25 @@ export class PostController {
 
 ## 코드 리뷰 체크리스트
 
+### Repository & 트랜잭션
+
 - [ ] RepositoryProvider 사용 (@InjectRepository 금지)
-- [ ] Entity Factory Method 사용
+- [ ] **Mutation에 @Transactional 데코레이터 적용**
+- [ ] find/findBy/findOrFail 사용 (queryBuilder 지양)
 - [ ] findOrFail + catch 에러 처리 패턴
+
+> 상세: [repository.md](./repository.md), [transaction.md](./transaction.md)
+
+### DDD 패턴
+
+- [ ] Entity Factory Method로 생성
+- [ ] 상태 변경 로직은 Entity 메서드로 구현
+- [ ] 권한 검증 로직은 Entity에 구현
+- [ ] Service는 오케스트레이션만 담당
+
+> 상세: [ddd.md](./ddd.md)
+
+### 기타
+
 - [ ] Zod 스키마 정의 (input/output)
-- [ ] 트랜잭션 필요 여부 확인
-- [ ] 권한 검증 로직 Entity에 구현
+- [ ] 적절한 에러 메시지 제공
