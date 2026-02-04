@@ -37,6 +37,8 @@ VITE_API_URL=http://localhost:3000
 | Frontend 개발 | `.claude/skills/frontend/SKILL.md` | React 프론트엔드 개발     |
 | 공통 패턴     | `.claude/skills/common/SKILL.md`   | 공통 코딩 패턴            |
 
+> **주의**: 스킬 수정 시 `.claude/hooks/skill-forced.sh` 파일도 함께 수정하세요.
+
 ## Context
 
 배경지식은 `.claude/context/` 폴더를 참조하세요:
