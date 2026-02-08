@@ -1,4 +1,4 @@
-import { UseMiddlewares } from 'nestjs-trpc';
+import { UseMiddlewares } from 'nestjs-trpc-v2';
 import { ErrorHandlingMiddleware } from '../errorHandling.middleware';
 
 /**

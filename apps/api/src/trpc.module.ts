@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { TRPCModule } from 'nestjs-trpc';
+import { TRPCModule } from 'nestjs-trpc-v2';
 import { MicroserviceClient } from '@src/module/trpc/microserviceClient';
 import { AutoRouterModule } from '@src/module/trpc/routerModule';
 import { TRPCAppContext } from '@src/module/trpc/trpcAppContext';

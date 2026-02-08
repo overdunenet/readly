@@ -3,7 +3,7 @@ import {
   MiddlewareOptions,
   MiddlewareResponse,
   TRPCMiddleware,
-} from 'nestjs-trpc';
+} from 'nestjs-trpc-v2';
 import { Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import { TRPCError } from '@trpc/server';

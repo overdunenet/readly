@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ContextOptions } from 'nestjs-trpc';
+import { ContextOptions, TRPCContext } from 'nestjs-trpc-v2';
 
 @Injectable()
-export class TRPCAppContext {
+export class TRPCAppContext implements TRPCContext {
   async create(opts: ContextOptions) {
     return opts;
   }
