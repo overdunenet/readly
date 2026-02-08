@@ -2,6 +2,11 @@
 
 # .claude/hooks/workflow-enforced.sh
 # 작업 워크플로우 순서 강제 프로토콜 - UserPromptSubmit hook
+# 프로젝트(.claude) + 글로벌(~/.claude) skills 자동 탐색
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_CLAUDE_DIR="$(dirname "$SCRIPT_DIR")"
+GLOBAL_CLAUDE_DIR="$HOME/.claude"
 
 echo "✅ [Hook] 워크플로우 순서 강제 프로토콜 실행됨"
 
@@ -24,13 +29,6 @@ PHASE 1: 계획 (Planning) - 구현 전 필수
 - [ ] 관련 Skill 문서 확인 (.claude/skills/)
 - [ ] 필요시 Context 문서 확인 (.claude/context/)
 - [ ] 기존 코드 탐색 (Explore Agent 또는 직접 탐색)
-
-Skill 문서 위치:
-| 주제 | 경로 |
-|------|------|
-| API 개발 | .claude/skills/api/SKILL.md |
-| Frontend 개발 | .claude/skills/frontend/SKILL.md |
-| 공통 패턴 | .claude/skills/common/SKILL.md |
 
 ### Step 1.2: 수정 계획 작성
 
@@ -58,15 +56,7 @@ PHASE 2: 구현 (Implementation)
 
 ### Step 2.2: Skill 규칙 준수
 
-**API 개발 시:**
-- [ ] RepositoryProvider 사용 (InjectRepository 금지)
-- [ ] Entity Factory Method 사용
-- [ ] findOrFail + catch 패턴
-
-**Frontend 개발 시:**
-- [ ] tailwind-styled-components 사용
-- [ ] Styled Components 파일 하단 배치
-- [ ] React Hook Form + Zod 폼 검증
+구현 시 아래 Skills에서 해당하는 규칙을 참조하세요.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 PHASE 3: 리뷰 (Review) - 구현 후 필수
@@ -126,6 +116,57 @@ style: 코드 스타일 변경
 │  PHASE 4: 커밋                                              │
 │  └─ 4.1 git add (개별) + commit                             │
 └─────────────────────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+참조 가능한 Skills (자동 탐색됨)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EOF
+
+# === Skills 탐색 함수 ===
+scan_skills() {
+  local base_dir="$1"
+  local label="$2"
+
+  if [ -d "$base_dir/skills" ]; then
+    local found=false
+    for skill_dir in "$base_dir/skills"/*/; do
+      if [ -d "$skill_dir" ]; then
+        skill_name=$(basename "$skill_dir")
+        skill_file="$skill_dir/SKILL.md"
+
+        if [ -f "$skill_file" ]; then
+          if [ "$found" = false ]; then
+            echo "**$label**"
+            echo ""
+            found=true
+          fi
+          local display_path
+          if [[ "$skill_dir" == "$GLOBAL_CLAUDE_DIR"* ]]; then
+            display_path="~/.claude/skills/$skill_name/SKILL.md"
+          else
+            display_path=".claude/skills/$skill_name/SKILL.md"
+          fi
+          echo "**[$skill_name]** \`$display_path\`"
+          echo '```yaml'
+          head -6 "$skill_file"
+          echo '```'
+          echo ""
+        fi
+      fi
+    done
+  fi
+}
+
+# 프로젝트 Skills (우선)
+scan_skills "$PROJECT_CLAUDE_DIR" "프로젝트 Skills"
+
+# 글로벌 Skills (다른 경우에만)
+if [ "$PROJECT_CLAUDE_DIR" != "$GLOBAL_CLAUDE_DIR" ]; then
+  scan_skills "$GLOBAL_CLAUDE_DIR" "글로벌 Skills"
+fi
+
+cat << 'EOF'
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 예외 상황
