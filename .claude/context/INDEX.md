@@ -17,11 +17,13 @@ estimated_tokens: ~200
 
 ## 도메인 (`domain/`)
 
-| 문서                                | 설명                                     |
-| ----------------------------------- | ---------------------------------------- |
-| [features.md](./domain/features.md) | 기능 명세 (사용자 유형, 접근 권한)       |
-| [user.md](./domain/user.md)         | User 도메인 (Entity, Service, Router)    |
-| [post.md](./domain/post.md)         | Post 도메인 (Entity, 접근 권한, Service) |
+| 문서                                | 설명                                             |
+| ----------------------------------- | ------------------------------------------------ |
+| [overview.md](./domain/overview.md) | 프로젝트 기획서 (비전, 사용자 유형, 서비스 구성) |
+| [features.md](./domain/features.md) | 기능 명세 (접근 권한, 유료/무료 섹션, 결제)      |
+| [user.md](./domain/user.md)         | User 도메인 (Entity, Service, Router)            |
+| [post.md](./domain/post.md)         | Post 도메인 (Entity, 유료/무료 섹션, 접근 권한)  |
+| [seo.md](./domain/seo.md)           | SEO 전략 (Partial SSR, 메타태그 서버 주입)       |
 
 ## 빠른 참조
 
@@ -39,5 +41,8 @@ estimated_tokens: ~200
 
 ### 비즈니스 로직
 
-1. **접근 권한**: `context/domain/post.md` → 접근 권한 시스템
-2. **JWT 인증**: `context/domain/user.md` → JWT 설정
+1. **프로젝트 기획**: `context/domain/overview.md` → 비전, 주요 Flow
+2. **유료/무료 섹션**: `context/domain/post.md` → 유료/무료 섹션 구분
+3. **접근 권한**: `context/domain/post.md` → 접근 권한 시스템
+4. **JWT 인증**: `context/domain/user.md` → JWT 설정
+5. **SEO 전략**: `context/domain/seo.md` → Partial SSR, 메타태그 서버 주입

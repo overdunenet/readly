@@ -11,8 +11,7 @@
 | 서비스     | 포트 |
 | ---------- | ---- |
 | API        | 3000 |
-| Client     | 5173 |
-| Editor     | 5174 |
+| Web App    | 5173 |
 | Backoffice | 5175 |
 
 ## 환경 변수
@@ -20,7 +19,6 @@
 ```bash
 # API
 DATABASE_URL=postgresql://...
-REDIS_URL=redis://...
 JWT_SECRET=...
 
 # Frontend

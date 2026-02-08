@@ -15,12 +15,10 @@
 - **Backend**: tRPC + NestJS
 - **Frontend**: React + Vite + Tailwind CSS
 - **Database**: PostgreSQL + TypeORM
-- **Cache**: Redis
 
 ## 서비스 구성
 
-- **Client**: 팔로워용 React 앱 (콘텐츠 소비자)
-- **Editor**: 에디터용 React 앱 (콘텐츠 생산자)
+- **Web App**: 팔로워 + 에디터 통합 React 앱 (콘텐츠 소비/생산)
 - **Backoffice**: 관리자용 React 앱 (플랫폼 운영자)
 
 ## 폴더 구조
@@ -29,8 +27,7 @@
 readly/
 ├── apps/
 │   ├── api/          # tRPC + NestJS API
-│   ├── client/       # 팔로워용 React 앱
-│   ├── editor/       # 에디터용 React 앱
+│   ├── client/       # 팔로워 + 에디터 통합 웹앱 (단일 배포)
 │   └── backoffice/   # 관리자용 React 앱
 ├── packages/
 │   ├── shared/       # 공통 유틸리티
@@ -45,8 +42,7 @@ readly/
 ```bash
 yarn dev           # 모든 서비스 개발 서버 시작
 yarn dev:api       # API 서버만 시작
-yarn dev:client    # Client 앱만 시작
-yarn dev:editor    # Editor 앱만 시작
+yarn dev:client    # Web App(팔로워+에디터) 시작
 yarn dev:backoffice # Backoffice 앱만 시작
 yarn lint          # 코드 린팅
 yarn typecheck     # 타입 체크
