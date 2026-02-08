@@ -10,14 +10,6 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  optimizeDeps: {
-    include: ['react-quill-new'],
-  },
-  build: {
-    commonjsOptions: {
-      transformMixedEsModules: true,
-    },
-  },
   resolve: {
     alias: {
       '@': '/src',

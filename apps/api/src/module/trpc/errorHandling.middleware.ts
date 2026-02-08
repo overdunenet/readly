@@ -2,7 +2,7 @@ import {
   MiddlewareOptions,
   MiddlewareResponse,
   TRPCMiddleware,
-} from 'nestjs-trpc';
+} from 'nestjs-trpc-v2';
 import { Injectable } from '@nestjs/common';
 import { transformToTRPCError } from '@src/utils/trpc-error-transformer';
 

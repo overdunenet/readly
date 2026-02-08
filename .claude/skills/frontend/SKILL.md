@@ -228,28 +228,28 @@ const createMutation = trpc.post.create.useMutation({
 
 ## 에디터 (Rich Text)
 
-**react-quill-new 사용**
+**CKEditor 5 사용** (`ckeditor5` + `@ckeditor/ckeditor5-react`)
 
 ```typescript
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import { ClassicEditor, Essentials, Paragraph, Heading, Bold, Italic, Underline, Strikethrough, List, BlockQuote, CodeBlock, Link, Image, ImageInsert, Base64UploadAdapter, RemoveFormat, EditorConfig } from 'ckeditor5';
+import 'ckeditor5/ckeditor5.css';
+
+const editorConfig: EditorConfig = {
+  plugins: [Essentials, Paragraph, Heading, Bold, Italic, Underline, Strikethrough, List, BlockQuote, CodeBlock, Link, Image, ImageInsert, Base64UploadAdapter, RemoveFormat],
+  toolbar: ['heading', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'numberedList', 'bulletedList', '|', 'blockQuote', 'codeBlock', '|', 'link', 'insertImage', '|', 'removeFormat'],
+  placeholder: '내용을 입력하세요',
+};
 
 <Controller
   name="content"
   control={control}
   render={({ field }) => (
-    <ReactQuill
-      theme="snow"
-      value={field.value}
-      onChange={field.onChange}
-      modules={{
-        toolbar: [
-          [{ header: [1, 2, 3, false] }],
-          ['bold', 'italic', 'underline'],
-          [{ list: 'ordered' }, { list: 'bullet' }],
-          ['link', 'image'],
-        ],
-      }}
+    <CKEditor
+      editor={ClassicEditor}
+      config={editorConfig}
+      data={field.value}
+      onChange={(_event, editor) => field.onChange(editor.getData())}
     />
   )}
 />

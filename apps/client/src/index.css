@@ -1,19 +1,20 @@
 @import "tailwindcss";
 
-/* Quill Editor Customization */
-.ql-editor {
+/* CKEditor Customization */
+.ck-editor__editable_inline {
   min-height: 300px;
   font-size: 14px;
 }
 
-.ql-toolbar {
+.ck.ck-toolbar {
   border-top: none !important;
   border-left: none !important;
   border-right: none !important;
 }
 
-.ql-container {
+.ck.ck-editor__main > .ck-editor__editable {
   border: none !important;
+  box-shadow: none !important;
 }
 
 /* Snappy Modal Customization */

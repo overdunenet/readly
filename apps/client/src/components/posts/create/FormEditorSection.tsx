@@ -1,5 +1,24 @@
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import {
+  ClassicEditor,
+  Essentials,
+  Paragraph,
+  Heading,
+  Bold,
+  Italic,
+  Underline,
+  Strikethrough,
+  List,
+  BlockQuote,
+  CodeBlock,
+  Link,
+  Image,
+  ImageInsert,
+  Base64UploadAdapter,
+  RemoveFormat,
+  EditorConfig,
+} from 'ckeditor5';
 import { Controller, Control, FieldErrors } from 'react-hook-form';
-import ReactQuill from 'react-quill-new';
 import tw from 'tailwind-styled-components';
 
 import { CreatePostForm } from './types';
@@ -35,13 +54,11 @@ export function FormEditorSection({ control, errors }: FormEditorSectionProps) {
           control={control}
           render={({ field }) => (
             <EditorWrapper hasError={!!errors.content}>
-              <ReactQuill
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="포스트 내용을 작성하세요"
-                modules={quillModules}
-                formats={quillFormats}
-                theme="snow"
+              <CKEditor
+                editor={ClassicEditor}
+                config={editorConfig}
+                data={field.value}
+                onChange={(_event, editor) => field.onChange(editor.getData())}
               />
             </EditorWrapper>
           )}
@@ -54,31 +71,46 @@ export function FormEditorSection({ control, errors }: FormEditorSectionProps) {
   );
 }
 
-// ReactQuill configuration
-const quillModules = {
-  toolbar: [
-    [{ header: [1, 2, 3, false] }],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ list: 'ordered' }, { list: 'bullet' }],
-    ['blockquote', 'code-block'],
-    ['link', 'image'],
-    ['clean'],
+// CKEditor configuration
+const editorConfig: EditorConfig = {
+  plugins: [
+    Essentials,
+    Paragraph,
+    Heading,
+    Bold,
+    Italic,
+    Underline,
+    Strikethrough,
+    List,
+    BlockQuote,
+    CodeBlock,
+    Link,
+    Image,
+    ImageInsert,
+    Base64UploadAdapter,
+    RemoveFormat,
   ],
+  toolbar: [
+    'heading',
+    '|',
+    'bold',
+    'italic',
+    'underline',
+    'strikethrough',
+    '|',
+    'numberedList',
+    'bulletedList',
+    '|',
+    'blockQuote',
+    'codeBlock',
+    '|',
+    'link',
+    'insertImage',
+    '|',
+    'removeFormat',
+  ],
+  placeholder: '포스트 내용을 작성하세요',
 };
-
-const quillFormats = [
-  'header',
-  'bold',
-  'italic',
-  'underline',
-  'strike',
-  'list',
-  'bullet',
-  'blockquote',
-  'code-block',
-  'link',
-  'image',
-];
 
 // Styled Components
 const FormSection = tw.div`

@@ -5,8 +5,8 @@ import {
   Router,
   Mutation,
   UseMiddlewares,
-  Ctx,
-} from 'nestjs-trpc';
+  Context,
+} from 'nestjs-trpc-v2';
 import { BaseTrpcRouter } from '../trpc/baseTrpcRouter';
 import {
   UserAuthMiddleware,
@@ -81,7 +81,7 @@ export class UserRouter extends BaseTrpcRouter {
   async login(
     @Input('email') email: string,
     @Input('password') password: string,
-    @Ctx() ctx: any
+    @Context() ctx: any
   ) {
     const result = await this.microserviceClient.send('user.login', {
       email,
@@ -105,7 +105,7 @@ export class UserRouter extends BaseTrpcRouter {
     input: z.object({}),
     output: loginResponseSchema,
   })
-  async refreshToken(@Ctx() ctx: any) {
+  async refreshToken(@Context() ctx: any) {
     const refreshToken = this.cookieService.getRefreshTokenFromCookie(ctx.req);
     if (!refreshToken) {
       throw new Error('Refresh token not found');
@@ -133,7 +133,7 @@ export class UserRouter extends BaseTrpcRouter {
     input: z.object({}),
     output: z.boolean(),
   })
-  async logout(@Ctx() ctx: any) {
+  async logout(@Context() ctx: any) {
     // Clear refreshToken cookie
     this.cookieService.clearRefreshTokenCookie(ctx.res);
     return true;
@@ -146,7 +146,7 @@ export class UserRouter extends BaseTrpcRouter {
   @Query({
     output: userSchema,
   })
-  async me(@Ctx() ctx: UserAuthorizedContext) {
+  async me(@Context() ctx: UserAuthorizedContext) {
     const result = await this.microserviceClient.send('user.getMe', {
       userId: ctx.user.sub,
     });
