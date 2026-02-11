@@ -1,27 +1,25 @@
 ---
-name: Post-Domain
-description: Post 도메인 모델. Entity, 접근 권한, 유료/무료 섹션(freeContent/paidContent), 발행 흐름.
+name: codebase-post-entity
+description: PostEntity 구조, 권한 검증 로직, Repository 확장, tRPC Router
 keywords:
   [
-    Post,
-    Entity,
-    접근권한,
-    발행,
-    draft,
-    published,
-    Repository,
+    PostEntity,
     freeContent,
     paidContent,
-    유료,
-    무료,
-    콘텐츠타입,
+    accessLevel,
+    canAccessPaidContent,
+    PostRouter,
   ]
-estimated_tokens: ~1000
+estimated_tokens: ~800
+related_contexts:
+  - business-access-control
+  - business-payment
+  - codebase-user-entity
 ---
 
-# Post 도메인
+# PostEntity 및 권한 검증
 
-## PostEntity
+## PostEntity 구조
 
 ```typescript
 @Entity('posts')
@@ -80,32 +78,6 @@ export class PostEntity extends BaseEntity {
 }
 ```
 
-## 유료/무료 섹션 구분
-
-### 설계 원칙
-
-하나의 Post는 **무료 구간(freeContent)**과 **유료 구간(paidContent)** 두 개의 필드로 나뉩니다.
-
-| 필드          | 용도                      | 노출 조건         |
-| ------------- | ------------------------- | ----------------- |
-| `freeContent` | 무료 공개 부분 (미리보기) | 항상 노출         |
-| `paidContent` | 유료 부분 (본문)          | 결제/구독 후 노출 |
-
-### 접근 시나리오
-
-| accessLevel  | freeContent | paidContent   |
-| ------------ | ----------- | ------------- |
-| `public`     | 모두 열람   | 모두 열람     |
-| `subscriber` | 모두 열람   | 구독자만 열람 |
-| `purchaser`  | 모두 열람   | 구매자만 열람 |
-| `private`    | 작성자만    | 작성자만      |
-
-### 필드 분리 방식 선택 이유
-
-- **보안**: 서버에서 유료 콘텐츠 자체를 미전송 (마커 방식은 프론트에서 숨기는 것에 불과)
-- **단순성**: 프론트엔드에서 조건부 렌더링 로직이 간단
-- **확장성**: 향후 유료 구간별 가격 차등 등 확장 용이
-
 ## 콘텐츠 타입 (향후 확장)
 
 | contentType | 설명                          | 현재 상태            |
@@ -116,18 +88,7 @@ export class PostEntity extends BaseEntity {
 
 > 현재는 `text` 타입만 구현합니다. `contentType` 필드는 향후 확장을 위해 Entity에 포함합니다.
 
-## 접근 권한 시스템
-
-| accessLevel  | 설명        | 접근 가능                   |
-| ------------ | ----------- | --------------------------- |
-| `public`     | 전체공개    | 모든 사용자 (비로그인 포함) |
-| `subscriber` | 구독자 전용 | 작성자 + 구독자             |
-| `purchaser`  | 구매자 전용 | 작성자 + 구매자             |
-| `private`    | 비공개      | 작성자만                    |
-
-## 비즈니스 로직
-
-### Factory Method
+## Factory Method
 
 ```typescript
 static create(input: {
@@ -156,7 +117,7 @@ static create(input: {
 }
 ```
 
-### 발행/취소
+## 발행/취소 메서드
 
 ```typescript
 publish(): void {
@@ -176,7 +137,7 @@ unpublish(): void {
 }
 ```
 
-### 권한 검증
+## 권한 검증 메서드
 
 ```typescript
 // 수정 권한
@@ -301,13 +262,8 @@ const response = {
 
 ## 포스트 작성 흐름
 
-```mermaid
-flowchart LR
-    A[create] -->|draft| B[update]
-    B -->|여러 번 가능| B
-    B --> C[publish]
-    C -->|필요시| D[unpublish]
-    D --> B
+```
+create → (draft) → update (여러 번 가능) → publish → [필요시] unpublish → update
 ```
 
 ## 프론트엔드 폼 스키마
@@ -324,3 +280,8 @@ const createPostSchema = z.object({
   thumbnail: z.string().url().optional(),
 });
 ```
+
+## 관련 문서
+
+- `business/access-control.md`: 접근 권한 정책
+- `codebase/user-entity.md`: UserEntity와의 관계
