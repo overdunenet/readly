@@ -1,11 +1,15 @@
 ---
-name: Project-Overview
-description: Readly 프로젝트 전체 기획서. 비전, 핵심 가치, 사용자 유형, 서비스 구성, 주요 Flow.
-keywords: [기획, 비전, 개요, overview, 유료블로그, 팬픽, 콘텐츠, 서비스구성]
-estimated_tokens: ~600
+name: business-overview
+description: Readly 서비스 개요 - 비전, 사용자 유형, 서비스 구성, 주요 Flow
+keywords: [비전, 사용자, 팔로워, 에디터, 서비스구성, Flow, 유료블로그]
+estimated_tokens: ~500
+related_contexts:
+  - business-access-control
+  - business-payment
+  - codebase-architecture-overview
 ---
 
-# Readly 프로젝트 기획서
+# Readly 서비스 개요
 
 ## 비전
 
@@ -31,30 +35,6 @@ Instagram처럼 사용자가 Post를 발행하고, 다른 사용자가 해당 Po
 
 ## 서비스 구성
 
-```mermaid
-flowchart TB
-    subgraph Frontend["Frontend"]
-        subgraph WebApp["Web App :5173"]
-            SSR["Express SSR Server<br/>(메타태그 주입)"]
-            SPA["React SPA<br/>(팔로워 + 에디터 통합)"]
-        end
-        Backoffice["Backoffice :5175<br/>(관리자용)"]
-    end
-
-    subgraph API["API Server :3000"]
-        tRPC["tRPC + NestJS"]
-    end
-
-    subgraph Storage["Storage"]
-        PostgreSQL[(PostgreSQL)]
-    end
-
-    SSR -->|SEO 데이터 조회| tRPC
-    SPA -->|tRPC Client| tRPC
-    Backoffice -->|tRPC Client| tRPC
-    tRPC --> PostgreSQL
-```
-
 | 앱             | 대상            | 주요 기능                                               |
 | -------------- | --------------- | ------------------------------------------------------- |
 | **Web App**    | 팔로워 + 에디터 | Post 열람/검색/구매/구독 + Post 작성/발행/수익 대시보드 |
@@ -62,44 +42,30 @@ flowchart TB
 | **API**        | 전체            | tRPC + NestJS 백엔드, 인증, 결제 처리                   |
 
 > Client(팔로워용)와 Editor(에디터용)는 **하나의 프론트엔드 앱으로 통합 배포**됩니다.
-> Web App은 **Partial SSR** 방식으로 SEO 메타태그만 서버에서 주입하고, 본문은 클라이언트에서 렌더링합니다. (상세: `domain/seo.md`)
 
 ## 주요 Flow
 
 ### 1. Post 발행 Flow (에디터)
 
-```mermaid
-flowchart LR
-    A["Post 생성<br/>(draft)"] --> B["무료 구간 작성<br/>(freeContent)"]
-    B --> C["유료 구간 작성<br/>(paidContent)"]
-    C --> D["접근 권한<br/>가격 설정"]
-    D --> E["발행<br/>(publish)"]
+```
+Post 생성(draft) → 무료 구간 작성(freeContent) → 유료 구간 작성(paidContent) → 접근 권한/가격 설정 → 발행(publish)
 ```
 
 ### 2. Post 열람 Flow (팔로워)
 
-```mermaid
-flowchart TD
-    A["Post 목록 조회"] --> B["Post 선택"]
-    B --> C["무료 구간 표시<br/>(freeContent)"]
-    C --> D{"유료 구간<br/>존재?"}
-    D -->|없음| E["전체 콘텐츠 열람"]
-    D -->|있음| F["유료 구간 잠금 표시"]
-    F --> G{"결제/구독<br/>여부"}
-    G -->|결제 완료| H["전체 콘텐츠 열람"]
-    G -->|미결제| I["결제/구독 유도"]
-    I --> G
+```
+Post 목록 조회 → Post 선택 → 무료 구간 표시(freeContent)
+→ [유료 구간 있음] → 결제/구독 여부 확인
+  → [결제 완료] → 전체 콘텐츠 열람
+  → [미결제] → 결제/구독 유도
 ```
 
 ### 3. 결제 Flow
 
-```mermaid
-flowchart TD
-    A["팔로워가<br/>유료 Post 열람 시도"] --> B{"결제 방식<br/>선택"}
-    B -->|개별 구매| C["Post 단건 결제"]
-    B -->|구독| D["에디터 월간 구독"]
-    C --> E["해당 Post<br/>유료 구간 열람"]
-    D --> F["구독자 전용 Post<br/>전체 열람"]
+```
+팔로워가 유료 Post 열람 시도
+→ [개별 구매] → Post 단건 결제 → 해당 Post 유료 구간 열람
+→ [구독] → 에디터 월간 구독 → 구독자 전용 Post 전체 열람
 ```
 
 ## 콘텐츠 타입
@@ -117,10 +83,6 @@ flowchart TD
 
 ## 관련 문서
 
-| 문서                    | 설명                                   |
-| ----------------------- | -------------------------------------- |
-| `domain/features.md`    | 기능 명세 상세                         |
-| `domain/post.md`        | Post 도메인 모델 (유료/무료 섹션 포함) |
-| `domain/user.md`        | User 도메인 모델                       |
-| `domain/seo.md`         | SEO 전략 (Partial SSR)                 |
-| `architecture/INDEX.md` | 시스템 아키텍처                        |
+- `business/access-control.md`: 접근 권한 시스템 상세
+- `business/payment.md`: 결제/구독/환불 정책
+- `codebase/architecture-overview.md`: 시스템 아키텍처

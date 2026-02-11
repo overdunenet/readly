@@ -1,13 +1,16 @@
 ---
-name: User-Domain
-description: User 도메인 모델. Entity, Service, Router, JWT 인증.
-keywords: [User, Entity, JWT, 인증, 로그인, 회원가입, bcrypt]
-estimated_tokens: ~600
+name: codebase-user-entity
+description: UserEntity 구조, 비밀번호 관리, JWT 인증 설정
+keywords: [UserEntity, JWT, bcrypt, 인증, 로그인, AccessToken, RefreshToken]
+estimated_tokens: ~500
+related_contexts:
+  - business-overview
+  - codebase-architecture-overview
 ---
 
-# User 도메인
+# UserEntity 및 인증
 
-## UserEntity
+## UserEntity 구조
 
 ```typescript
 @Entity('users')
@@ -75,9 +78,7 @@ export const getUserRepository = (source?) =>
     });
 ```
 
-## UserService
-
-### 주요 메서드
+## UserService 주요 메서드
 
 | 메서드                | 설명              |
 | --------------------- | ----------------- |
@@ -168,3 +169,8 @@ auth: {
   },
 }
 ```
+
+## 관련 문서
+
+- `codebase/post-entity.md`: PostEntity와 User 관계
+- `codebase/architecture-overview.md`: API 아키텍처

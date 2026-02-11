@@ -1,11 +1,46 @@
 ---
-name: Codebase Index
-description: 코드베이스 모듈 참조 목록
+name: codebase-context-index
+description: Codebase Context 인덱스 - Readly 구현 아키텍처 및 Entity 구조
+keywords: [코드베이스, 구현, 아키텍처, Entity, tRPC, SSR]
+estimated_tokens: ~150
 ---
 
-# Codebase Context Index
+# Codebase Context 인덱스
 
-## 모듈 목록
+이 폴더는 Readly 서비스의 **구현 방법과 코드 구조**를 담고 있습니다.
+"어떻게 구현되어 있는가", "어떤 기술을 사용하는가"에 대한 답입니다.
 
-| 모듈 | 설명 | 문서 |
-| ---- | ---- | ---- |
+## 문서 목록
+
+| 문서                                                   | 설명                                |
+| ------------------------------------------------------ | ----------------------------------- |
+| [architecture-overview.md](./architecture-overview.md) | 시스템 구성, 포트, 기술 스택        |
+| [user-entity.md](./user-entity.md)                     | UserEntity 구조, JWT 인증           |
+| [post-entity.md](./post-entity.md)                     | PostEntity 구조, 권한 검증 로직     |
+| [seo-implementation.md](./seo-implementation.md)       | Partial SSR 구현 (Express, SeoHead) |
+
+## 빠른 참조
+
+### 핵심 기술
+
+- **Backend**: tRPC + NestJS + TypeORM + PostgreSQL
+- **Frontend**: React + Vite + TailwindCSS
+- **인증**: JWT (Access 15분, Refresh 7일)
+- **SEO**: Partial SSR (메타태그만 서버 렌더링)
+
+### Entity 요약
+
+**UserEntity**: email, password(bcrypt), nickname, profileImage
+**PostEntity**: freeContent, paidContent, accessLevel, status, price
+
+### 포트
+
+- API: 3000
+- Web App: 5173
+- Backoffice: 5175
+
+### 관련 Business Context
+
+- `business/overview.md`: 서비스 비전 및 Flow
+- `business/access-control.md`: 접근 권한 정책
+- `business/seo-strategy.md`: SEO 전략 배경
