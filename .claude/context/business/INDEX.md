@@ -18,6 +18,7 @@ estimated_tokens: ~150
 | [access-control.md](./access-control.md) | 접근 권한 시스템 (무료/유료 구간 구분) |
 | [payment.md](./payment.md)               | 결제 수단, 유형, 환불 정책             |
 | [seo-strategy.md](./seo-strategy.md)     | SEO 전략 목적 및 Partial SSR 채택 배경 |
+| [developer-experience.md](./developer-experience.md) | Claude Code 사용 경험 최적화           |
 
 ## 빠른 참조
 

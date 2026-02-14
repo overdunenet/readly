@@ -18,6 +18,8 @@ estimated_tokens: ~150
 | [user-entity.md](./user-entity.md)                     | UserEntity 구조, JWT 인증           |
 | [post-entity.md](./post-entity.md)                     | PostEntity 구조, 권한 검증 로직     |
 | [seo-implementation.md](./seo-implementation.md)       | Partial SSR 구현 (Express, SeoHead) |
+| [context-handoff.md](./context-handoff.md)         | Context Handoff Skill 구조            |
+| [prompt-structuring.md](./prompt-structuring.md)   | Prompt Structuring Skill 구조         |
 
 ## 빠른 참조
 
