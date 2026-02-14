@@ -7,12 +7,14 @@ estimated_tokens: ~350
 
 # tailwind-styled-components 스킬
 
+<rules>
+
 ## 핵심 원칙
 
 **DOM depth를 최소화하라.**
 
-- 불필요한 wrapper div 제거
-- 스타일만을 위한 중첩 요소 금지
+- 불필요한 wrapper div를 제거
+- 단일 수준 구조를 유지 (스타일 전용 중첩 대신)
 - 하나의 Styled Component가 하나의 DOM 요소
 
 ## 필수 준수 사항
@@ -24,8 +26,13 @@ estimated_tokens: ~350
 | `<Wrapper><Inner><Content>...</Content></Inner></Wrapper>` | `<Container>...</Container>` |
 | `<div><div className="...">...</div></div>`                | `<StyledDiv>...</StyledDiv>` |
 
+</rules>
+
+<examples>
+
 ### 예제: 불필요한 중첩 제거
 
+<example type="bad">
 ```typescript
 // ❌ Bad - 불필요한 DOM depth
 const Card = () => (
@@ -39,7 +46,10 @@ const Card = () => (
     </div>
   </div>
 );
-
+```
+</example>
+<example type="good">
+```typescript
 // ✅ Good - 최소한의 DOM depth
 const CardContainer = tw.div`
   p-4
@@ -52,14 +62,17 @@ const CardContainer = tw.div`
 `;
 
 const Card = () => (
-  <CardContainer>
-    {content}
-  </CardContainer>
+<CardContainer>
+{content}
+</CardContainer>
 );
-```
+
+````
+</example>
 
 ### 예제: Tailwind 디자인 변환
 
+<example type="bad">
 ```typescript
 // 원본 Tailwind (depth: 3)
 <div className="p-5">
@@ -69,7 +82,11 @@ const Card = () => (
     </div>
   </div>
 </div>
+````
 
+</example>
+<example type="good">
+```typescript
 // ✅ 변환 후 (depth: 1)
 const StepContent = tw.div`
   p-5
@@ -84,6 +101,9 @@ const StepContent = tw.div`
   <Title>Title</Title>
 </StepContent>
 ```
+</example>
+
+</examples>
 
 ## Styled Component 네이밍
 
@@ -153,16 +173,20 @@ const Input = tw.input`
 `;
 ```
 
+<checklist>
+
 ## 체크리스트
 
 ### DOM 구조
 
-- [ ] 스타일만을 위한 wrapper div가 있는가? → 제거
-- [ ] 중첩된 div를 하나로 합칠 수 있는가? → 합치기
-- [ ] depth가 3 이상인가? → 리팩토링 고려
+- [ ] 스타일 전용 wrapper div가 있는가? (있다면 제거)
+- [ ] 중첩된 div를 하나로 합칠 수 있는가? (합치기)
+- [ ] depth가 3 이상인가? (리팩토링 고려)
 
 ### Styled Component
 
 - [ ] 의미 있는 이름인가?
 - [ ] transient props($prefix)를 사용하는가?
 - [ ] 재사용 가능한 컴포넌트인가?
+
+</checklist>
