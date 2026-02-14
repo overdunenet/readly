@@ -23,9 +23,27 @@
           }
         ]
       }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/skill-forced-subagent.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dangerous-command-blocker.sh"
+          }
+        ]
+      }
     ]
-  },
-  "enabledPlugins": {
-    "oh-my-claudecode@omc": false
   }
 }
