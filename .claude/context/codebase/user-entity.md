@@ -170,6 +170,26 @@ auth: {
 }
 ```
 
+## 테스트
+
+### 파일 구조
+
+| 파일 | 역할 | 테스트 범위 |
+| ---- | ---- | ----------- |
+| apps/api/src/module/user/user.service.spec.ts | UserService 기본 통합 테스트 | Repository 접근, register, 중복 이메일 검증 |
+| apps/api/src/module/user/user.service.auth.spec.ts | UserService 인증 통합 테스트 | register, login, refreshToken, getMe, 통합 플로우 |
+
+### 테스트 패턴
+
+- **통합 테스트**: 실제 DB (Docker PostgreSQL) 사용, 트랜잭션 rollback 격리
+- **생명주기**: beforeAll에서 DataSource 초기화 + TestingModule 생성, afterAll에서 정리
+- **격리**: beforeEach에서 트랜잭션 시작, afterEach에서 rollback
+- **테스트 인프라**: `@test/jest-util`의 `getTestingModule()`, `getTestingEntityManager()` 사용
+
+### 관련 Codebase Context
+
+- [test-infrastructure.md](./test-infrastructure.md): 테스트 인프라 유틸리티
+
 ## 관련 문서
 
 - `codebase/post-entity.md`: PostEntity와 User 관계
