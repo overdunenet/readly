@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+.yarn/
+
+# Build outputs
+dist/
+coverage/
+*.tsbuildinfo
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Docker data
+docker/postgresql/data/
+
+# Lock files
+yarn.lock
+
+# Generated
+apps/api/@generated/
+apps/client/src/routeTree.gen.*
