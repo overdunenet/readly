@@ -19,13 +19,14 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'yarn dev:api',
+      command: 'yarn workspace @readly/api dev',
       url: 'http://localhost:3000',
       reuseExistingServer: !process.env.CI,
       cwd: '../../',
+      timeout: 30000,
     },
     {
-      command: 'yarn dev:client',
+      command: 'yarn workspace @readly/client dev',
       url: 'http://localhost:5173',
       reuseExistingServer: !process.env.CI,
       cwd: '../../',

@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@playwright/test": "^1.50.0",
     "@readly/api-types": "*",
     "@tanstack/router-devtools": "^1.125.3",
     "@tanstack/router-plugin": "^1.102.3",
@@ -69,7 +70,6 @@
     "puppeteer": "^24.37.3",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.22.0",
-    "vite": "^6.1.0",
-    "@playwright/test": "^1.50.0"
+    "vite": "^6.1.0"
   }
 }
