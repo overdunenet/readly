@@ -7,6 +7,10 @@ import { TransactionService } from '@src/module/shared/transaction/transaction.s
 export class DataSources {
   private static readlyInstance: DataSource;
 
+  static setTestInstance(testInstance: DataSource) {
+    this.readlyInstance = testInstance;
+  }
+
   static get readly(): DataSource {
     if (!this.readlyInstance) {
       const connectionOptions: PostgresConnectionOptions = {

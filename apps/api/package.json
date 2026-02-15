@@ -13,7 +13,7 @@
     "dev": "rm -rf .env && yarn generateEnv && nest start --watch",
     "start:prod": "rm -rf .env && node dist/scripts/generateEnv.js && node dist/src/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
+    "test": "jest --runInBand --detectOpenHandles --forceExit",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -101,8 +101,12 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
+    "globalSetup": "../testDocker/setup.js",
+    "globalTeardown": "../testDocker/teardown.js",
+    "testTimeout": 600000,
     "moduleNameMapper": {
-      "^@src/(.*)$": "<rootDir>/$1"
+      "^@src/(.*)$": "<rootDir>/$1",
+      "^@test/(.*)$": "<rootDir>/../test/$1"
     }
   }
 }
