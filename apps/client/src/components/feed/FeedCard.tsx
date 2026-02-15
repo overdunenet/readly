@@ -4,12 +4,27 @@ interface FeedCardProps {
   author: string;
   authorAvatar?: string;
   title: string;
-  excerpt: string;
-  thumbnail?: string;
-  publishedAt: string;
-  likes: number;
-  comments: number;
+  excerpt?: string | null;
+  thumbnail?: string | null;
+  publishedAt: string | Date | null;
   tags?: string[];
+}
+
+function formatRelativeTime(date: string | Date | null): string {
+  if (!date) return '';
+  const now = new Date();
+  const target = new Date(date);
+  const diffMs = now.getTime() - target.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return '방금 전';
+  if (diffMin < 60) return `${diffMin}분 전`;
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour}시간 전`;
+  const diffDay = Math.floor(diffHour / 24);
+  if (diffDay < 30) return `${diffDay}일 전`;
+  const diffMonth = Math.floor(diffDay / 30);
+  if (diffMonth < 12) return `${diffMonth}개월 전`;
+  return `${Math.floor(diffMonth / 12)}년 전`;
 }
 
 const FeedCard = ({
@@ -19,8 +34,6 @@ const FeedCard = ({
   excerpt,
   thumbnail,
   publishedAt,
-  likes,
-  comments,
   tags,
 }: FeedCardProps) => {
   return (
@@ -37,13 +50,13 @@ const FeedCard = ({
         </Avatar>
         <AuthorInfo>
           <AuthorName>{author}</AuthorName>
-          <PublishTime>{publishedAt}</PublishTime>
+          <PublishTime>{formatRelativeTime(publishedAt)}</PublishTime>
         </AuthorInfo>
       </CardHeader>
 
       <CardContent>
         <Title>{title}</Title>
-        <Excerpt>{excerpt}</Excerpt>
+        {excerpt && <Excerpt>{excerpt}</Excerpt>}
 
         {thumbnail && (
           <ThumbnailContainer>
@@ -72,7 +85,6 @@ const FeedCard = ({
           >
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
-          <span>{likes}</span>
         </ActionButton>
 
         <ActionButton>
@@ -86,7 +98,6 @@ const FeedCard = ({
           >
             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
           </svg>
-          <span>{comments}</span>
         </ActionButton>
 
         <ActionButton>
