@@ -60,4 +60,9 @@ export class PostController {
   ): Promise<PostEntity[]> {
     return this.postService.getMyPosts(data.authorId);
   }
+
+  @MessagePattern('post.getAccessible')
+  async getAccessiblePosts(): Promise<PostEntity[]> {
+    return this.postService.getAccessiblePosts();
+  }
 }
