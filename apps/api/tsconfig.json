@@ -22,7 +22,8 @@
     "resolveJsonModule": true,
     /* path */
     "paths": {
-      "@src/*": ["./src/*"]
+      "@src/*": ["./src/*"],
+      "@test/*": ["./test/*"]
     }
   }
 }
