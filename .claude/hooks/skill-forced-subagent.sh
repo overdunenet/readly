@@ -9,6 +9,10 @@ CLAUDE_DIR="$(dirname "$SCRIPT_DIR")"
 GLOBAL_CLAUDE_DIR="$HOME/.claude"
 PROJECT_CLAUDE_DIR="$(pwd)/.claude"
 
+# Dedup: project 우선, global은 project 버전 존재 시 양보
+source "$SCRIPT_DIR/_dedup.sh"
+_hook_dedup_check "${BASH_SOURCE[0]}" || exit 0
+
 echo "✅ [Hook] Subagent Skill 평가 프로토콜 실행됨"
 
 cat << 'EOF'
