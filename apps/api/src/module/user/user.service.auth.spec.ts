@@ -3,7 +3,7 @@ import {
   getTestingEntityManager,
   getTestingModule,
   testingRepositoryProvider,
-} from '@src/util/jest-util';
+} from '@test/jest-util';
 import { TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
