@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "prepare": "husky",
-    "test": "echo \"No test specified\" && exit 0"
+    "test": "echo \"No test specified\" && exit 0",
+    "test:e2e": "playwright test"
   },
   "husky": {
     "hooks": {
@@ -45,6 +46,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@playwright/test": "^1.50.0",
     "@readly/api-types": "*",
     "@tanstack/router-devtools": "^1.125.3",
     "@tanstack/router-plugin": "^1.102.3",

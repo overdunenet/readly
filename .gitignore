@@ -47,3 +47,7 @@ docker/postgresql/data
 .env
 */**/CLAUDE.md
 !.claude/CLAUDE.md
+
+# Playwright
+test-results/
+playwright-report/

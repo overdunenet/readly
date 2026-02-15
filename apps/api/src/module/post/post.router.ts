@@ -5,7 +5,7 @@ import {
   Router,
   Mutation,
   UseMiddlewares,
-  Context,
+  Ctx,
 } from 'nestjs-trpc-v2';
 import { BaseTrpcRouter } from '../trpc/baseTrpcRouter';
 import {
@@ -60,7 +60,7 @@ export class PostRouter extends BaseTrpcRouter {
     output: postResponseSchema,
   })
   async create(
-    @Context() ctx: UserAuthorizedContext,
+    @Ctx() ctx: UserAuthorizedContext,
     @Input()
     input: z.infer<typeof editPostInputSchema> & {
       title: string;
@@ -87,7 +87,7 @@ export class PostRouter extends BaseTrpcRouter {
     output: postResponseSchema,
   })
   async update(
-    @Context() ctx: UserAuthorizedContext,
+    @Ctx() ctx: UserAuthorizedContext,
     @Input('postId') postId: string,
     @Input('data') data: z.infer<typeof editPostInputSchema>
   ) {
@@ -109,7 +109,7 @@ export class PostRouter extends BaseTrpcRouter {
     output: postResponseSchema,
   })
   async publish(
-    @Context() ctx: UserAuthorizedContext,
+    @Ctx() ctx: UserAuthorizedContext,
     @Input('postId') postId: string
   ) {
     return await this.microserviceClient.send('post.publish', {
@@ -129,7 +129,7 @@ export class PostRouter extends BaseTrpcRouter {
     output: postResponseSchema,
   })
   async unpublish(
-    @Context() ctx: UserAuthorizedContext,
+    @Ctx() ctx: UserAuthorizedContext,
     @Input('postId') postId: string
   ) {
     return await this.microserviceClient.send('post.unpublish', {
@@ -149,7 +149,7 @@ export class PostRouter extends BaseTrpcRouter {
     output: z.boolean(),
   })
   async delete(
-    @Context() ctx: UserAuthorizedContext,
+    @Ctx() ctx: UserAuthorizedContext,
     @Input('postId') postId: string
   ) {
     await this.microserviceClient.send('post.delete', {
@@ -168,7 +168,7 @@ export class PostRouter extends BaseTrpcRouter {
     }),
     output: postResponseSchema,
   })
-  async getOne(@Context() ctx: any, @Input('postId') postId: string) {
+  async getOne(@Ctx() ctx: any, @Input('postId') postId: string) {
     const userId = ctx.user?.sub;
     return await this.microserviceClient.send('post.getOne', {
       postId,
@@ -183,7 +183,7 @@ export class PostRouter extends BaseTrpcRouter {
   @Query({
     output: z.array(postResponseSchema),
   })
-  async getMy(@Context() ctx: UserAuthorizedContext) {
+  async getMy(@Ctx() ctx: UserAuthorizedContext) {
     return await this.microserviceClient.send('post.getMy', {
       authorId: ctx.user.sub,
     });
@@ -195,7 +195,7 @@ export class PostRouter extends BaseTrpcRouter {
   @Query({
     output: z.array(postResponseSchema),
   })
-  async getAccessible(@Context() ctx: any) {
+  async getAccessible(@Ctx() ctx: any) {
     const userId = ctx.user?.sub;
     return await this.microserviceClient.send('post.getAccessible', {
       userId,
