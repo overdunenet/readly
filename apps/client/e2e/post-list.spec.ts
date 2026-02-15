@@ -33,16 +33,20 @@ async function seedPublishedPost(overrides?: {
   content?: string;
   nickname?: string;
 }) {
-  // 1. 사용자 등록 (accessToken 획득)
+  // 1. 사용자 등록
   const email = uniqueEmail();
   const nickname =
     overrides?.nickname ?? `author-${Math.random().toString(36).slice(2, 7)}`;
-  const registerResult = await trpcMutation('user.register', {
+  const password = 'password123';
+  await trpcMutation('user.register', {
     email,
-    password: 'password123',
+    password,
     nickname,
   });
-  const accessToken = registerResult.accessToken;
+
+  // 로그인하여 accessToken 획득
+  const loginResult = await trpcMutation('user.login', { email, password });
+  const accessToken = loginResult.accessToken;
 
   // 2. 포스트 생성
   const title = overrides?.title ?? '테스트 포스트 제목';
