@@ -12,7 +12,7 @@ import { SharedModule } from '../shared/shared.module';
     JwtModule.register({
       secret: ConfigProvider.auth.jwt.user.access.secret,
       signOptions: {
-        expiresIn: ConfigProvider.auth.jwt.user.access.expiresIn,
+        expiresIn: ConfigProvider.auth.jwt.user.access.expiresIn as any,
       },
     }),
   ],
