@@ -1,7 +1,7 @@
 ---
 name: codebase-context-index
 description: Codebase Context 인덱스 - Readly 구현 아키텍처 및 Entity 구조
-keywords: [코드베이스, 구현, 아키텍처, Entity, tRPC, SSR]
+keywords: [코드베이스, 구현, 아키텍처, Entity, tRPC, 프리렌더링]
 estimated_tokens: ~150
 ---
 
@@ -17,7 +17,7 @@ estimated_tokens: ~150
 | [architecture-overview.md](./architecture-overview.md) | 시스템 구성, 포트, 기술 스택        |
 | [user-entity.md](./user-entity.md)                     | UserEntity 구조, JWT 인증           |
 | [post-entity.md](./post-entity.md)                     | PostEntity 구조, 권한 검증 로직     |
-| [seo-implementation.md](./seo-implementation.md)       | Partial SSR 구현 (Express, SeoHead) |
+| [seo-implementation.md](./seo-implementation.md)       | 빌드 타임 프리렌더링 구현 (Vite Plugin, Helmet) |
 | [test-infrastructure.md](./test-infrastructure.md) | 통합 테스트 인프라 (트랜잭션 rollback 격리) |
 | [context-handoff.md](./context-handoff.md)         | Context Handoff Skill 구조            |
 | [prompt-structuring.md](./prompt-structuring.md)   | Prompt Structuring Skill 구조         |
@@ -29,7 +29,7 @@ estimated_tokens: ~150
 - **Backend**: tRPC + NestJS + TypeORM + PostgreSQL
 - **Frontend**: React + Vite + TailwindCSS
 - **인증**: JWT (Access 15분, Refresh 7일)
-- **SEO**: Partial SSR (메타태그만 서버 렌더링)
+- **SEO**: 빌드 타임 프리렌더링 (Vite Plugin + Puppeteer + react-helmet-async)
 
 ### Entity 요약
 
