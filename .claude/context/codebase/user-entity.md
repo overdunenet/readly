@@ -170,6 +170,12 @@ auth: {
 }
 ```
 
+### 타입 호환성 참고
+
+- `ConfigProvider.auth.jwt.user.access.expiresIn` 값을 `JwtModule.register()` 및 `JwtService.signAsync()`에 전달할 때 `as any` 타입 캐스트 사용
+- 원인: `@nestjs/jwt`의 `expiresIn` 타입과 ConfigProvider 반환 타입 간 호환성 불일치
+- 관련 파일: `apps/api/src/module/user/user.module.ts`, `apps/api/src/module/user/user.service.ts`
+
 ## 관련 문서
 
 - `codebase/post-entity.md`: PostEntity와 User 관계
