@@ -30,6 +30,7 @@ fi
   echo "─────────┼────────┼────────────────┼──────────────────────────────────────────"
 
   # 태스크 출력 (Done 제외, Priority 순: P0 → P1 → P2 → 없음)
+  # jq에서 Issue 번호를 직접 포맷: Issue → #번호, DraftIssue → "draft"
   echo "$TASKS" | jq -r '
     .items
     | map(select(.status != "Done"))
@@ -40,18 +41,22 @@ fi
         else 3 end
       )
     | .[]
-    | "\(.priority // "-")\t\(.content.number // "-")\t\(.status // "-")\t\(.title)"
-  ' | while IFS=$'\t' read -r priority issue_no status title; do
-    # Issue 번호 포맷
-    if [ "$issue_no" != "-" ]; then
-      issue_no="#${issue_no}"
-    fi
-    # Title 길이 제한 (37자)
-    if [ ${#title} -gt 37 ]; then
-      title="${title:0:37}..."
-    fi
-    printf "%-8s │ %-6s │ %-14s │ %-40s\n" "$priority" "$issue_no" "$status" "$title"
-  done
+    | "\(.priority // "-")\t\(if .content.type == "Issue" and .content.number then "#\(.content.number)" else "draft" end)\t\(.status // "-")\t\(.title)"
+  ' | {
+    draft_idx=0
+    while IFS=$'\t' read -r priority issue_no task_status title; do
+      # DraftIssue는 순번 부여
+      if [ "$issue_no" = "draft" ]; then
+        draft_idx=$((draft_idx + 1))
+        issue_no="D-${draft_idx}"
+      fi
+      # Title 길이 제한 (37자)
+      if [ ${#title} -gt 37 ]; then
+        title="${title:0:37}..."
+      fi
+      printf "%-8s │ %-6s │ %-14s │ %-40s\n" "$priority" "$issue_no" "$task_status" "$title"
+    done
+  }
 
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo "💡 /tasks 로 상세 목록 확인 | 진행중: ${TOTAL}개"
