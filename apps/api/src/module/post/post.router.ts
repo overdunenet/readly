@@ -29,10 +29,6 @@ const editPostInputSchema = z.object({
   price: z.number().int().min(0).optional(),
 });
 
-const schedulePostInputSchema = z.object({
-  scheduledAt: z.date(),
-});
-
 const postResponseSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -46,6 +42,14 @@ const postResponseSchema = z.object({
   scheduledAt: z.date().nullish(),
   createdAt: z.date(),
   updatedAt: z.date(),
+});
+
+const postFeedItemSchema = postResponseSchema.extend({
+  author: z.object({
+    id: z.string(),
+    nickname: z.string(),
+    profileImage: z.string().nullish(),
+  }),
 });
 
 // Editor 페이지에서 포스트 관리를 위한 Router
@@ -71,8 +75,7 @@ export class PostRouter extends BaseTrpcRouter {
       authorId: ctx.user.sub,
       input,
     });
-    return {};
-    // return postResponseSchema.parse(result);
+    return result;
   }
 
   /**
@@ -193,12 +196,9 @@ export class PostRouter extends BaseTrpcRouter {
    * 접근 가능한 포스트 목록 조회
    */
   @Query({
-    output: z.array(postResponseSchema),
+    output: z.array(postFeedItemSchema),
   })
-  async getAccessible(@Ctx() ctx: any) {
-    const userId = ctx.user?.sub;
-    return await this.microserviceClient.send('post.getAccessible', {
-      userId,
-    });
+  async getAccessible() {
+    return await this.microserviceClient.send('post.getAccessible', {});
   }
 }

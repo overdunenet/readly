@@ -126,4 +126,12 @@ export class PostService {
       order: { createdAt: 'DESC' },
     });
   }
+
+  async getAccessiblePosts(): Promise<PostEntity[]> {
+    return this.repositoryProvider.PostRepository.find({
+      where: { status: 'published', accessLevel: 'public' },
+      relations: ['author'],
+      order: { publishedAt: 'DESC' },
+    });
+  }
 }
