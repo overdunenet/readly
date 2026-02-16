@@ -129,7 +129,7 @@ export class PostService {
 
   async getAccessiblePosts(): Promise<PostEntity[]> {
     return this.repositoryProvider.PostRepository.find({
-      where: { status: 'published', accessLevel: 'public' as PostAccessLevel },
+      where: { status: 'published', accessLevel: 'public' },
       relations: ['author'],
       order: { publishedAt: 'DESC' },
     });

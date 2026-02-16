@@ -92,9 +92,9 @@ describe('PostService - getAccessiblePosts', () => {
   it('publishedAt DESC 순서로 정렬된다', async () => {
     const user = await createTestUser();
 
-    const post1 = await createTestPost(user.id, { title: '먼저 작성' });
+    await createTestPost(user.id, { title: '먼저 작성' });
     // 약간의 시간차를 위해 publishedAt을 직접 설정
-    const post2 = await createTestPost(user.id, { title: '나중에 작성' });
+    await createTestPost(user.id, { title: '나중에 작성' });
 
     const result = await service.getAccessiblePosts();
 
