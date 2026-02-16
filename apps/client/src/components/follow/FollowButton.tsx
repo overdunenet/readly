@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import tw from 'tailwind-styled-components';
 
+import { useFollow } from '../../hooks/useFollow';
 import { useAuthStore } from '../../stores/auth';
-
-import { trpc } from '@/shared';
 
 interface FollowButtonProps {
   followeeId: string;
@@ -12,67 +11,16 @@ interface FollowButtonProps {
 const FollowButton = ({ followeeId }: FollowButtonProps) => {
   const user = useAuthStore((state) => state.user);
   const [isHovered, setIsHovered] = useState(false);
+  const { isFollowing, isLoading, toggleFollow } = useFollow(followeeId);
 
-  const utils = trpc.useUtils();
-
-  const { data: isFollowing } = trpc.follow.isFollowing.useQuery(
-    { followeeId },
-    { enabled: !!user },
-  );
-
-  const followMutation = trpc.follow.follow.useMutation({
-    onMutate: async () => {
-      await utils.follow.isFollowing.cancel({ followeeId });
-      const previous = utils.follow.isFollowing.getData({ followeeId });
-      utils.follow.isFollowing.setData({ followeeId }, true);
-      return { previous };
-    },
-    onError: (_err, _vars, context) => {
-      if (context?.previous !== undefined) {
-        utils.follow.isFollowing.setData({ followeeId }, context.previous);
-      }
-    },
-    onSettled: () => {
-      utils.follow.isFollowing.invalidate({ followeeId });
-    },
-  });
-
-  const unfollowMutation = trpc.follow.unfollow.useMutation({
-    onMutate: async () => {
-      await utils.follow.isFollowing.cancel({ followeeId });
-      const previous = utils.follow.isFollowing.getData({ followeeId });
-      utils.follow.isFollowing.setData({ followeeId }, false);
-      return { previous };
-    },
-    onError: (_err, _vars, context) => {
-      if (context?.previous !== undefined) {
-        utils.follow.isFollowing.setData({ followeeId }, context.previous);
-      }
-    },
-    onSettled: () => {
-      utils.follow.isFollowing.invalidate({ followeeId });
-    },
-  });
-
-  // 비로그인 또는 자기 자신이면 숨김
   if (!user || user.id === followeeId) {
     return null;
   }
 
-  const handleClick = () => {
-    if (isFollowing) {
-      unfollowMutation.mutate({ followeeId });
-    } else {
-      followMutation.mutate({ followeeId });
-    }
-  };
-
-  const isLoading = followMutation.isPending || unfollowMutation.isPending;
-
   if (isFollowing) {
     return (
       <FollowingButton
-        onClick={handleClick}
+        onClick={toggleFollow}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         disabled={isLoading}
@@ -84,7 +32,7 @@ const FollowButton = ({ followeeId }: FollowButtonProps) => {
   }
 
   return (
-    <FollowBtn onClick={handleClick} disabled={isLoading}>
+    <FollowBtn onClick={toggleFollow} disabled={isLoading}>
       팔로우
     </FollowBtn>
   );
