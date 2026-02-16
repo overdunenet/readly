@@ -94,11 +94,12 @@ export default FollowButton;
 
 // Styled Components
 const FollowBtn = tw.button`
-  px-4
+  w-20
   py-1.5
   text-sm
   font-semibold
   text-white
+  text-center
   bg-blue-500
   rounded-full
   hover:bg-blue-600
@@ -107,10 +108,11 @@ const FollowBtn = tw.button`
 `;
 
 const FollowingButton = tw.button<{ $isHovered: boolean }>`
-  px-4
+  w-20
   py-1.5
   text-sm
   font-semibold
+  text-center
   rounded-full
   border
   transition-colors
