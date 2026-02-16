@@ -6,6 +6,7 @@ import {
   Unique,
   EntityManager,
 } from 'typeorm';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { UserEntity } from './user.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
@@ -42,11 +43,28 @@ export const getFollowRepository = (
   getEntityManager(source)
     .getRepository(FollowEntity)
     .extend({
-      async findByFollowerAndFollowee(
+      async follow(
         followerId: string,
         followeeId: string
-      ): Promise<FollowEntity | null> {
-        return this.findOneBy({ followerId, followeeId });
+      ): Promise<FollowEntity> {
+        const existing = await this.findOneBy({ followerId, followeeId });
+        if (existing) {
+          throw new ConflictException('Already following this user');
+        }
+
+        const follow = FollowEntity.create(followerId, followeeId);
+        return this.save(follow);
+      },
+
+      async unfollow(followerId: string, followeeId: string): Promise<void> {
+        const follow = await this.findOneByOrFail({
+          followerId,
+          followeeId,
+        }).catch(() => {
+          throw new NotFoundException('Not following this user');
+        });
+
+        await this.remove(follow);
       },
 
       async countFollowers(followeeId: string): Promise<number> {

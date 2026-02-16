@@ -12,20 +12,18 @@ import {
   UserAuthMiddleware,
   UserAuthorizedContext,
 } from '../user/user.auth.middleware';
+import {
+  followInputSchema,
+  followOutputSchema,
+  userIdInputSchema,
+} from './follow.schema';
 
 @Router({ alias: 'follow' })
 export class FollowRouter extends BaseTrpcRouter {
   @UseMiddlewares(UserAuthMiddleware)
   @Mutation({
-    input: z.object({
-      followeeId: z.string().uuid(),
-    }),
-    output: z.object({
-      id: z.string(),
-      followerId: z.string(),
-      followeeId: z.string(),
-      createdAt: z.date(),
-    }),
+    input: followInputSchema,
+    output: followOutputSchema,
   })
   async follow(
     @Ctx() ctx: UserAuthorizedContext,
@@ -39,9 +37,7 @@ export class FollowRouter extends BaseTrpcRouter {
 
   @UseMiddlewares(UserAuthMiddleware)
   @Mutation({
-    input: z.object({
-      followeeId: z.string().uuid(),
-    }),
+    input: followInputSchema,
     output: z.boolean(),
   })
   async unfollow(
@@ -57,9 +53,7 @@ export class FollowRouter extends BaseTrpcRouter {
 
   @UseMiddlewares(UserAuthMiddleware)
   @Query({
-    input: z.object({
-      followeeId: z.string().uuid(),
-    }),
+    input: followInputSchema,
     output: z.boolean(),
   })
   async isFollowing(
@@ -73,9 +67,7 @@ export class FollowRouter extends BaseTrpcRouter {
   }
 
   @Query({
-    input: z.object({
-      userId: z.string().uuid(),
-    }),
+    input: userIdInputSchema,
     output: z.number(),
   })
   async getFollowerCount(@Input('userId') userId: string) {
@@ -85,9 +77,7 @@ export class FollowRouter extends BaseTrpcRouter {
   }
 
   @Query({
-    input: z.object({
-      userId: z.string().uuid(),
-    }),
+    input: userIdInputSchema,
     output: z.number(),
   })
   async getFollowingCount(@Input('userId') userId: string) {

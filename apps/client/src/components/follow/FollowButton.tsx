@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import tw from 'tailwind-styled-components';
 
-import { useFollow } from '../../hooks/useFollow';
 import { useAuthStore } from '../../stores/auth';
+
+import { useFollow } from './useFollow';
 
 interface FollowButtonProps {
   followeeId: string;

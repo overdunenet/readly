@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { FollowEntity } from '../domain/follow.entity';
 
@@ -16,29 +11,17 @@ export class FollowService {
       throw new BadRequestException('Cannot follow yourself');
     }
 
-    const existing = await this.repositoryProvider.FollowRepository.findOneBy({
+    return this.repositoryProvider.FollowRepository.follow(
       followerId,
-      followeeId,
-    });
-
-    if (existing) {
-      throw new ConflictException('Already following this user');
-    }
-
-    const follow = FollowEntity.create(followerId, followeeId);
-    return this.repositoryProvider.FollowRepository.save(follow);
+      followeeId
+    );
   }
 
   async unfollow(followerId: string, followeeId: string): Promise<void> {
-    const follow =
-      await this.repositoryProvider.FollowRepository.findOneByOrFail({
-        followerId,
-        followeeId,
-      }).catch(() => {
-        throw new NotFoundException('Not following this user');
-      });
-
-    await this.repositoryProvider.FollowRepository.remove(follow);
+    return this.repositoryProvider.FollowRepository.unfollow(
+      followerId,
+      followeeId
+    );
   }
 
   async isFollowing(followerId: string, followeeId: string): Promise<boolean> {
