@@ -29,10 +29,6 @@ const editPostInputSchema = z.object({
   price: z.number().int().min(0).optional(),
 });
 
-const schedulePostInputSchema = z.object({
-  scheduledAt: z.date(),
-});
-
 const postResponseSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -202,10 +198,7 @@ export class PostRouter extends BaseTrpcRouter {
   @Query({
     output: z.array(postFeedItemSchema),
   })
-  async getAccessible(@Ctx() ctx: any) {
-    const userId = ctx.user?.sub;
-    return await this.microserviceClient.send('post.getAccessible', {
-      userId,
-    });
+  async getAccessible() {
+    return await this.microserviceClient.send('post.getAccessible', {});
   }
 }
