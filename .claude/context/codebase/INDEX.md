@@ -21,6 +21,7 @@ estimated_tokens: ~150
 | [test-infrastructure.md](./test-infrastructure.md) | 통합 테스트 인프라 (트랜잭션 rollback 격리, CI 워크플로우) |
 | [context-handoff.md](./context-handoff.md)         | Context Handoff Skill 구조            |
 | [prompt-structuring.md](./prompt-structuring.md)   | Prompt Structuring Skill 구조         |
+| [follow-module.md](./follow-module.md)             | Follow 모듈 (팔로우/언팔로우, BE+FE)   |
 
 ## 빠른 참조
 
@@ -35,6 +36,7 @@ estimated_tokens: ~150
 
 **UserEntity**: email, password(bcrypt), nickname, profileImage
 **PostEntity**: freeContent, paidContent, accessLevel, status, price
+**FollowEntity**: followerId, followeeId (Unique Constraint)
 
 ### 포트
 
