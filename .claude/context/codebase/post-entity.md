@@ -228,6 +228,29 @@ export const getPostRepository = (source?) =>
     });
 ```
 
+## PostService
+
+| 파일 | 역할 | 핵심 메서드 |
+| ---- | ---- | ----------- |
+| apps/api/src/module/post/post.service.ts | Post 비즈니스 로직 | createPost(), updatePost(), publishPost(), unpublishPost(), deletePost(), getPost(), getMyPosts(), getAccessiblePosts() |
+| apps/api/src/module/post/post.service.spec.ts | PostService 통합 테스트 | getAccessiblePosts() 시나리오 5건 |
+
+### getAccessiblePosts()
+
+```typescript
+async getAccessiblePosts(): Promise<PostEntity[]> {
+  return this.repositoryProvider.PostRepository.find({
+    where: { status: 'published', accessLevel: 'public' },
+    relations: ['author'],
+    order: { publishedAt: 'DESC' },
+  });
+}
+```
+
+- `published` + `public` 포스트만 반환
+- `publishedAt` 내림차순 정렬
+- `author` 관계 포함
+
 ## PostRouter (tRPC)
 
 ### Mutations (인증 필요)
