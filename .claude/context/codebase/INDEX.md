@@ -16,7 +16,7 @@ estimated_tokens: ~150
 | ------------------------------------------------------ | ----------------------------------- |
 | [architecture-overview.md](./architecture-overview.md) | 시스템 구성, 포트, 기술 스택        |
 | [user-entity.md](./user-entity.md)                     | UserEntity 구조, JWT 인증           |
-| [post-entity.md](./post-entity.md)                     | PostEntity 구조, 권한 검증 로직     |
+| [post-entity.md](./post-entity.md)                     | PostEntity 구조, 권한 검증 로직, PostService |
 | [seo-implementation.md](./seo-implementation.md)       | 빌드 타임 프리렌더링 구현 (Vite Plugin, Helmet) |
 | [test-infrastructure.md](./test-infrastructure.md) | 통합 테스트 인프라 (트랜잭션 rollback 격리, CI 워크플로우) |
 | [context-handoff.md](./context-handoff.md)         | Context Handoff Skill 구조            |
