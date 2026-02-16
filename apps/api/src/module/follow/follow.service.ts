@@ -16,11 +16,10 @@ export class FollowService {
       throw new BadRequestException('Cannot follow yourself');
     }
 
-    const existing =
-      await this.repositoryProvider.FollowRepository.findByFollowerAndFollowee(
-        followerId,
-        followeeId
-      );
+    const existing = await this.repositoryProvider.FollowRepository.findOneBy({
+      followerId,
+      followeeId,
+    });
 
     if (existing) {
       throw new ConflictException('Already following this user');
@@ -32,24 +31,21 @@ export class FollowService {
 
   async unfollow(followerId: string, followeeId: string): Promise<void> {
     const follow =
-      await this.repositoryProvider.FollowRepository.findByFollowerAndFollowee(
+      await this.repositoryProvider.FollowRepository.findOneByOrFail({
         followerId,
-        followeeId
-      );
-
-    if (!follow) {
-      throw new NotFoundException('Not following this user');
-    }
+        followeeId,
+      }).catch(() => {
+        throw new NotFoundException('Not following this user');
+      });
 
     await this.repositoryProvider.FollowRepository.remove(follow);
   }
 
   async isFollowing(followerId: string, followeeId: string): Promise<boolean> {
-    const follow =
-      await this.repositoryProvider.FollowRepository.findByFollowerAndFollowee(
-        followerId,
-        followeeId
-      );
+    const follow = await this.repositoryProvider.FollowRepository.findOneBy({
+      followerId,
+      followeeId,
+    });
     return !!follow;
   }
 
