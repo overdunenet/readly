@@ -1,6 +1,9 @@
 import tw from 'tailwind-styled-components';
 
+import FollowButton from '../follow/FollowButton';
+
 interface FeedCardProps {
+  authorId: string;
   author: string;
   authorAvatar?: string;
   title: string;
@@ -28,6 +31,7 @@ function formatRelativeTime(date: string | Date | null): string {
 }
 
 const FeedCard = ({
+  authorId,
   author,
   authorAvatar,
   title,
@@ -52,6 +56,7 @@ const FeedCard = ({
           <AuthorName>{author}</AuthorName>
           <PublishTime>{formatRelativeTime(publishedAt)}</PublishTime>
         </AuthorInfo>
+        <FollowButton followeeId={authorId} />
       </CardHeader>
 
       <CardContent>

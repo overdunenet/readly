@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { getUserRepository } from '@src/module/domain/user.entity';
 import { getPostRepository } from '@src/module/domain/post.entity';
+import { getFollowRepository } from '@src/module/domain/follow.entity';
 import { TransactionService } from '@src/module/shared/transaction/transaction.service';
 
 @Injectable()
@@ -13,5 +14,9 @@ export class RepositoryProvider {
 
   get PostRepository() {
     return getPostRepository(this.transaction);
+  }
+
+  get FollowRepository() {
+    return getFollowRepository(this.transaction);
   }
 }

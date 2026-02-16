@@ -5,6 +5,55 @@ const t = initTRPC.create();
 const publicProcedure = t.procedure;
 
 const appRouter = t.router({
+  follow: t.router({
+    follow: publicProcedure
+      .input(
+        z.object({
+          followeeId: z.string().uuid(),
+        })
+      )
+      .output(
+        z.object({
+          id: z.string(),
+          followerId: z.string(),
+          followeeId: z.string(),
+          createdAt: z.date(),
+        })
+      )
+      .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
+    unfollow: publicProcedure
+      .input(
+        z.object({
+          followeeId: z.string().uuid(),
+        })
+      )
+      .output(z.boolean())
+      .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
+    isFollowing: publicProcedure
+      .input(
+        z.object({
+          followeeId: z.string().uuid(),
+        })
+      )
+      .output(z.boolean())
+      .query(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
+    getFollowerCount: publicProcedure
+      .input(
+        z.object({
+          userId: z.string().uuid(),
+        })
+      )
+      .output(z.number())
+      .query(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
+    getFollowingCount: publicProcedure
+      .input(
+        z.object({
+          userId: z.string().uuid(),
+        })
+      )
+      .output(z.number())
+      .query(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
+  }),
   post: t.router({
     create: publicProcedure
       .input(

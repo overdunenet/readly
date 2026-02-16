@@ -19,6 +19,7 @@ estimated_tokens: ~150
 | [payment.md](./payment.md)               | 결제 수단, 유형, 환불 정책             |
 | [seo-strategy.md](./seo-strategy.md)     | SEO 전략 목적 및 빌드 타임 프리렌더링 채택 배경 |
 | [developer-experience.md](./developer-experience.md) | Claude Code 사용 경험 최적화           |
+| [user-follow.md](./user-follow.md)               | 사용자 팔로우 기능 (에디터-팔로워 관계) |
 
 ## 빠른 참조
 
@@ -34,3 +35,4 @@ estimated_tokens: ~150
 - `codebase/post-entity.md`: Post 구조 및 권한 검증 구현
 - `codebase/user-entity.md`: User 인증 구현
 - `codebase/seo-implementation.md`: SEO 구현 상세
+- `codebase/follow-module.md`: Follow 모듈 구현
