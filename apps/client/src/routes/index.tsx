@@ -29,6 +29,7 @@ function HomePage() {
             {posts.map((post) => (
               <FeedCard
                 key={post.id}
+                authorId={post.author.id}
                 author={post.author.nickname}
                 authorAvatar={post.author.profileImage ?? undefined}
                 title={post.title}
