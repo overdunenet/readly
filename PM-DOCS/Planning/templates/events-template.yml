@@ -1,0 +1,17 @@
+# events.yml - Feature 이벤트 트래킹 정의서
+# 사용법: Feature_PRD/feature#{N}_{name}/ 폴더에 events.yml로 복사하여 사용
+
+feature: '{feature-name}'
+events:
+  - name: 'event_name'
+    trigger: '이벤트 발화 조건'
+    screen_id: 'SCR-{NNN}'
+    category: 'interaction | navigation | conversion | error'
+    properties:
+      - name: 'prop_name'
+        type: 'string | number | boolean'
+        description: '프로퍼티 설명'
+        required: true
+        pii: false
+    kpi: '연결 KPI'
+    funnel: '소속 퍼널명'
