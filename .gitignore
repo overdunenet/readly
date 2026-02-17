@@ -61,8 +61,3 @@ PM-DOCS/workflow/references/bmad-method/node_modules
 PM-DOCS/workflow/references/bmad-method/.git
 PM-DOCS/workflow/references/bmad-method/dist
 PM-DOCS/workflow/references/bmad-method/build
-
-# PM workflow internal documents (implementation plans, prompts)
-PM-DOCS/workflow/PM-workflow-implementation-plan.md
-PM-DOCS/workflow/atomic-execution-plan.md
-PM-DOCS/workflow/prompt/
