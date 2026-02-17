@@ -51,3 +51,13 @@ docker/postgresql/data
 # Playwright
 test-results/
 playwright-report/
+
+# Reference repositories (external sources, not tracked in detail)
+PM-DOCS/workflow/references/bmad-cis/node_modules
+PM-DOCS/workflow/references/bmad-cis/.git
+PM-DOCS/workflow/references/bmad-cis/dist
+PM-DOCS/workflow/references/bmad-cis/build
+PM-DOCS/workflow/references/bmad-method/node_modules
+PM-DOCS/workflow/references/bmad-method/.git
+PM-DOCS/workflow/references/bmad-method/dist
+PM-DOCS/workflow/references/bmad-method/build
