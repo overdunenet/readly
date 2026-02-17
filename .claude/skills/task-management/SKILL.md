@@ -7,6 +7,9 @@ estimated_tokens: ~600
 
 # GitHub Project 태스크 관리
 
+> **참고**: GitHub Project ID/옵션 값은 `.claude/skills/planning/pm-config.yml`에서 중앙 관리됩니다.
+> 아래 테이블은 빠른 참조용이며, 값 변경 시 pm-config.yml을 우선 수정하세요.
+
 ## 프로젝트 정보
 
 | 항목           | 값                                             |
