@@ -1,5 +1,7 @@
 # Dependencies
 node_modules/
+!node_modules/bmad-method
+!node_modules/bmad-creative-intelligence-suite
 .yarn/
 
 # Build outputs
