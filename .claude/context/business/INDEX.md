@@ -20,6 +20,7 @@ estimated_tokens: ~150
 | [seo-strategy.md](./seo-strategy.md)     | SEO 전략 목적 및 빌드 타임 프리렌더링 채택 배경 |
 | [developer-experience.md](./developer-experience.md) | Claude Code 사용 경험 최적화           |
 | [user-follow.md](./user-follow.md)               | 사용자 팔로우 기능 (에디터-팔로워 관계) |
+| [pm-workflow.md](./pm-workflow.md)               | PM 기획 워크플로우 (Milestone/Feature/Issue 관리) |
 
 ## 빠른 참조
 
@@ -30,9 +31,19 @@ estimated_tokens: ~150
 - **접근 레벨**: public, subscriber, purchaser, private
 - **결제 유형**: 포스트 단건 구매, 월간 구독
 
+### PM 워크플로우
+
+- **/pm 커맨드**: Milestone/Feature/Issue 기획 워크플로우
+- **5-Phase PRD**: 대화형 기획서 작성 (Phase A→E)
+- **9개 불변 규칙**: Feature-Milestone 소속 필수, Bug/Feature 상호 배타 등
+
 ### 관련 Codebase Context
 
 - `codebase/post-entity.md`: Post 구조 및 권한 검증 구현
 - `codebase/user-entity.md`: User 인증 구현
 - `codebase/seo-implementation.md`: SEO 구현 상세
 - `codebase/follow-module.md`: Follow 모듈 구현
+- `codebase/pm-planner-agent.md`: PM Planner Agent 구현
+- `codebase/planning-skill.md`: Planning Skill 구현
+- `codebase/project-task-manager-agent.md`: Task Manager Agent 구현
+- `codebase/developer-tooling.md`: 개발 도구 설정

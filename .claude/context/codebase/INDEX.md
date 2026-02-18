@@ -22,6 +22,10 @@ estimated_tokens: ~150
 | [context-handoff.md](./context-handoff.md)         | Context Handoff Skill 구조            |
 | [prompt-structuring.md](./prompt-structuring.md)   | Prompt Structuring Skill 구조         |
 | [follow-module.md](./follow-module.md)             | Follow 모듈 (팔로우/언팔로우, BE+FE)   |
+| [pm-planner-agent.md](./pm-planner-agent.md)       | PM Planner Agent (Milestone/Feature/Issue/CIS 관리) |
+| [project-task-manager-agent.md](./project-task-manager-agent.md) | Project Task Manager Agent (GitHub Project CRUD) |
+| [planning-skill.md](./planning-skill.md)           | Planning Skill (/pm 커맨드, 5-Phase PRD 워크플로우) |
+| [developer-tooling.md](./developer-tooling.md)     | 개발 도구 설정 (Git Hooks, lint-staged, claudeignore) |
 
 ## 빠른 참조
 
@@ -44,8 +48,15 @@ estimated_tokens: ~150
 - Web App: 5173
 - Backoffice: 5175
 
+### PM 워크플로우
+
+- **PM Planner Agent**: /pm 커맨드, 5-Phase PRD 작성, CIS 워크플로우
+- **Project Task Manager Agent**: GitHub Project 태스크 CRUD
+- **Planning Skill**: /pm 메뉴 라우팅, 자동화 로직
+
 ### 관련 Business Context
 
 - `business/overview.md`: 서비스 비전 및 Flow
 - `business/access-control.md`: 접근 권한 정책
 - `business/seo-strategy.md`: SEO 전략 배경
+- `business/pm-workflow.md`: PM 기획 워크플로우
