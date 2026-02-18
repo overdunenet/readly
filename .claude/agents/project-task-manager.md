@@ -40,6 +40,8 @@ GitHub Project 태스크 관리를 담당하는 전문 Agent입니다.
 
 > **필수 참조**: `.claude/skills/task-management/SKILL.md`
 
+> **참고**: 아래 ID 값들은 `.claude/skills/planning/pm-config.yml`에서 중앙 관리됩니다.
+
 ## 프로젝트 정보
 
 | 항목           | 값                   |
@@ -272,6 +274,26 @@ gh project item-list 4 --owner overdunenet --format json
 ```
 
 ---
+
+## 역할 경계 (pm-planner와의 구분)
+
+### 이 Agent가 담당하는 작업
+
+- 개발 태스크 단건 CRUD (조회/생성/상태변경/우선순위변경/삭제)
+- Status/Priority 관리
+- GitHub Project #4 항목 직접 조작
+
+### /pm 워크플로우(pm-planner)가 담당하는 작업
+
+- Feature Issue 일괄 생성 (PRD → Issue 분해)
+- `feature:{name}` 라벨 자동 생성/관리
+- Milestone ↔ Feature ↔ Issue 계층 연결
+- Feature 상태 자동 전파
+
+### pm-planner 호출 시
+
+- pm-planner의 지시에 따라 GitHub Issue/Project 조작 실행
+- 단, 기존 CRUD API는 그대로 유지
 
 ## 주의사항
 

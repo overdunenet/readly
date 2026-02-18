@@ -1,0 +1,5 @@
+# 전체 이벤트 통합본 (자동 집계 - 직접 수정 금지)
+# 각 Feature_PRD/*/events.yml에서 자동 통합됨
+last_updated: '2026-02-18'
+total_events: 0
+events: []

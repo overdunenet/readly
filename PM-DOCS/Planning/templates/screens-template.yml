@@ -1,0 +1,16 @@
+# screens.yml - Feature 화면 정의서
+# 사용법: Feature_PRD/feature#{N}_{name}/ 폴더에 screens.yml로 복사하여 사용
+
+feature: '{feature-name}'
+screens:
+  - id: 'SCR-{NNN}'
+    name: '화면명'
+    route: '/path'
+    description: '화면 설명'
+    entry_conditions:
+      - '진입 조건 1'
+    ui_elements:
+      - '주요 UI 요소 1'
+    states:
+      - name: '기본'
+        description: '기본 상태 설명'

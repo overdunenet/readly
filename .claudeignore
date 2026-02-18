@@ -1,5 +1,7 @@
 # Dependencies
 node_modules/
+!node_modules/bmad-method
+!node_modules/bmad-creative-intelligence-suite
 .yarn/
 
 # Build outputs
@@ -23,3 +25,6 @@ yarn.lock
 # Generated
 apps/api/@generated/
 apps/client/src/routeTree.gen.*
+
+# Personal archive (not for Claude reference)
+PM-DOCS/workflow/

@@ -1,0 +1,44 @@
+# PM 워크플로우 중앙 설정
+github:
+  project:
+    id: 'PVT_kwDOBneqM84BOTlj'
+    number: 4
+    owner: 'overdunenet'
+  fields:
+    status:
+      field_id: 'PVTSSF_lADOBneqM84BOTljzg9DAno'
+      options:
+        backlog: 'f75ad846'
+        ready: '61e4505c'
+        in_progress: '47fc9ee4'
+        in_review: 'df73e18b'
+        done: '98236657'
+    priority:
+      field_id: 'PVTSSF_lADOBneqM84BOTljzg9DArc'
+      options:
+        p0: '79628723'
+        p1: '0a877460'
+        p2: 'da944a9c'
+
+labels:
+  feature_prefix: 'feature:'
+  bug_label: 'bug'
+
+paths:
+  context_output: 'PM-DOCS/Context Output'
+  planning: 'PM-DOCS/Planning'
+  roadmap: 'PM-DOCS/Planning/Roadmap'
+  feature_prd: 'PM-DOCS/Planning/Feature_PRD'
+  ia: 'PM-DOCS/Planning/IA'
+  templates: 'PM-DOCS/Planning/templates'
+
+bmad:
+  version: '2024-Q4'
+  referenced_workflows:
+    - 'pm-agent'
+    - 'prd-create'
+    - 'prd-validate'
+    - 'prd-edit'
+    - 'create-epics'
+    - 'architect-review'
+    - 'po-validation'

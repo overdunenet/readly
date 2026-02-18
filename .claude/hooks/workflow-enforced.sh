@@ -16,6 +16,12 @@ if [ -f "$SCRIPT_DIR/_dedup.sh" ]; then
   _hook_dedup_check "${BASH_SOURCE[0]}" || exit 0
 fi
 
+# /pm 기획 워크플로우 실행 시 코드 4-Phase 스킵
+INPUT=$(cat)
+if echo "$INPUT" | grep -qE '^\s*/pm(\s|$)'; then
+  exit 0
+fi
+
 echo "✅ [Hook] 워크플로우 순서 강제 프로토콜 실행됨"
 
 cat << 'EOF'
