@@ -14,7 +14,7 @@ estimated_tokens: ~150
 
 | 문서                                                   | 설명                                |
 | ------------------------------------------------------ | ----------------------------------- |
-| [architecture-overview.md](./architecture-overview.md) | 시스템 구성, 포트, 기술 스택        |
+| [architecture-overview.md](./architecture-overview.md) | 시스템 구성, 포트, 기술 스택, 환경별 설정 |
 | [user-entity.md](./user-entity.md)                     | UserEntity 구조, JWT 인증           |
 | [post-entity.md](./post-entity.md)                     | PostEntity 구조, 권한 검증 로직, PostService |
 | [seo-implementation.md](./seo-implementation.md)       | 빌드 타임 프리렌더링 구현 (Vite Plugin, Helmet) |

@@ -76,6 +76,20 @@ JWT_SECRET=...
 VITE_API_URL=http://localhost:3000
 ```
 
+## 환경별 설정 (Configuration)
+
+API 서버는 `apps/api/config/` 디렉토리에서 환경별 설정을 관리합니다.
+
+| 파일 | 역할 | 핵심 설정 |
+|------|------|-----------|
+| `default.js` | 프로덕션 기본 설정 | 환경변수 기반 DB 접속, SSL 활성화, JWT 인증 |
+| `development.js` | 개발 환경 오버라이드 | CORS 로컬 origin 허용 |
+| `localdev.js` | 로컬 개발 환경 | 로컬 DB (127.0.0.1:5432), SSL 비활성화, 하드코딩 인증 시크릿 |
+| `test.js` | 테스트 환경 | 테스트 DB (포트 55432), 하드코딩 인증 시크릿 |
+
+- `default.js`를 기본으로 환경별 파일이 오버라이드
+- SSL: 프로덕션 활성화(`{ rejectUnauthorized: false }`) → 로컬 개발 시 명시적 비활성화(`ssl: undefined`)
+
 ## 서비스 구성 다이어그램
 
 ```
