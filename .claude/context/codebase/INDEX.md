@@ -22,6 +22,7 @@ estimated_tokens: ~150
 | [context-handoff.md](./context-handoff.md)         | Context Handoff Skill 구조            |
 | [prompt-structuring.md](./prompt-structuring.md)   | Prompt Structuring Skill 구조         |
 | [follow-module.md](./follow-module.md)             | Follow 모듈 (팔로우/언팔로우, BE+FE)   |
+| [deployment-infrastructure.md](./deployment-infrastructure.md) | Docker + AWS EB 배포 인프라 (CI/CD 파이프라인) |
 
 ## 빠른 참조
 

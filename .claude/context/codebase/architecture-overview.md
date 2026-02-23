@@ -104,9 +104,16 @@ VITE_API_URL=http://localhost:3000
 └─────────────────────────────────────────┘
 ```
 
+## 배포 환경
+
+- **인프라**: AWS Elastic Beanstalk (Docker)
+- **CI/CD**: GitHub Actions → ECR → EB
+- **상세**: [deployment-infrastructure.md](./deployment-infrastructure.md)
+
 ## 관련 문서
 
 - `business/overview.md`: 서비스 구성 상세
 - `codebase/user-entity.md`: UserEntity 구조
 - `codebase/post-entity.md`: PostEntity 구조
 - `codebase/seo-implementation.md`: SSR 서버 구현
+- `codebase/deployment-infrastructure.md`: Docker + EB 배포 인프라
