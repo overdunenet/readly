@@ -43,7 +43,6 @@ module.exports = {
   cors: {
     origin: [
       /\.readly\.co\.kr$/,
-      'http://localhost:5173',
     ],
     credentials: true,
   }
