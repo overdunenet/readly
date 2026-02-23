@@ -10,6 +10,7 @@ module.exports = {
       password: 'postgres',
       database: 'readly',
       migrationsRun: true,
+      ssl: undefined,
     },
   },
 
