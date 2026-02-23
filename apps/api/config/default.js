@@ -42,7 +42,8 @@ module.exports = {
   },
   cors: {
     origin: [
-      // TODO: 프로덕션 도메인들 (실제 배포 시 수정 필요)
+      /\.readly\.co\.kr$/,
+      'http://localhost:5173',
     ],
     credentials: true,
   }

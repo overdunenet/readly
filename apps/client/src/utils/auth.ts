@@ -3,7 +3,7 @@ import { useAuthStore } from '../stores/auth';
 export async function refreshAuth() {
   try {
     const response = await fetch(
-      'http://localhost:3000/trpc/user.refreshToken',
+      `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/trpc/user.refreshToken`,
       {
         method: 'POST',
         credentials: 'include',
