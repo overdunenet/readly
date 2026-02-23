@@ -11,7 +11,7 @@ module.exports = {
       password: process.env.DB_POSTGRES_PASSWORD,
       database: 'readly',
       ssl: { rejectUnauthorized: false },
-      migrationsRun: false,
+      migrationsRun: true,
       entities: ['dist/src/module/**/*.entity.js'],
       migrations: ['dist/src/database/migration/*.js'],
     },
