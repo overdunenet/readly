@@ -1,0 +1,106 @@
+name: Deploy API
+
+on:
+  push:
+    branches:
+      - main
+      - setting/deploy
+
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REPOSITORY: readly-api
+  EB_APPLICATION: Readly2-Api
+  EB_ENVIRONMENT: Readly2-Api-Prod
+  S3_BUCKET: elasticbeanstalk-ap-northeast-2-371113813598
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.meta.outputs.image-tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build API
+        run: yarn workspace @readly/api build
+
+      - name: Set image tag
+        id: meta
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "image-tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "image-tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.meta.outputs.image-tag }}
+        run: |
+          docker build -f apps/api/Dockerfile \
+            --build-arg AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+            --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Upload Dockerrun.aws.json to S3
+        env:
+          IMAGE_TAG: ${{ steps.meta.outputs.image-tag }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          sed -i "s|<TAG>|$IMAGE_TAG|g" Dockerrun.aws.json
+          sed -i "s|<ECR_REGISTRY>|$ECR_REGISTRY|g" Dockerrun.aws.json
+          aws s3 cp Dockerrun.aws.json s3://$S3_BUCKET/$ECR_REPOSITORY/Dockerrun.aws.json.$IMAGE_TAG
+
+      - name: Create EB application version
+        env:
+          IMAGE_TAG: ${{ steps.meta.outputs.image-tag }}
+        run: |
+          aws elasticbeanstalk create-application-version \
+            --application-name $EB_APPLICATION \
+            --version-label $IMAGE_TAG \
+            --source-bundle S3Bucket=$S3_BUCKET,S3Key=$ECR_REPOSITORY/Dockerrun.aws.json.$IMAGE_TAG \
+            --region $AWS_REGION
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to EB
+        run: |
+          aws elasticbeanstalk update-environment \
+            --application-name $EB_APPLICATION \
+            --environment-name $EB_ENVIRONMENT \
+            --version-label ${{ needs.build.outputs.image-tag }} \
+            --region $AWS_REGION

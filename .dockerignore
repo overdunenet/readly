@@ -1,0 +1,4 @@
+*
+!apps/api/dist
+!apps/api/config
+!apps/api/package.json
