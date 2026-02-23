@@ -11,6 +11,8 @@ RUN corepack enable
 
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY apps/api/package.json ./apps/api/package.json
+COPY apps/client/package.json ./apps/client/package.json
+COPY packages/api-types/package.json ./packages/api-types/package.json
 
 RUN yarn install --immutable
 
