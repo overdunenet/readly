@@ -20,7 +20,6 @@ flowchart TB
             SSR["Express SSR Server<br/>(메타태그 주입)"]
             SPA["React SPA<br/>(팔로워 + 에디터 통합)"]
         end
-        Backoffice["Backoffice<br/>(관리자용)"]
     end
 
     subgraph API["API Gateway (tRPC + NestJS)"]
@@ -38,7 +37,6 @@ flowchart TB
 
     SSR -->|SEO 데이터 조회| API
     SPA -->|tRPC Client| API
-    Backoffice -->|tRPC Client| API
     API --> PostgreSQL
 ```
 
@@ -69,12 +67,10 @@ readly/
 │   │   └── src/
 │   │       ├── module/      # NestJS 모듈
 │   │       └── shared/      # 공통 유틸리티
-│   ├── client/              # 팔로워 + 에디터 통합 웹앱 (단일 배포)
-│   └── backoffice/          # 관리자 웹앱
+│   └── client/              # 팔로워 + 에디터 통합 웹앱 (단일 배포)
 ├── packages/
-│   ├── shared/              # 공통 유틸리티
-│   ├── ui/                  # UI 컴포넌트
 │   └── api-types/           # API 타입 정의
+├── PM-DOCS/                 # PM 기획 문서
 └── docker/                  # Docker 설정
 ```
 

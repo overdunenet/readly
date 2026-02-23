@@ -24,11 +24,10 @@ related_contexts:
 
 ## 개발 서버 포트
 
-| 서비스     | 포트 |
-| ---------- | ---- |
-| API        | 3000 |
-| Web App    | 5173 |
-| Backoffice | 5175 |
+| 서비스  | 포트 |
+| ------- | ---- |
+| API     | 3000 |
+| Web App | 5173 |
 
 ## 폴더 구조
 
@@ -36,33 +35,26 @@ related_contexts:
 readly/
 ├── apps/
 │   ├── api/          # tRPC + NestJS API
-│   ├── client/       # 팔로워 + 에디터 통합 웹앱 (단일 배포)
-│   └── backoffice/   # 관리자용 React 앱
+│   └── client/       # 팔로워 + 에디터 통합 웹앱 (단일 배포)
 ├── packages/
-│   ├── shared/       # 공통 유틸리티
-│   ├── ui/           # 공통 UI 컴포넌트
 │   └── api-types/    # API 타입 정의
-├── docs/             # 프로젝트 문서
+├── PM-DOCS/          # PM 기획 문서
 └── docker/           # Docker 설정
 ```
 
 ## 주요 명령어
 
 ```bash
-# 개발 서버
-yarn dev           # 모든 서비스 개발 서버 시작
-yarn dev:api       # API 서버만 시작
-yarn dev:client    # Web App(팔로워+에디터) 시작
-yarn dev:backoffice # Backoffice 앱만 시작
+# 루트
+yarn lint          # 코드 린팅
+yarn lint:fix      # 린트 자동 수정
 
-# 빌드/린트
-yarn lint          # ESLint 실행
-yarn typecheck     # TypeScript 체크
-yarn build         # 프로덕션 빌드
+# API (apps/api)
+yarn workspace api dev           # API 서버 시작
+yarn workspace api migration:run # 데이터베이스 마이그레이션
 
-# DB 작업
-yarn db:migrate    # 마이그레이션 실행
-yarn db:seed       # 시드 데이터 삽입
+# Client (apps/client)
+yarn workspace client dev        # Web App 시작
 ```
 
 ## 환경 변수
@@ -85,8 +77,6 @@ VITE_API_URL=http://localhost:3000
 │  Web App :5173                          │
 │  ├─ Express SSR Server (메타태그 주입)   │
 │  └─ React SPA (팔로워 + 에디터 통합)     │
-│                                         │
-│  Backoffice :5175 (관리자용)            │
 └────────────┬────────────────────────────┘
              │
              ├─ tRPC Client

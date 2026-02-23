@@ -42,7 +42,6 @@ estimated_tokens: ~150
 
 - API: 3000
 - Web App: 5173
-- Backoffice: 5175
 
 ### 관련 Business Context
 

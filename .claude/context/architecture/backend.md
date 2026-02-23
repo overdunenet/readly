@@ -147,7 +147,6 @@ export const ConfigProvider = {
         access: { secret, expiresIn },
         refresh: { secret, expiresIn },
       },
-      backoffice: { ... }
     }
   },
   cors: { origin, credentials }
