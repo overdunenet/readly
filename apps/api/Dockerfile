@@ -25,6 +25,5 @@ RUN ln -snf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
     echo "Asia/Seoul" > /etc/timezone
 
 EXPOSE 3000
-EXPOSE 80
 
 CMD ["sh", "-c", "rm -f .env && node dist/scripts/generateEnv.js && node dist/src/main"]
