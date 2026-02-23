@@ -49,15 +49,15 @@ export class PostRouter extends BaseTrpcRouter {
     super();
   }
 
+  @UseMiddlewares(UserAuthMiddleware)
   @Mutation({
     input: createPostSchema,
     output: postResponseSchema,
   })
-  @Transactional() // Mutation 필수!
   async create(
     @Input('title') title: string,
     @Input('content') content: string,
-    @Ctx() ctx: any
+    @Ctx() ctx: UserAuthorizedContext
   ) {
     return await this.microserviceClient.send('post.create', {
       title,
@@ -66,10 +66,11 @@ export class PostRouter extends BaseTrpcRouter {
     });
   }
 
+  @UseMiddlewares(UserAuthMiddleware)
   @Query({
     output: z.array(postResponseSchema),
   })
-  async getMy(@Ctx() ctx: any) {
+  async getMy(@Ctx() ctx: UserAuthorizedContext) {
     return await this.microserviceClient.send('post.getMy', {
       authorId: ctx.user.id,
     });
@@ -151,9 +152,9 @@ export class PostService {
 ```typescript
 @Router({ alias: 'post' })
 export class PostRouter extends BaseTrpcRouter {
+  @UseMiddlewares(UserAuthMiddleware)
   @Mutation({ input: schema, output: schema })
-  @Transactional()
-  async create(@Input('title') title: string, @Ctx() ctx: any) {
+  async create(@Input('title') title: string, @Ctx() ctx: UserAuthorizedContext) {
     return this.microserviceClient.send('post.create', { ... });
   }
 }
@@ -176,7 +177,7 @@ export class PostController {
 ### Repository & 트랜잭션
 
 - [ ] RepositoryProvider 사용 (@InjectRepository 금지)
-- [ ] **Mutation에 @Transactional 데코레이터 적용**
+- [ ] **인증 필요 메서드에 @UseMiddlewares(UserAuthMiddleware) 적용**
 - [ ] find/findBy/findOrFail 사용 (queryBuilder 지양)
 - [ ] findOrFail + catch 에러 처리 패턴
 

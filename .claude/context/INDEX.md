@@ -1,54 +1,42 @@
 ---
 name: Context-Index
-description: Context 문서 전체 인덱스. 아키텍처, 도메인 문서 참조.
-keywords: [인덱스, context, 아키텍처, 도메인, 참조]
+description: Context 문서 전체 인덱스. 하위 폴더별 INDEX.md로 안내.
+keywords: [인덱스, context, 아키텍처, 비즈니스, 코드베이스, 기획]
 estimated_tokens: ~200
 ---
 
 # Context 문서 인덱스
 
-## 기획 (`planning/`)
+각 하위 폴더의 `INDEX.md`에 상세 목록이 있습니다.
 
-| 문서                     | 설명                                               |
-| ------------------------ | -------------------------------------------------- |
-| [planning/](./planning/) | PM 기획 문서 요약 (Roadmap, PRD) - **최우선 참조** |
-
-## 아키텍처 (`architecture/`)
-
-| 문서                                      | 설명                                                |
-| ----------------------------------------- | --------------------------------------------------- |
-| [INDEX.md](./architecture/INDEX.md)       | 시스템 아키텍처 개요                                |
-| [backend.md](./architecture/backend.md)   | 백엔드 상세 (Microservice + tRPC, Transaction 패턴) |
-| [frontend.md](./architecture/frontend.md) | 프론트엔드 상세 (TanStack Router, 인증 흐름)        |
-
-## 도메인 (`domain/`)
-
-| 문서                                | 설명                                             |
-| ----------------------------------- | ------------------------------------------------ |
-| [overview.md](./domain/overview.md) | 프로젝트 기획서 (비전, 사용자 유형, 서비스 구성) |
-| [features.md](./domain/features.md) | 기능 명세 (접근 권한, 유료/무료 섹션, 결제)      |
-| [user.md](./domain/user.md)         | User 도메인 (Entity, Service, Router)            |
-| [post.md](./domain/post.md)         | Post 도메인 (Entity, 유료/무료 섹션, 접근 권한)  |
-| [seo.md](./domain/seo.md)           | SEO 전략 (Partial SSR, 메타태그 서버 주입)       |
+| 폴더            | 설명                                               | 상세                                |
+| --------------- | -------------------------------------------------- | ----------------------------------- |
+| `planning/`     | PM 기획 문서 요약 (Roadmap, PRD) - **최우선 참조** | [INDEX.md](./planning/INDEX.md)     |
+| `architecture/` | 시스템 아키텍처 (백엔드, 프론트엔드 설계)          | [INDEX.md](./architecture/INDEX.md) |
+| `business/`     | 비즈니스 도메인 (기획, 접근 권한, 결제, SEO)       | [INDEX.md](./business/INDEX.md)     |
+| `codebase/`     | 코드베이스 상세 (Entity, 모듈, 구현 가이드)        | [INDEX.md](./codebase/INDEX.md)     |
 
 ## 빠른 참조
 
 ### 백엔드 개발 시
 
-1. **새 Entity 추가**: `context/architecture/backend.md` → 모듈 추가 체크리스트
-2. **Repository 패턴**: `context/architecture/backend.md` → Repository 패턴
-3. **인증 미들웨어**: `context/domain/user.md` → UserRouter
+1. **새 Entity 추가**: `architecture/backend.md` → 모듈 추가 체크리스트
+2. **Repository 패턴**: `architecture/backend.md` → Repository 패턴
+3. **User Entity**: `codebase/user-entity.md` → User 도메인 구현
+4. **Post Entity**: `codebase/post-entity.md` → Post 도메인 구현
+5. **Follow 모듈**: `codebase/follow-module.md` → 팔로우 기능 구현
 
 ### 프론트엔드 개발 시
 
-1. **라우팅 추가**: `context/architecture/frontend.md` → TanStack Router 구조
-2. **인증 흐름**: `context/architecture/frontend.md` → 인증 흐름
-3. **API 호출**: `context/architecture/frontend.md` → tRPC 클라이언트
+1. **라우팅 추가**: `architecture/frontend.md` → TanStack Router 구조
+2. **인증 흐름**: `architecture/frontend.md` → 인증 흐름
+3. **API 호출**: `architecture/frontend.md` → tRPC 클라이언트
+4. **SEO 구현**: `codebase/seo-implementation.md` → SEO 구현 상세
 
 ### 비즈니스 로직
 
-1. **프로젝트 기획**: `context/domain/overview.md` → 비전, 주요 Flow
-2. **유료/무료 섹션**: `context/domain/post.md` → 유료/무료 섹션 구분
-3. **접근 권한**: `context/domain/post.md` → 접근 권한 시스템
-4. **JWT 인증**: `context/domain/user.md` → JWT 설정
-5. **SEO 전략**: `context/domain/seo.md` → Partial SSR, 메타태그 서버 주입
+1. **프로젝트 기획**: `business/overview.md` → 비전, 주요 Flow
+2. **접근 권한**: `business/access-control.md` → 접근 권한 시스템
+3. **결제**: `business/payment.md` → 유료/무료 섹션, 결제 흐름
+4. **SEO 전략**: `business/seo-strategy.md` → Partial SSR, 메타태그 서버 주입
+5. **팔로우**: `business/user-follow.md` → 사용자 팔로우 기능

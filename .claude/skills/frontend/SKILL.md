@@ -16,7 +16,7 @@ Readly의 프론트엔드는 React, Vite, Tailwind CSS 기반입니다.
 ## 프로젝트 구조
 
 ```
-apps/{client,editor,backoffice}/src/
+apps/client/src/
 ├── components/       # UI 컴포넌트
 │   ├── layout/      # 레이아웃 컴포넌트
 │   └── shared/      # 공유 컴포넌트

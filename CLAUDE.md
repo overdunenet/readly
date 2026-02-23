@@ -19,7 +19,6 @@
 ## 서비스 구성
 
 - **Web App**: 팔로워 + 에디터 통합 React 앱 (콘텐츠 소비/생산)
-- **Backoffice**: 관리자용 React 앱 (플랫폼 운영자)
 
 ## 폴더 구조
 
@@ -27,36 +26,37 @@
 readly/
 ├── apps/
 │   ├── api/          # tRPC + NestJS API
-│   ├── client/       # 팔로워 + 에디터 통합 웹앱 (단일 배포)
-│   └── backoffice/   # 관리자용 React 앱
+│   └── client/       # 팔로워 + 에디터 통합 웹앱 (단일 배포)
 ├── packages/
-│   ├── shared/       # 공통 유틸리티
-│   ├── ui/           # 공통 UI 컴포넌트
 │   └── api-types/    # API 타입 정의
-├── docs/             # 프로젝트 문서
+├── PM-DOCS/          # PM 기획 문서
 └── docker/           # Docker 설정
 ```
 
 ## 주요 명령어
 
 ```bash
-yarn dev           # 모든 서비스 개발 서버 시작
-yarn dev:api       # API 서버만 시작
-yarn dev:client    # Web App(팔로워+에디터) 시작
-yarn dev:backoffice # Backoffice 앱만 시작
+# 루트
 yarn lint          # 코드 린팅
-yarn typecheck     # 타입 체크
-yarn db:migrate    # 데이터베이스 마이그레이션
+yarn lint:fix      # 린트 자동 수정
+
+# API (apps/api)
+yarn workspace api dev           # API 서버 시작
+yarn workspace api migration:run # 데이터베이스 마이그레이션
+
+# Client (apps/client)
+yarn workspace client dev        # Web App 시작
 ```
 
 ## 문서 구조
 
 상세 문서는 다음 위치를 참조하세요:
 
-| 문서            | 위치                            | 설명                        |
-| --------------- | ------------------------------- | --------------------------- |
-| 기획/Planning   | `.claude/context/planning/`     | PM 기획 문서 (PRD, Roadmap) |
-| 아키텍처        | `.claude/context/architecture/` | 시스템 설계 및 기술 스택    |
-| 기능 명세       | `.claude/context/domain/`       | 서비스 기능 상세            |
-| API 개발        | `.claude/skills/api/`           | tRPC + NestJS API 개발      |
-| 프론트엔드 개발 | `.claude/skills/frontend/`      | React 애플리케이션 개발     |
+| 문서            | 위치                            | 설명                         |
+| --------------- | ------------------------------- | ---------------------------- |
+| 기획/Planning   | `.claude/context/planning/`     | PM 기획 문서 (PRD, Roadmap)  |
+| 아키텍처        | `.claude/context/architecture/` | 시스템 설계 및 기술 스택     |
+| 비즈니스 정책   | `.claude/context/business/`     | 서비스 기획 및 비즈니스 정책 |
+| 코드베이스      | `.claude/context/codebase/`     | 구현 아키텍처 및 Entity 구조 |
+| API 개발        | `.claude/skills/api/`           | tRPC + NestJS API 개발       |
+| 프론트엔드 개발 | `.claude/skills/frontend/`      | React 애플리케이션 개발      |
