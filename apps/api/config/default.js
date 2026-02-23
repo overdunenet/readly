@@ -34,7 +34,7 @@ module.exports = {
           expiresIn: '1h',
         },
         refresh: {
-          secret: process.env.JWT_USER_ACCESS_SECRET,
+          secret: process.env.JWT_USER_REFRESH_SECRET,
           expiresIn: '7d',
         }
       }
