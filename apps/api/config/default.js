@@ -4,12 +4,12 @@ module.exports = {
   database: {
     readly: {
       type: 'postgres',
-      host: process.env.POSTGRES_DB_HOST,
-      roHost: process.env.POSTGRES_DB_HOST_RO || process.env.POSTGRES_DB_HOST,
+      host: process.env.DB_POSTGRES_HOST,
+      roHost: process.env.DB_POSTGRES_RO_HOST || process.env.DB_POSTGRES_HOST,
       port: 5432,
-      username: process.env.POSTGRES_DB_USERNAME,
-      password: process.env.POSTGRES_DB_PASSWORD,
-      database: process.env.POSTGRES_DB_NAME,
+      username: process.env.DB_POSTGRES_USERNAME,
+      password: process.env.DB_POSTGRES_PASSWORD,
+      database: 'readly',
       migrationsRun: false,
       entities: ['dist/src/module/**/*.entity.js'],
       migrations: ['dist/src/database/migration/*.js'],
