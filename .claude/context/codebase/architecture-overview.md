@@ -20,6 +20,7 @@ related_contexts:
 
 - **Node.js**: v22 (`.nvmrc` 참조)
 - **Package Manager**: Yarn (v4.x)
+  - `checksumBehavior: update` 설정 (`.yarnrc.yml`) - CI 환경에서 checksum 불일치 방지
 - **Language**: TypeScript (strict mode)
 
 ## 개발 서버 포트
