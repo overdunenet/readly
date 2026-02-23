@@ -1,0 +1,13 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "<ECR_REGISTRY>/readly-api:<TAG>"
+  },
+  "Ports": [
+    {
+      "ContainerPort": 80,
+      "HostPort": 80
+    }
+  ],
+  "Logging": "/usr/local/logs"
+}

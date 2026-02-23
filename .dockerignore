@@ -1,0 +1,9 @@
+*
+!package.json
+!yarn.lock
+!.yarnrc.yml
+!apps/api/dist
+!apps/api/config
+!apps/api/package.json
+!apps/client/package.json
+!packages/api-types/package.json

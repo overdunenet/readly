@@ -35,7 +35,7 @@ function HomePage() {
                 title={post.title}
                 excerpt={post.excerpt}
                 thumbnail={post.thumbnail}
-                publishedAt={post.publishedAt}
+                publishedAt={post.publishedAt ?? null}
               />
             ))}
           </FeedList>

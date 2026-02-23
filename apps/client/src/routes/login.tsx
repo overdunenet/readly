@@ -38,7 +38,7 @@ function LoginPage() {
     try {
       await login(data.email, data.password);
     } catch (err) {
-      setError(err?.message || '로그인에 실패했습니다');
+      setError(err instanceof Error ? err.message : '로그인에 실패했습니다');
     } finally {
       setIsLoading(false);
     }

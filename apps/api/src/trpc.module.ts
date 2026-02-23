@@ -18,7 +18,10 @@ class TrpcModuleExport {}
   imports: [
     TrpcModuleExport,
     TRPCModule.forRoot({
-      autoSchemaFile: '../../packages/api-types/src',
+      autoSchemaFile:
+        process.env.NODE_ENV === 'production'
+          ? undefined
+          : '../../packages/api-types/src',
       context: TRPCAppContext,
     }),
     AutoRouterModule.forRoot({

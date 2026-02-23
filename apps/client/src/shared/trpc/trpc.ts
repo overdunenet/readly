@@ -8,7 +8,7 @@ import { useAuthStore } from '../../stores/auth';
 const refreshAccessToken = async (): Promise<string | null> => {
   try {
     const response = await fetch(
-      'http://localhost:3000/trpc/user.refreshToken',
+      `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/trpc/user.refreshToken`,
       {
         method: 'POST',
         credentials: 'include', // 쿠키 포함
@@ -48,7 +48,7 @@ export const trpc = createTRPCReact<AppRouter>();
 export const trpcClient = trpc.createClient({
   links: [
     httpLink({
-      url: 'http://localhost:3000/trpc',
+      url: `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/trpc`,
       async fetch(url, options) {
         const makeRequest = async (
           token?: string | null,
