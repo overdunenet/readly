@@ -152,23 +152,17 @@ async login(@Input('email') email: string, @Ctx() ctx: any) {
 
 ## JWT 설정
 
-```typescript
-// ConfigProvider
-auth: {
-  jwt: {
-    user: {
-      access: {
-        secret: string,
-        expiresIn: '15m',  // 15분
-      },
-      refresh: {
-        secret: string,
-        expiresIn: '7d',   // 7일
-      },
-    },
-  },
-}
-```
+설정 파일: `apps/api/config/default.js`
+
+| 구분 | 환경변수 | 만료 |
+| ---- | -------- | ---- |
+| Backoffice Access | `JWT_BACKOFFICE_ACCESS_SECRET` | 1h |
+| Backoffice Refresh | `JWT_BACKOFFICE_REFRESH_SECRET` | 30d |
+| User Access | `JWT_USER_ACCESS_SECRET` | 1h |
+| User Refresh | `JWT_USER_REFRESH_SECRET` | 7d |
+
+- Backoffice와 User 각각 별도의 Access/Refresh secret 사용
+- 각 JWT secret은 환경변수로 주입
 
 ## 테스트
 
