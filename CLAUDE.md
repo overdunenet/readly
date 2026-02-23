@@ -53,9 +53,10 @@ yarn db:migrate    # 데이터베이스 마이그레이션
 
 상세 문서는 다음 위치를 참조하세요:
 
-| 문서            | 위치                            | 설명                     |
-| --------------- | ------------------------------- | ------------------------ |
-| 아키텍처        | `.claude/context/architecture/` | 시스템 설계 및 기술 스택 |
-| 기능 명세       | `.claude/context/domain/`       | 서비스 기능 상세         |
-| API 개발        | `.claude/skills/api/`           | tRPC + NestJS API 개발   |
-| 프론트엔드 개발 | `.claude/skills/frontend/`      | React 애플리케이션 개발  |
+| 문서            | 위치                            | 설명                        |
+| --------------- | ------------------------------- | --------------------------- |
+| 기획/Planning   | `.claude/context/planning/`     | PM 기획 문서 (PRD, Roadmap) |
+| 아키텍처        | `.claude/context/architecture/` | 시스템 설계 및 기술 스택    |
+| 기능 명세       | `.claude/context/domain/`       | 서비스 기능 상세            |
+| API 개발        | `.claude/skills/api/`           | tRPC + NestJS API 개발      |
+| 프론트엔드 개발 | `.claude/skills/frontend/`      | React 애플리케이션 개발     |

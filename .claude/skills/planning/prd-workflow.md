@@ -199,6 +199,7 @@ Phase E: 검증 & 저장
    - `Feature_PRD/*/events.yml` 전체 스캔
    - 통합 → `Planning/events-index.yml` 갱신
 6. **Planning/changelog.md 기록**:
+
    ```markdown
    ## [YYYY-MM-DD]
 
@@ -215,6 +216,14 @@ Phase E: 검증 & 저장
 1. AskUserQuestion: "GitHub Issue로 분해할까요?"
    - **Yes** → Issue 자동 생성 워크플로우
    - **No** → PRD만 저장 후 완료
+
+### E4: Planning Context 동기화
+
+PRD 저장 완료 후 `.claude/context/planning/INDEX.md`를 업데이트합니다:
+
+- Feature PRD 목록에 새 PRD 추가
+- Roadmap 현황 갱신
+- supersedes 관계가 있으면 명시 (예: 이 PRD가 business/payment.md의 정책을 변경함)
 
 ### Issue 자동 생성 (E3-Yes 선택 시)
 
