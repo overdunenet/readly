@@ -1,20 +1,90 @@
 @import "tailwindcss";
+@import "ckeditor5/ckeditor5.css";
 
-/* CKEditor Customization */
+/* Undo Tailwind Preflight inside CKEditor */
+.ck svg {
+  display: inline;
+}
+
+.ck button {
+  background-color: revert;
+  border-radius: revert;
+}
+
+.ck ol,
+.ck ul,
+.ck menu {
+  list-style: revert;
+}
+
+.ck h1,
+.ck h2,
+.ck h3,
+.ck h4,
+.ck h5,
+.ck h6 {
+  font-size: revert;
+  font-weight: revert;
+}
+
+/* CKEditor Customization - Readly Design System */
+
+/* 에디터 영역 */
 .ck-editor__editable_inline {
   min-height: 300px;
-  font-size: 14px;
 }
 
-.ck.ck-toolbar {
-  border-top: none !important;
-  border-left: none !important;
-  border-right: none !important;
-}
-
+/* 전체 에디터 래퍼 - 포커스 시 Readly 입력 필드 스타일 */
 .ck.ck-editor__main > .ck-editor__editable {
   border: none !important;
   box-shadow: none !important;
+}
+
+.ck.ck-editor__editable:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 툴바 - 깔끔한 하단 구분선만 유지 */
+.ck.ck-toolbar {
+  background: white !important;
+  border: none !important;
+  border-bottom: 1px solid #e5e7eb !important; /* gray-200 */
+  padding: 4px 8px !important;
+  border-radius: 0 !important;
+}
+
+/* 툴바 버튼 - 호버/액티브 시 Readly 색상 */
+.ck.ck-button.ck-on,
+.ck.ck-button.ck-on:not(.ck-disabled):hover {
+  background-color: #eff6ff !important; /* blue-50 */
+  color: #2563eb !important; /* blue-600 */
+}
+
+.ck.ck-button:not(.ck-disabled):hover {
+  background-color: #f3f4f6 !important; /* gray-100 */
+}
+
+/* 드롭다운 패널 - Readly 카드 스타일 */
+.ck.ck-dropdown__panel {
+  border: 1px solid #e5e7eb !important; /* gray-200 */
+  border-radius: 0.5rem !important; /* rounded-lg */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important; /* shadow-lg */
+}
+
+/* 에디터 래퍼 포커스 링 - 부모 div에서 처리 */
+.ck.ck-editor {
+  border-radius: 0 !important;
+}
+
+/* 툴바 구분선 */
+.ck.ck-toolbar .ck-toolbar__separator {
+  background-color: #e5e7eb !important; /* gray-200 */
+}
+
+/* 스티키 패널 border 제거 */
+.ck.ck-sticky-panel__content {
+  border: 0 !important;
 }
 
 /* Snappy Modal Customization */
