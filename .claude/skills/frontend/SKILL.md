@@ -225,6 +225,7 @@ const createMutation = trpc.post.create.useMutation({
 1. **Styled Components 위치**: 파일 하단 `// Styled Components` 주석과 함께
 2. **클래스 작성**: 한 줄에 하나씩
 3. **모바일 우선**: `md:max-w-md md:mx-auto`
+4. **아이콘**: lucide-react 사용 (인라인 SVG 지양), size prop으로 크기 지정 (네비게이션: 24, 메뉴 아이템: 16)
 
 ## 에디터 (Rich Text)
 
