@@ -1,7 +1,7 @@
 ---
 name: codebase-user-entity
-description: UserEntity 구조, 비밀번호 관리, JWT 인증 설정
-keywords: [UserEntity, JWT, bcrypt, 인증, 로그인, AccessToken, RefreshToken]
+description: UserEntity 구조, 비밀번호 관리, JWT 인증 설정, 프론트엔드 User 타입 및 인증 스토어
+keywords: [UserEntity, JWT, bcrypt, 인증, 로그인, AccessToken, RefreshToken, Zustand, useAuthStore, UserMenu]
 estimated_tokens: ~500
 related_contexts:
   - business-overview
@@ -189,6 +189,35 @@ auth: {
 ### 관련 Codebase Context
 
 - [test-infrastructure.md](./test-infrastructure.md): 테스트 인프라 유틸리티
+
+## 프론트엔드 User 타입
+
+### 파일 구조
+
+| 파일 | 역할 | 핵심 export |
+| ---- | ---- | ----------- |
+| apps/client/src/stores/auth.ts | 인증 상태 관리 (Zustand) | User, useAuthStore |
+| apps/client/src/components/layout/UserMenu.tsx | 사용자 드롭다운 메뉴 | UserMenu |
+
+### User 타입 정의
+
+`stores/auth.ts`에서 `User` 인터페이스를 export하여 프론트엔드 전역에서 재사용합니다.
+필드: id, email, nickname, profileImage (API 응답과 동일한 구조)
+
+### useAuthStore (Zustand)
+
+| 속성/메서드 | 설명 |
+| ----------- | ---- |
+| user | 현재 로그인 사용자 (User \| null) |
+| accessToken | JWT 액세스 토큰 |
+| login(data) | 사용자 정보 + 토큰 설정 |
+| logout() | 상태 초기화 |
+
+### UserMenu 컴포넌트
+
+- `stores/auth`의 `User` 타입을 import하여 사용
+- 드롭다운 메뉴: 글쓰기(/editor), 내 포스트(/editor/posts), 설정(/editor/settings), 로그아웃
+- tailwind-styled-components로 스타일링
 
 ## 관련 문서
 
