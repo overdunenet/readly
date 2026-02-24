@@ -2,12 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { FileText, LogOut, Settings, SquarePen } from 'lucide-react';
 import tw from 'tailwind-styled-components';
 
-interface User {
-  id: string;
-  email: string;
-  nickname: string;
-  profileImage: string | null;
-}
+import type { User } from '../../stores/auth';
 
 interface Props {
   user: User | null;
