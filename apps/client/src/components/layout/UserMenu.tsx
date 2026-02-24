@@ -32,18 +32,18 @@ const UserMenu = ({ user, isOpen, onToggle, onClose, onLogout }: Props) => (
             <UserEmail>{user?.email}</UserEmail>
           </UserInfo>
           <MenuDivider />
-          <MenuItem as={Link} to="/_auth/editor" onClick={onClose}>
+          <MenuLinkItem to="/_auth/editor" onClick={onClose}>
             <SquarePen size={16} />
             글쓰기
-          </MenuItem>
-          <MenuItem as={Link} to="/_auth/editor/posts" onClick={onClose}>
+          </MenuLinkItem>
+          <MenuLinkItem to="/_auth/editor/posts" onClick={onClose}>
             <FileText size={16} />내 포스트
-          </MenuItem>
+          </MenuLinkItem>
           <MenuDivider />
-          <MenuItem as={Link} to="/_auth/editor/settings" onClick={onClose}>
+          <MenuLinkItem to="/_auth/editor/settings" onClick={onClose}>
             <Settings size={16} />
             설정
-          </MenuItem>
+          </MenuLinkItem>
           <MenuItem onClick={onLogout}>
             <LogOut size={16} />
             로그아웃
@@ -123,6 +123,21 @@ const MenuDivider = tw.div`
   my-2
   border-t
   border-gray-200
+`;
+
+const MenuLinkItem = tw(Link)`
+  w-full
+  px-4
+  py-2
+  text-left
+  text-sm
+  text-gray-700
+  hover:bg-gray-100
+  flex
+  items-center
+  gap-3
+  transition-colors
+  no-underline
 `;
 
 const MenuItem = tw.button`
