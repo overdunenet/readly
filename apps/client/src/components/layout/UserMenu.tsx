@@ -32,15 +32,15 @@ const UserMenu = ({ user, isOpen, onToggle, onClose, onLogout }: Props) => (
             <UserEmail>{user?.email}</UserEmail>
           </UserInfo>
           <MenuDivider />
-          <MenuLinkItem to="/_auth/editor" onClick={onClose}>
+          <MenuLinkItem to="/editor" onClick={onClose}>
             <SquarePen size={16} />
             글쓰기
           </MenuLinkItem>
-          <MenuLinkItem to="/_auth/editor/posts" onClick={onClose}>
+          <MenuLinkItem to="/editor/posts" onClick={onClose}>
             <FileText size={16} />내 포스트
           </MenuLinkItem>
           <MenuDivider />
-          <MenuLinkItem to="/_auth/editor/settings" onClick={onClose}>
+          <MenuLinkItem to="/editor/settings" onClick={onClose}>
             <Settings size={16} />
             설정
           </MenuLinkItem>
