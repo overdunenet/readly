@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 // API 응답과 동일한 User 타입 정의
-interface User {
+export interface User {
   id: string;
   email: string;
   nickname: string;
