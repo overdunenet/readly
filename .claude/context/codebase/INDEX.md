@@ -22,6 +22,7 @@ estimated_tokens: ~150
 | [context-handoff.md](./context-handoff.md)         | Context Handoff Skill 구조            |
 | [prompt-structuring.md](./prompt-structuring.md)   | Prompt Structuring Skill 구조         |
 | [follow-module.md](./follow-module.md)             | Follow 모듈 (팔로우/언팔로우, BE+FE)   |
+| [post-editor.md](./post-editor.md)                | CKEditor 5 포스트 에디터 UI 및 스타일링 |
 
 ## 빠른 참조
 
