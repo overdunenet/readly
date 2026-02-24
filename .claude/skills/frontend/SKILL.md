@@ -124,6 +124,17 @@ function EditorLayout() {
 }
 ```
 
+### Link 경로 작성 규칙
+
+`_auth/`, `_guest/` 등 언더스코어(`_`) prefix가 붙은 디렉토리는 **레이아웃 라우트**로, URL 경로에 포함되지 않습니다. `Link`의 `to` prop에는 실제 URL 경로를 사용하세요.
+
+| 파일 경로                             | Link to            | URL                |
+| ------------------------------------- | ------------------ | ------------------ |
+| `routes/_auth/editor/index.tsx`       | `/editor`          | `/editor`          |
+| `routes/_auth/editor/posts/index.tsx` | `/editor/posts`    | `/editor/posts`    |
+| `routes/_auth/editor/settings.tsx`    | `/editor/settings` | `/editor/settings` |
+| `routes/login.tsx`                    | `/login`           | `/login`           |
+
 ## 폼 처리 (React Hook Form + Zod)
 
 ```typescript
