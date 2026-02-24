@@ -22,6 +22,7 @@ estimated_tokens: ~150
 | [context-handoff.md](./context-handoff.md)         | Context Handoff Skill 구조            |
 | [prompt-structuring.md](./prompt-structuring.md)   | Prompt Structuring Skill 구조         |
 | [follow-module.md](./follow-module.md)             | Follow 모듈 (팔로우/언팔로우, BE+FE)   |
+| [prd-workflow.md](./prd-workflow.md)               | PRD 5-Phase 대화형 워크플로우 Skill 구조  |
 
 ## 빠른 참조
 
