@@ -133,13 +133,20 @@ EOF
 CONTEXT_BASE_DIR="$PROJECT_CLAUDE_DIR/context"
 HAS_CONTEXT=false
 
-for context_type in "business" "codebase"; do
+for context_type in "planning" "business" "codebase"; do
   context_dir="$CONTEXT_BASE_DIR/$context_type"
   if [ -d "$context_dir" ]; then
     HAS_CONTEXT=true
 
     # 헤더 출력
-    if [ "$context_type" = "business" ]; then
+    if [ "$context_type" = "planning" ]; then
+      echo "---"
+      echo ""
+      echo "### Planning Context (MANDATORY - 코드 작업 전 반드시 확인)"
+      echo ""
+      echo "> Planning이 business context와 상충할 경우, Planning이 '의도된 방향'이며 business는 '현재 상태'입니다."
+      echo ""
+    elif [ "$context_type" = "business" ]; then
       echo "---"
       echo ""
       echo "### Business Context"

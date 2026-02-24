@@ -20,8 +20,10 @@ estimated_tokens: ~1200
 .claude/
 ├── CLAUDE.md          # 프로젝트 전체 가이드 (인덱스 역할)
 ├── context/           # 사실/배경 정보 (읽기 전용)
-│   ├── architecture.md
-│   └── domain/
+│   ├── architecture/
+│   ├── business/
+│   ├── codebase/
+│   └── planning/
 ├── skills/            # 방법/절차 가이드 (액션 지침)
 │   ├── Coding/
 │   │   └── SKILL.md
