@@ -13,7 +13,7 @@ estimated_tokens: ~3000
 ## 워크플로우 개요
 
 ```
-Phase A: 컨텍스트 수집
+Phase A: 컨텍스트 수집 (A0: Product Brief → A1: Milestone → A2: CIS)
   ↓
 Phase B: 핵심 요구사항 수집
   ↓
@@ -35,6 +35,21 @@ Phase E: 검증 & 저장
 ---
 
 ## Phase A: 컨텍스트 수집
+
+### A0: Product Brief 필수 읽기
+
+1. `PM-DOCS/Context Output/innovation-strategy_2026-02-25_product-brief.md` 파일을 읽는다
+2. 다음 항목을 PRD 작성의 전략적 기반으로 활용한다:
+   - **Vision & Mission**: PRD §1 개요 - 배경 및 목적의 근거
+   - **Target Users**: PRD §3 유저스토리 - 역할 정의의 근거
+   - **Value Proposition**: PRD §3 유저스토리 - 가치 정의의 근거
+   - **Roadmap**: PRD §10 우선순위 & 스코프 - MVP vs 후속 판단 근거
+3. PRD frontmatter에 `product_brief_ref` 필드를 기록한다:
+   ```yaml
+   product_brief_ref: PM-DOCS/Context Output/innovation-strategy_2026-02-25_product-brief.md
+   ```
+
+> Product Brief의 "부록: PRD 작성 시 참조 가이드" 섹션에 각 Product Brief 섹션 → PRD 섹션 매핑이 정리되어 있다.
 
 ### A1: Milestone 선택
 
