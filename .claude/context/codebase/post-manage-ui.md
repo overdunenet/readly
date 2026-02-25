@@ -14,10 +14,11 @@ estimated_tokens: ~300
 | 파일 | 역할 | 핵심 함수/컴포넌트 |
 | ---- | ---- | ------------------- |
 | apps/client/src/routes/_auth/editor/posts/index.tsx | 포스트 관리 페이지 | PostsPage, statusFilter, searchQuery |
+| apps/client/src/components/posts/manage/types.ts | 공통 타입 정의 | PostStatus, PostAccessLevel, PostItem |
 | apps/client/src/components/posts/manage/PostListItem.tsx | 포스트 목록 카드 | PostListItem, formatRelativeTime() |
-| apps/client/src/components/posts/manage/PostStatusBadge.tsx | 상태 뱃지 | PostStatusBadge (draft/published/scheduled) |
-| apps/client/src/components/posts/manage/PostAccessBadge.tsx | 접근레벨 뱃지 | PostAccessBadge (public/subscriber/purchaser/private) |
-| apps/client/src/components/posts/manage/PostActions.tsx | 액션 드롭다운 | PostActions (수정/발행/삭제) |
+| apps/client/src/components/posts/manage/PostStatusBadge.tsx | 상태 뱃지 | PostStatusBadge, STATUS_CONFIG |
+| apps/client/src/components/posts/manage/PostAccessBadge.tsx | 접근레벨 뱃지 | PostAccessBadge, ACCESS_CONFIG |
+| apps/client/src/components/posts/manage/PostActions.tsx | 액션 드롭다운 (WAI-ARIA) | PostActions (수정/발행/삭제) |
 
 ## 핵심 흐름
 
@@ -25,6 +26,12 @@ estimated_tokens: ~300
 2. `statusFilter` + `searchQuery` → `useMemo`로 클라이언트 필터링
 3. 각 포스트 → `PostListItem` 렌더링 (썸네일, 제목, 발췌, 뱃지, 액션)
 4. 사용자 액션 → `trpc.post.publish/unpublish/delete` mutation → 캐시 무효화
+
+## 공통 타입 (`types.ts`)
+
+- `PostStatus`: `'draft' | 'published' | 'scheduled'`
+- `PostAccessLevel`: `'public' | 'subscriber' | 'purchaser' | 'private'`
+- `PostItem`: 포스트 목록 아이템 인터페이스 (id, title, excerpt, thumbnail, accessLevel, status, price, publishedAt, createdAt)
 
 ## 컴포넌트 계층
 
@@ -36,7 +43,7 @@ PostsPage
     └── PostListItem[]
         ├── PostStatusBadge
         ├── PostAccessBadge
-        └── PostActions → ConfirmModal (삭제 확인)
+        └── PostActions (WAI-ARIA dropdown) → ConfirmModal (삭제 확인)
 ```
 
 ## tRPC 연동
@@ -45,6 +52,14 @@ PostsPage
 - **Mutations**: `post.publish`, `post.unpublish`, `post.delete`
 - 성공 시 `utils.post.getMy.invalidate()`로 캐시 무효화
 - 실패 시 `AlertModal`로 에러 메시지 표시
+
+## 접근성 (a11y)
+
+- `PostActions`: WAI-ARIA 드롭다운 메뉴 패턴 적용
+  - 트리거 버튼: `aria-haspopup="true"`, `aria-expanded={isOpen}`
+  - 드롭다운 컨테이너: `role="menu"`
+  - 메뉴 아이템: `role="menuitem"`
+  - Escape 키로 닫기 지원
 
 ## 스타일링
 
