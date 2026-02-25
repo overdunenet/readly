@@ -4,21 +4,10 @@ import tw from 'tailwind-styled-components';
 import PostAccessBadge from '@/components/posts/manage/PostAccessBadge';
 import PostActions from '@/components/posts/manage/PostActions';
 import PostStatusBadge from '@/components/posts/manage/PostStatusBadge';
-
-interface Post {
-  id: string;
-  title: string;
-  excerpt?: string | null;
-  thumbnail?: string | null;
-  accessLevel: 'public' | 'subscriber' | 'purchaser' | 'private';
-  status: 'draft' | 'published' | 'scheduled';
-  price: number;
-  publishedAt?: Date | string | null;
-  createdAt: Date | string;
-}
+import { PostItem } from '@/components/posts/manage/types';
 
 interface PostListItemProps {
-  post: Post;
+  post: PostItem;
   onEdit: (postId: string) => void;
   onPublish: (postId: string) => void;
   onUnpublish: (postId: string) => void;
@@ -85,7 +74,6 @@ const PostListItem = ({
 
       <ActionsContainer>
         <PostActions
-          postId={post.id}
           status={post.status}
           onEdit={() => onEdit(post.id)}
           onPublish={() => onPublish(post.id)}

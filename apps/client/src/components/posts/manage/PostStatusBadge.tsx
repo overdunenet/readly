@@ -1,6 +1,6 @@
 import tw from 'tailwind-styled-components';
 
-type PostStatus = 'draft' | 'published' | 'scheduled';
+import { PostStatus } from '@/components/posts/manage/types';
 
 interface PostStatusBadgeProps {
   status: PostStatus;

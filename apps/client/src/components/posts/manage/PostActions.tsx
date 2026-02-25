@@ -1,13 +1,13 @@
 import { Eye, EyeOff, MoreVertical, Pencil, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SnappyModal from 'react-snappy-modal';
 import tw from 'tailwind-styled-components';
 
+import { PostStatus } from '@/components/posts/manage/types';
 import { ConfirmModal } from '@/shared/modal/ConfirmModal';
 
 interface PostActionsProps {
-  postId: string;
-  status: 'draft' | 'published' | 'scheduled';
+  status: PostStatus;
   onEdit: () => void;
   onPublish: () => void;
   onUnpublish: () => void;
@@ -25,6 +25,15 @@ const PostActions = ({
 
   const handleToggle = () => setIsOpen((prev) => !prev);
   const handleClose = () => setIsOpen(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [isOpen]);
 
   const handleEdit = () => {
     handleClose();
@@ -58,19 +67,23 @@ const PostActions = ({
 
   return (
     <Container>
-      <TriggerButton onClick={handleToggle}>
+      <TriggerButton
+        onClick={handleToggle}
+        aria-haspopup="true"
+        aria-expanded={isOpen}
+      >
         <MoreVertical size={18} />
       </TriggerButton>
 
       {isOpen && (
         <>
           <Overlay onClick={handleClose} />
-          <Dropdown>
-            <MenuItem onClick={handleEdit}>
+          <Dropdown role="menu">
+            <MenuItem role="menuitem" onClick={handleEdit}>
               <Pencil size={16} />
               수정
             </MenuItem>
-            <MenuItem onClick={handlePublishToggle}>
+            <MenuItem role="menuitem" onClick={handlePublishToggle}>
               {status === 'published' ? (
                 <>
                   <EyeOff size={16} />
@@ -83,7 +96,7 @@ const PostActions = ({
                 </>
               )}
             </MenuItem>
-            <DeleteMenuItem onClick={handleDelete}>
+            <DeleteMenuItem role="menuitem" onClick={handleDelete}>
               <Trash2 size={16} />
               삭제
             </DeleteMenuItem>

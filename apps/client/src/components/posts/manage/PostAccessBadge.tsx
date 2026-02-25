@@ -1,7 +1,7 @@
 import { Lock } from 'lucide-react';
 import tw from 'tailwind-styled-components';
 
-type PostAccessLevel = 'public' | 'subscriber' | 'purchaser' | 'private';
+import { PostAccessLevel } from '@/components/posts/manage/types';
 
 interface PostAccessBadgeProps {
   accessLevel: PostAccessLevel;
