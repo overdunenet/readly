@@ -63,8 +63,8 @@ function PostsPage() {
   }, [posts, statusFilter, searchQuery]);
 
   const handleEdit = (postId: string) => {
+    // TODO: 편집 라우트 구현 후 '/editor/posts/$postId/edit'로 변경
     navigate({ to: '/editor/posts/create' });
-    console.log('TODO: navigate to edit page for postId:', postId);
   };
 
   const handlePublish = (postId: string) => {
