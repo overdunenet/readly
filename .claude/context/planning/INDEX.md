@@ -32,6 +32,6 @@ estimated_tokens: ~150
 
 ## 관련 Context
 
-- `business/overview.md`: 현재 서비스 비전 (Planning과 비교하여 변경사항 확인)
+- **Product Brief**: `PM-DOCS/Context Output/innovation-strategy_2026-02-25_product-brief.md` — 제품 전략 기초 (PRD 작성 시 필수 참조)
 - `business/access-control.md`: 현재 접근 권한 (PRD에서 변경 예정이면 확인)
 - `business/payment.md`: 현재 결제 정책 (PRD에서 변경 예정이면 확인)
