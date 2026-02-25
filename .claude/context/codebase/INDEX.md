@@ -23,6 +23,7 @@ estimated_tokens: ~150
 | [prompt-structuring.md](./prompt-structuring.md)   | Prompt Structuring Skill 구조         |
 | [follow-module.md](./follow-module.md)             | Follow 모듈 (팔로우/언팔로우, BE+FE)   |
 | [post-editor.md](./post-editor.md)                | CKEditor 5 포스트 에디터 UI 및 스타일링 |
+| [post-manage-ui.md](./post-manage-ui.md)          | 에디터 포스트 목록 관리 UI (필터, 검색, 액션) |
 
 ## 빠른 참조
 

@@ -36,3 +36,4 @@ estimated_tokens: ~150
 - `codebase/user-entity.md`: User 인증 구현
 - `codebase/seo-implementation.md`: SEO 구현 상세
 - `codebase/follow-module.md`: Follow 모듈 구현
+- `codebase/post-manage-ui.md`: 포스트 관리 UI 구현
