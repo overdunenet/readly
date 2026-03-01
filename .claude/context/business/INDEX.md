@@ -20,6 +20,7 @@ estimated_tokens: ~150
 | [seo-strategy.md](./seo-strategy.md)                                                               | SEO 전략 목적 및 빌드 타임 프리렌더링 채택 배경            |
 | [developer-experience.md](./developer-experience.md)                                               | Claude Code 사용 경험 최적화                               |
 | [user-follow.md](./user-follow.md)                                                                 | 사용자 팔로우 기능 (에디터-팔로워 관계)                    |
+| [deployment-efficiency.md](./deployment-efficiency.md)                                             | 빌드 캐시 최적화로 배포 속도 향상                          |
 
 ## 빠른 참조
 
