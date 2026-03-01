@@ -12,19 +12,19 @@ estimated_tokens: ~150
 
 ## 문서 목록
 
-| 문서                                                                                               | 설명                                                       |
-| -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| [Product Brief](../../../PM-DOCS/Context%20Output/innovation-strategy_2026-02-25_product-brief.md) | 제품 전략 기초 문서 (비전, 타겟 유저, 시장, 비즈니스 모델) |
-| [access-control.md](./access-control.md)                                                           | 접근 권한 시스템 (무료/유료 구간 구분)                     |
-| [payment.md](./payment.md)                                                                         | 결제 수단, 유형, 환불 정책                                 |
-| [seo-strategy.md](./seo-strategy.md)                                                               | SEO 전략 목적 및 빌드 타임 프리렌더링 채택 배경            |
-| [developer-experience.md](./developer-experience.md)                                               | Claude Code 사용 경험 최적화                               |
-| [user-follow.md](./user-follow.md)                                                                 | 사용자 팔로우 기능 (에디터-팔로워 관계)                    |
+| 문서                                                                | 설명                                                       |
+| ------------------------------------------------------------------- | ---------------------------------------------------------- |
+| [Product Brief](../../../PM-DOCS/Context%20Output/PRODUCT_BRIEF.md) | 제품 전략 기초 문서 (비전, 타겟 유저, 시장, 비즈니스 모델) |
+| [access-control.md](./access-control.md)                            | 접근 권한 시스템 (무료/유료 구간 구분)                     |
+| [payment.md](./payment.md)                                          | 결제 수단, 유형, 환불 정책                                 |
+| [seo-strategy.md](./seo-strategy.md)                                | SEO 전략 목적 및 빌드 타임 프리렌더링 채택 배경            |
+| [developer-experience.md](./developer-experience.md)                | Claude Code 사용 경험 최적화                               |
+| [user-follow.md](./user-follow.md)                                  | 사용자 팔로우 기능 (에디터-팔로워 관계)                    |
 
 ## 빠른 참조
 
 > **Product Brief**: 서비스의 비전, 타겟 유저, 시장 전략, 비즈니스 모델 등 제품 전략 기초는
-> `PM-DOCS/Context Output/innovation-strategy_2026-02-25_product-brief.md` 를 참조하세요.
+> `PM-DOCS/Context Output/PRODUCT_BRIEF.md` 를 참조하세요.
 
 ### 핵심 개념
 
