@@ -7,3 +7,4 @@
 !apps/api/package.json
 !apps/client/package.json
 !packages/api-types/package.json
+!.yarn/cache
