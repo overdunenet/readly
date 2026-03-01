@@ -14,7 +14,8 @@ COPY apps/api/package.json ./apps/api/package.json
 COPY apps/client/package.json ./apps/client/package.json
 COPY packages/api-types/package.json ./packages/api-types/package.json
 
-RUN --mount=type=cache,target=/app/.yarn/cache yarn install --immutable
+COPY .yarn/cache ./.yarn/cache
+RUN yarn install --immutable && rm -rf .yarn/cache
 
 COPY apps/api/config ./apps/api/config
 COPY apps/api/dist ./apps/api/dist
