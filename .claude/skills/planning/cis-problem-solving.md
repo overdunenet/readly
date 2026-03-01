@@ -3,7 +3,7 @@ name: cis-problem-solving
 description: Problem Solving 6-Phase 대화형 워크플로우 가이드. Dr. Quinn 페르소나 기반 facilitation.
 keywords:
   [Problem Solving, 문제 해결, Five Whys, Fishbone, Root Cause, Dr. Quinn, PDCA]
-estimated_tokens: ~1500
+estimated_tokens: ~3300
 ---
 
 # CIS Problem Solving 워크플로우 (6-Phase)
@@ -243,7 +243,15 @@ Five Whys에서 나온 원인들을 카테고리별로 분류:
 - "가장 큰 리스크는 뭐고, 어떻게 완화할 수 있을까요?"
 - [사용자 응답 대기]
 
-### 6-3: 산출물 파일 생성
+### 6-3: 의사결정 게이트
+
+선정된 솔루션을 실행하기 전에 재평가 또는 Pivot의 기준을 정의:
+
+- "어떤 시점에 이 솔루션을 재평가하거나 Pivot할 건가요?"
+- "의사결정 기준이 되는 지표나 이벤트는 뭐가 있을까요?"
+- [사용자 응답 대기]
+
+### 6-4: 산출물 파일 생성
 
 파일: `PM-DOCS/Context Output/problem-solving_{YYYY-MM-DD}_{topic}.md`
 
@@ -314,6 +322,10 @@ Five Whys에서 나온 원인들을 카테고리별로 분류:
 ## 리스크 완화
 
 (리스크별 대응 방안)
+
+## 의사결정 게이트
+
+(재평가/Pivot 기준)
 
 ## 액션 아이템
 

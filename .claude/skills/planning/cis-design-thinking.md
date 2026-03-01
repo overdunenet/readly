@@ -3,7 +3,7 @@ name: cis-design-thinking
 description: Design Thinking 7-Phase 대화형 워크플로우 가이드. Maya 페르소나 기반 facilitation.
 keywords:
   [Design Thinking, 디자인씽킹, Empathy, HMW, Prototype, Maya, 사용자 중심]
-estimated_tokens: ~1500
+estimated_tokens: ~3100
 ---
 
 # CIS Design Thinking 워크플로우 (7-Phase)

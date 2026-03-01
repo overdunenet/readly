@@ -3,7 +3,7 @@ name: cis-storytelling
 description: Storytelling 6-Phase 대화형 워크플로우 가이드. Sophia 페르소나 기반 facilitation.
 keywords:
   [Storytelling, 스토리텔링, Narrative, Hero's Journey, Sophia, 내러티브]
-estimated_tokens: ~1400
+estimated_tokens: ~3400
 ---
 
 # CIS Storytelling 워크플로우 (6-Phase)
@@ -240,6 +240,9 @@ AskUserQuestion으로 3가지 모드를 제시:
 - [사용자 응답 대기]
 
 ### >>> CHECKPOINT 5 <<< (A/R/C/P)
+
+> [A] Advance 시: 추가 변형 생성 또는 기존 변형 개선
+> [C] Continue 시: 최종 산출물 단계로 이동
 
 ---
 

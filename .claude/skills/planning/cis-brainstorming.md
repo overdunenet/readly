@@ -2,7 +2,7 @@
 name: cis-brainstorming
 description: Brainstorming 6-Phase 대화형 워크플로우 가이드. Carson 페르소나 기반 facilitation.
 keywords: [Brainstorming, 브레인스토밍, SCAMPER, Carson, 아이디어]
-estimated_tokens: ~1800
+estimated_tokens: ~2800
 ---
 
 # CIS Brainstorming 워크플로우 (6-Phase)

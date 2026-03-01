@@ -10,7 +10,7 @@ keywords:
     Victor,
     비즈니스 모델,
   ]
-estimated_tokens: ~1500
+estimated_tokens: ~3500
 ---
 
 # CIS Innovation Strategy 워크플로우 (7-Phase)
