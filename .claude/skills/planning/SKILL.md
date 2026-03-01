@@ -24,12 +24,17 @@ user-invocable: true
 
 ## 서브파일 구조
 
-| 파일              | 역할                                       |
-| ----------------- | ------------------------------------------ |
-| `prd-workflow.md` | Feature PRD 5-Phase 워크플로우 (Phase A→E) |
-| `prd-template.md` | PRD 11섹션 작성 가이드                     |
-| `cis-guide.md`    | CIS 5종 워크플로우 가이드                  |
-| `pm-config.yml`   | GitHub Project ID, 경로, 라벨 설정         |
+| 파일                         | 역할                                        |
+| ---------------------------- | ------------------------------------------- |
+| `prd-workflow.md`            | Feature PRD 5-Phase 워크플로우 (Phase A→E)  |
+| `prd-template.md`            | PRD 11섹션 작성 가이드                      |
+| `cis-guide.md`               | CIS 공통 실행 규칙 + 워크플로우 라우터      |
+| `cis-brainstorming.md`       | Brainstorming 6-Phase 가이드 (Carson)       |
+| `cis-design-thinking.md`     | Design Thinking 7-Phase 가이드 (Maya)       |
+| `cis-problem-solving.md`     | Problem Solving 6-Phase 가이드 (Dr. Quinn)  |
+| `cis-innovation-strategy.md` | Innovation Strategy 7-Phase 가이드 (Victor) |
+| `cis-storytelling.md`        | Storytelling 6-Phase 가이드 (Sophia)        |
+| `pm-config.yml`              | GitHub Project ID, 경로, 라벨 설정          |
 
 ---
 
