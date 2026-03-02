@@ -181,20 +181,33 @@ const appRouter = t.router({
         })
       )
       .output(
-        z.object({
-          id: z.string(),
-          title: z.string(),
-          content: z.string(),
-          excerpt: z.string().nullish(),
-          thumbnail: z.string().nullish(),
-          accessLevel: z.enum(['public', 'subscriber', 'purchaser', 'private']),
-          status: z.enum(['draft', 'published', 'scheduled']),
-          price: z.number(),
-          publishedAt: z.date().nullish(),
-          scheduledAt: z.date().nullish(),
-          createdAt: z.date(),
-          updatedAt: z.date(),
-        })
+        z
+          .object({
+            id: z.string(),
+            title: z.string(),
+            content: z.string(),
+            excerpt: z.string().nullish(),
+            thumbnail: z.string().nullish(),
+            accessLevel: z.enum([
+              'public',
+              'subscriber',
+              'purchaser',
+              'private',
+            ]),
+            status: z.enum(['draft', 'published', 'scheduled']),
+            price: z.number(),
+            publishedAt: z.date().nullish(),
+            scheduledAt: z.date().nullish(),
+            createdAt: z.date(),
+            updatedAt: z.date(),
+          })
+          .extend({
+            author: z.object({
+              id: z.string(),
+              nickname: z.string(),
+              profileImage: z.string().nullish(),
+            }),
+          })
       )
       .query(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
     getMy: publicProcedure

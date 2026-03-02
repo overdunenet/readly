@@ -169,7 +169,7 @@ export class PostRouter extends BaseTrpcRouter {
     input: z.object({
       postId: z.string(),
     }),
-    output: postResponseSchema,
+    output: postFeedItemSchema,
   })
   async getOne(@Ctx() ctx: any, @Input('postId') postId: string) {
     const userId = ctx.user?.sub;

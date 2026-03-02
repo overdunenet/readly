@@ -26,6 +26,7 @@
   "dependencies": {
     "@ckeditor/ckeditor5-react": "^11.0.1",
     "@hookform/resolvers": "^5.1.1",
+    "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-router": "^1.102.3",
