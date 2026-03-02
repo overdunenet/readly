@@ -2,6 +2,8 @@ import { useNavigate } from '@tanstack/react-router';
 import tw from 'tailwind-styled-components';
 
 interface HeaderSectionProps {
+  title?: string;
+  mode?: 'create' | 'editDraft' | 'editPublished';
   isValid: boolean;
   isDrafting: boolean;
   isPublishing: boolean;
@@ -10,6 +12,8 @@ interface HeaderSectionProps {
 }
 
 export function HeaderSection({
+  title = '새 포스트 작성',
+  mode = 'create',
   isValid,
   isDrafting,
   isPublishing,
@@ -37,24 +41,36 @@ export function HeaderSection({
           </svg>
           뒤로
         </BackButton>
-        <Title>새 포스트 작성</Title>
+        <Title>{title}</Title>
       </HeaderLeft>
 
       <HeaderRight>
-        <SaveButton
-          onClick={onSaveDraft}
-          disabled={!isValid || isDrafting || isPublishing}
-          type="button"
-        >
-          {isDrafting ? '저장 중...' : '임시저장'}
-        </SaveButton>
-        <PublishButton
-          onClick={onPublish}
-          disabled={!isValid || isDrafting || isPublishing}
-          type="button"
-        >
-          {isPublishing ? '발행 중...' : '발행'}
-        </PublishButton>
+        {mode === 'editPublished' ? (
+          <SaveButton
+            onClick={onSaveDraft}
+            disabled={!isValid || isDrafting}
+            type="button"
+          >
+            {isDrafting ? '저장 중...' : '저장'}
+          </SaveButton>
+        ) : (
+          <>
+            <SaveButton
+              onClick={onSaveDraft}
+              disabled={!isValid || isDrafting || isPublishing}
+              type="button"
+            >
+              {isDrafting ? '저장 중...' : '임시저장'}
+            </SaveButton>
+            <PublishButton
+              onClick={onPublish}
+              disabled={!isValid || isDrafting || isPublishing}
+              type="button"
+            >
+              {isPublishing ? '발행 중...' : '발행'}
+            </PublishButton>
+          </>
+        )}
       </HeaderRight>
     </Header>
   );

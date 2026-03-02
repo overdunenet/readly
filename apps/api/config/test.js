@@ -12,6 +12,7 @@ module.exports = {
       entities: ['src/module/**/*.entity.ts'],
       migrations: ['src/database/migration/*.ts'],
       migrationsRun: false,
+      ssl: false,
     },
   },
   auth: {
