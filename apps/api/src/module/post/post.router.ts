@@ -11,6 +11,8 @@ import { BaseTrpcRouter } from '../trpc/baseTrpcRouter';
 import {
   UserAuthMiddleware,
   UserAuthorizedContext,
+  OptionalUserAuthMiddleware,
+  OptionalUserContext,
 } from '../user/user.auth.middleware';
 
 const postAccessLevelSchema = z.enum([
@@ -165,13 +167,17 @@ export class PostRouter extends BaseTrpcRouter {
   /**
    * 포스트 단일 조회
    */
+  @UseMiddlewares(OptionalUserAuthMiddleware)
   @Query({
     input: z.object({
       postId: z.string(),
     }),
     output: postResponseSchema,
   })
-  async getOne(@Ctx() ctx: any, @Input('postId') postId: string) {
+  async getOne(
+    @Ctx() ctx: OptionalUserContext,
+    @Input('postId') postId: string
+  ) {
     const userId = ctx.user?.sub;
     return await this.microserviceClient.send('post.getOne', {
       postId,

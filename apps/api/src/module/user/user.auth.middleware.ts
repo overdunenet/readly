@@ -61,3 +61,37 @@ export class UserAuthMiddleware implements TRPCMiddleware {
 export interface UserAuthorizedContext extends CreateExpressContextOptions {
   user: UserAuthPayload;
 }
+
+@Injectable()
+export class OptionalUserAuthMiddleware implements TRPCMiddleware {
+  use(
+    opts: MiddlewareOptions
+  ): MiddlewareResponse | Promise<MiddlewareResponse> {
+    const { next, ctx } = opts;
+    const req: Request = (opts.ctx as ContextOptions).req;
+
+    const authorization = req.headers.authorization;
+    if (!authorization) {
+      return next({ ctx: { ...ctx, user: null } });
+    }
+
+    const [authType, token] = authorization.split(' ');
+    if (authType !== 'Bearer' || !token) {
+      return next({ ctx: { ...ctx, user: null } });
+    }
+
+    try {
+      const userPayload = jwtService.verify(token, {
+        secret: ConfigProvider.auth.jwt.user.access.secret,
+      }) as UserAuthPayload;
+
+      return next({ ctx: { ...ctx, user: userPayload } });
+    } catch {
+      return next({ ctx: { ...ctx, user: null } });
+    }
+  }
+}
+
+export interface OptionalUserContext extends CreateExpressContextOptions {
+  user: UserAuthPayload | null;
+}
