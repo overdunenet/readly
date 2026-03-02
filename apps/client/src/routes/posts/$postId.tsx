@@ -42,7 +42,7 @@ function PostDetailPage() {
   return (
     <Layout>
       <Helmet>
-        <title>{post.title} - Readly</title>
+        <title>{post.title}</title>
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.excerpt ?? post.title} />
         {post.thumbnail && (
