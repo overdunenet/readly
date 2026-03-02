@@ -1,6 +1,8 @@
+import DOMPurify from 'dompurify';
 import tw from 'tailwind-styled-components';
 
 import FollowButton from '../follow/FollowButton';
+import { formatRelativeTime } from '../../shared/utils/date';
 
 interface PostDetailProps {
   post: {
@@ -20,23 +22,6 @@ interface PostDetailProps {
       profileImage?: string | null;
     };
   };
-}
-
-function formatRelativeTime(date: string | Date | null | undefined): string {
-  if (!date) return '';
-  const now = new Date();
-  const target = new Date(date);
-  const diffMs = now.getTime() - target.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return '방금 전';
-  if (diffMin < 60) return `${diffMin}분 전`;
-  const diffHour = Math.floor(diffMin / 60);
-  if (diffHour < 24) return `${diffHour}시간 전`;
-  const diffDay = Math.floor(diffHour / 24);
-  if (diffDay < 30) return `${diffDay}일 전`;
-  const diffMonth = Math.floor(diffDay / 30);
-  if (diffMonth < 12) return `${diffMonth}개월 전`;
-  return `${Math.floor(diffMonth / 12)}년 전`;
 }
 
 const ACCESS_LEVEL_LABEL: Record<string, string> = {
@@ -77,7 +62,9 @@ const PostDetail = ({ post }: PostDetailProps) => {
         </ThumbnailContainer>
       )}
 
-      <ContentBody dangerouslySetInnerHTML={{ __html: post.content }} />
+      <ContentBody
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+      />
 
       <Divider />
 
