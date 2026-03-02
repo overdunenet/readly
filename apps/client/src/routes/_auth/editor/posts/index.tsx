@@ -120,7 +120,9 @@ function PostsPage() {
             type="text"
             placeholder="제목으로 검색..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setSearchQuery(e.target.value)
+            }
           />
         </SearchWrapper>
       </Toolbar>
