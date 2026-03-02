@@ -24,6 +24,7 @@ estimated_tokens: ~150
 | [follow-module.md](./follow-module.md)             | Follow 모듈 (팔로우/언팔로우, BE+FE)   |
 | [post-editor.md](./post-editor.md)                | CKEditor 5 포스트 에디터 UI 및 스타일링 |
 | [post-manage-ui.md](./post-manage-ui.md)          | 에디터 포스트 목록 관리 UI (필터, 검색, 액션) |
+| [ci-build-client.md](./ci-build-client.md)        | 클라이언트 빌드 검증 CI (yarn 캐시, 빌드 체크) |
 
 ## 빠른 참조
 
