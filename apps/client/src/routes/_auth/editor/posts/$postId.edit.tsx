@@ -77,6 +77,8 @@ function EditPostPage() {
 
   const watchedAccessLevel = watch('accessLevel');
 
+  const mode = postData?.status === 'published' ? 'editPublished' : 'editDraft';
+
   const onSubmit = async (data: CreatePostForm, shouldPublish = false) => {
     try {
       if (shouldPublish) {
@@ -94,8 +96,8 @@ function EditPostPage() {
         },
       });
 
-      // If should publish, publish it immediately
-      if (shouldPublish) {
+      // If should publish AND post is not already published
+      if (shouldPublish && postData?.status !== 'published') {
         await publishPostMutation.mutateAsync({ postId });
       }
 
@@ -135,6 +137,7 @@ function EditPostPage() {
     <Container>
       <HeaderSection
         title="포스트 편집"
+        mode={mode}
         isValid={isValid}
         isDrafting={isDrafting}
         isPublishing={isPublishing}
