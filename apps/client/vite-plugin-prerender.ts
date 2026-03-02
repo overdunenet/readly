@@ -29,7 +29,10 @@ export function prerender(options: PrerenderOptions): Plugin {
 
       // Dynamic import to avoid ESM issues
       const puppeteer = await import('puppeteer');
-      const browser = await puppeteer.default.launch({ headless: true });
+      const browser = await puppeteer.default.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
 
       let server: PreviewServer | null = null;
 
