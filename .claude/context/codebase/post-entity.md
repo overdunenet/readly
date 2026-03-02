@@ -265,11 +265,13 @@ async getAccessiblePosts(): Promise<PostEntity[]> {
 
 ### Queries
 
-| 엔드포인트           | 설명             | 인증               |
-| -------------------- | ---------------- | ------------------ |
-| `post.getOne`        | 포스트 조회      | 불필요 (권한 체크) |
-| `post.getMy`         | 내 포스트 목록   | 필요               |
-| `post.getAccessible` | 접근 가능 포스트 | 불필요             |
+| 엔드포인트           | 설명             | 인증                                              |
+| -------------------- | ---------------- | ------------------------------------------------- |
+| `post.getOne`        | 포스트 조회      | 미들웨어 없음 (`ctx.user?.sub`로 optional 추출)   |
+| `post.getMy`         | 내 포스트 목록   | 필요                                              |
+| `post.getAccessible` | 접근 가능 포스트 | 불필요                                            |
+
+> **참고**: `post.getOne`에서 `OptionalUserAuthMiddleware`가 제거되어 서버 측 JWT 검증 없이 `ctx.user?.sub`로 userId를 추출합니다. MVP 단순화를 위한 임시 조치입니다.
 
 ### 응답 시 유료 콘텐츠 제어
 

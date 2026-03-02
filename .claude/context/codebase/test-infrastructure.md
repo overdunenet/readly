@@ -60,9 +60,12 @@ jest-util.ts
 
 ## CI 워크플로우
 
-| 파일 | 트리거 | 대상 경로 |
-| ---- | ------ | --------- |
-| .github/workflows/test-api.yml | pull_request | apps/api/**, packages/** |
+| 파일 | 트리거 | 대상 경로 | 상태 |
+| ---- | ------ | --------- | ---- |
+| .github/workflows/test-api.yml | pull_request | apps/api/**, packages/** | 활성 |
+| ~~.github/workflows/build-client.yml~~ | ~~pull_request~~ | ~~apps/client/**, packages/**~~ | 삭제됨 (MVP 단순화) |
+
+> **참고**: 클라이언트 빌드 검증 CI(`build-client.yml`)가 삭제되어, 현재 PR 단계에서 클라이언트 빌드는 자동 검증되지 않습니다. API 테스트(`test-api.yml`)만 CI에서 실행됩니다.
 
 ### 실행 단계
 

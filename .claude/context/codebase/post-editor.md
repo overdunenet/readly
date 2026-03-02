@@ -18,14 +18,18 @@ CKEditor 5 ClassicEditor를 React에서 통합하여 사용하며, Readly 디자
 | 파일 | 역할 | 핵심 함수/클래스 |
 | ---- | ---- | ---------------- |
 | apps/client/src/components/posts/create/FormEditorSection.tsx | 에디터 섹션 컴포넌트 | FormEditorSection(), editorConfig |
+| apps/client/src/components/posts/create/HeaderSection.tsx | 포스트 작성 헤더 (새 포스트 전용) | HeaderSection (임시저장 + 발행 버튼) |
 | apps/client/src/index.css | CKEditor 커스텀 스타일 (Tailwind Preflight 리셋 포함) | - |
 | apps/client/src/main.tsx | 앱 진입점 (index.css import) | - |
 
+> **참고**: 기존 포스트 편집 페이지(`$postId.edit.tsx`)는 MVP 범위 축소로 삭제되었습니다. `HeaderSection`은 `mode`/`title` props가 제거되어 새 포스트 작성 전용으로 단순화되었습니다. 편집 기능은 향후 복원 예정입니다.
+
 ## 핵심 흐름
 
-1. `FormEditorSection` 컴포넌트가 react-hook-form `Controller`로 제목 input과 CKEditor를 렌더링
-2. CKEditor의 `onChange` 이벤트가 `editor.getData()`를 통해 폼 상태에 HTML 콘텐츠를 전달
-3. `editorConfig`에서 플러그인, 툴바 구성, 라이선스(GPL) 설정
+1. `HeaderSection`이 "임시저장" + "발행" 버튼을 렌더링 (새 포스트 작성 전용)
+2. `FormEditorSection` 컴포넌트가 react-hook-form `Controller`로 제목 input과 CKEditor를 렌더링
+3. CKEditor의 `onChange` 이벤트가 `editor.getData()`를 통해 폼 상태에 HTML 콘텐츠를 전달
+4. `editorConfig`에서 플러그인, 툴바 구성, 라이선스(GPL) 설정
 
 ## CKEditor 플러그인 구성
 

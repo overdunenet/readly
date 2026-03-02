@@ -25,6 +25,7 @@ estimated_tokens: ~300
 2. `statusFilter` + `searchQuery` → `useMemo`로 클라이언트 필터링
 3. 각 포스트 → `PostListItem` 렌더링 (썸네일, 제목, 발췌, 뱃지, 액션)
 4. 사용자 액션 → `trpc.post.publish/unpublish/delete` mutation → 캐시 무효화
+5. `handleEdit(postId)` → `/editor/posts/create`로 임시 리다이렉트 (편집 페이지 삭제로 인한 임시 조치, TODO 있음)
 
 ## 컴포넌트 계층
 

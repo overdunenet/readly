@@ -37,14 +37,16 @@ vite build
 
 ## 주요 파일
 
-| 파일                       | 역할                                 |
-| -------------------------- | ------------------------------------ |
-| `vite-plugin-prerender.ts` | 커스텀 Vite 프리렌더 플러그인        |
-| `vite.config.ts`           | 프리렌더 플러그인 설정 (라우트 목록) |
-| `src/main.tsx`             | HelmetProvider 래핑                  |
-| `src/routes/__root.tsx`    | 기본 Helmet 설정 (fallback title 등) |
-| `src/routes/about.tsx`     | 라우트별 Helmet 메타태그 예시        |
-| `index.html`               | 기본 메타태그 (fallback)             |
+| 파일                       | 역할                                 | 비고 |
+| -------------------------- | ------------------------------------ | ---- |
+| `vite-plugin-prerender.ts` | 커스텀 Vite 프리렌더 플러그인        | tsconfig.node.json include에서 제외됨 |
+| `vite.config.ts`           | 프리렌더 플러그인 설정 (라우트 목록) | |
+| `src/main.tsx`             | HelmetProvider 래핑                  | |
+| `src/routes/__root.tsx`    | 기본 Helmet 설정 (fallback title 등) | |
+| `src/routes/about.tsx`     | 라우트별 Helmet 메타태그 예시        | |
+| `index.html`               | 기본 메타태그 (fallback)             | |
+
+> **참고**: `vite-plugin-prerender.ts`의 Puppeteer launch 옵션에서 `--no-sandbox`, `--disable-setuid-sandbox` 인자가 제거되어 기본 Puppeteer 설정만 사용합니다. 또한 `tsconfig.node.json`의 `include`에서 제외되어 Node 빌드 시 타입 체크 대상이 아닙니다.
 
 ## Helmet 사용 패턴
 
