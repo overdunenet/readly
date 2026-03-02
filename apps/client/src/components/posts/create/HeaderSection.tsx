@@ -2,6 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import tw from 'tailwind-styled-components';
 
 interface HeaderSectionProps {
+  title?: string;
   isValid: boolean;
   isDrafting: boolean;
   isPublishing: boolean;
@@ -10,6 +11,7 @@ interface HeaderSectionProps {
 }
 
 export function HeaderSection({
+  title = '새 포스트 작성',
   isValid,
   isDrafting,
   isPublishing,
@@ -37,7 +39,7 @@ export function HeaderSection({
           </svg>
           뒤로
         </BackButton>
-        <Title>새 포스트 작성</Title>
+        <Title>{title}</Title>
       </HeaderLeft>
 
       <HeaderRight>
