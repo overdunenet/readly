@@ -24,6 +24,8 @@ estimated_tokens: ~150
 | [follow-module.md](./follow-module.md)             | Follow 모듈 (팔로우/언팔로우, BE+FE)   |
 | [post-editor.md](./post-editor.md)                | CKEditor 5 포스트 에디터 UI 및 스타일링 |
 | [post-manage-ui.md](./post-manage-ui.md)          | 에디터 포스트 목록 관리 UI (필터, 검색, 액션) |
+| [post-detail-ui.md](./post-detail-ui.md)  | 팔로워 포스트 상세페이지 UI (피드→본문 열람) |
+| [shared-utils.md](./shared-utils.md)      | 프론트엔드 공통 유틸리티 (날짜 포맷 등) |
 
 ## 빠른 참조
 

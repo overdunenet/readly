@@ -267,7 +267,7 @@ async getAccessiblePosts(): Promise<PostEntity[]> {
 
 | 엔드포인트           | 설명             | 인증               |
 | -------------------- | ---------------- | ------------------ |
-| `post.getOne`        | 포스트 조회      | 불필요 (권한 체크) |
+| `post.getOne`        | 포스트 조회 (author 포함) | 불필요 (권한 체크) |
 | `post.getMy`         | 내 포스트 목록   | 필요               |
 | `post.getAccessible` | 접근 가능 포스트 | 불필요             |
 
@@ -282,6 +282,13 @@ const response = {
     !post.canAccessPaidContent(user) && post.paidContent !== null,
 };
 ```
+
+### post.getOne 응답 스키마
+
+`post.getOne`의 output은 `postFeedItemSchema`를 사용하며, author 정보를 포함합니다:
+
+- post 기본 정보 (id, title, content, excerpt, thumbnail, accessLevel, status, price, publishedAt 등)
+- author 객체: { id, nickname, profileImage }
 
 ## 포스트 작성 흐름
 

@@ -33,6 +33,12 @@ Post는 **freeContent**(무료 공개 구간)와 **paidContent**(유료 구간) 
 - 유료 구간이 존재하면 잠금 표시 + 결제/구독 유도
 - 결제/구독 완료 후 전체 콘텐츠 열람
 
+### 현재 구현 상태
+
+- PostDetail 컴포넌트에서는 `post.content` 단일 필드로 본문을 렌더링합니다
+- `post.getOne` API 응답에서 서버가 권한에 따라 적절한 content를 반환합니다
+- freeContent/paidContent 분리 표시 (잠금 UI, 결제 유도)는 향후 구현 예정입니다
+
 ## 접근 레벨
 
 | 권한         | 설명        | freeContent 접근            | paidContent 접근            |

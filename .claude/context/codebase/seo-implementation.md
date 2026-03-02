@@ -45,6 +45,7 @@ vite build
 | `src/routes/__root.tsx`    | 기본 Helmet 설정 (fallback title 등) |
 | `src/routes/about.tsx`     | 라우트별 Helmet 메타태그 예시        |
 | `index.html`               | 기본 메타태그 (fallback)             |
+| `src/routes/posts/$postId.tsx` | 포스트 상세 동적 Helmet (title, og:*) |
 
 ## Helmet 사용 패턴
 
@@ -61,6 +62,18 @@ vite build
 </Helmet>
 ```
 
+### 동적 데이터 기반 Helmet
+
+```typescript
+// posts/$postId.tsx: API 데이터로 동적 메타태그
+<Helmet>
+  <title>{post.title}</title>
+  <meta property="og:title" content={post.title} />
+  <meta property="og:description" content={post.excerpt} />
+  <meta property="og:image" content={post.thumbnail} />
+</Helmet>
+```
+
 ## 프리렌더링 대상 라우트
 
 | 라우트      | 프리렌더링 | 비고                   |
@@ -68,6 +81,7 @@ vite build
 | `/about`    | O          | 서비스 소개 페이지     |
 | `/`         | X          | 추후 확장 가능         |
 | `/_auth/**` | X          | 인증 필요 (SEO 불필요) |
+| `/posts/:postId` | X          | 동적 라우트 (CSR, Helmet으로 메타태그) |
 
 ## 관련 문서
 
