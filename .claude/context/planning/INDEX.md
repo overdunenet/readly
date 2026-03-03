@@ -26,9 +26,17 @@ estimated_tokens: ~150
 
 ## 현재 상태
 
-- Roadmap: 아직 마일스톤 미작성 (템플릿 준비됨)
+- Roadmap: **M-001 MVP 핵심 기능 구현** 작성 완료 (2026-03-04 ~ 2026-03-31, backlog)
 - Feature PRD: 아직 PRD 미작성 (템플릿 준비됨)
 - `/pm` 커맨드로 기획 워크플로우 실행 가능
+
+## 마일스톤 요약
+
+| Milestone | 목표                | 기간                      | Feature 수 | 상태    |
+| --------- | ------------------- | ------------------------- | ---------- | ------- |
+| [M-001](../../../PM-DOCS/Planning/Roadmap/milestone-001.md) | MVP 핵심 기능 구현 | 2026-03-04 ~ 2026-03-31 | 16개       | backlog |
+
+상세: [planning/mvp-milestone.md](./mvp-milestone.md)
 
 ## 관련 Context
 
