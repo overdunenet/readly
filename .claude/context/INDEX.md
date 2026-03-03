@@ -35,7 +35,7 @@ estimated_tokens: ~200
 
 ### 비즈니스 로직
 
-1. **제품 전략**: `PM-DOCS/Context Output/innovation-strategy_2026-02-25_product-brief.md` → 비전, 타겟 유저, 시장, 비즈니스 모델
+1. **제품 전략**: `PM-DOCS/Context Output/PRODUCT_BRIEF.md` → 비전, 타겟 유저, 시장, 비즈니스 모델
 2. **접근 권한**: `business/access-control.md` → 접근 권한 시스템
 3. **결제**: `business/payment.md` → 유료/무료 섹션, 결제 흐름
 4. **SEO 전략**: `business/seo-strategy.md` → Partial SSR, 메타태그 서버 주입
