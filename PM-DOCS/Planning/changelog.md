@@ -3,6 +3,15 @@
 All notable changes to PM planning documents will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [2026-03-08]
+
+### Added
+
+- Feature_PRD/feature#1_auth/PRD.md 생성
+- Feature_PRD/feature#1_auth/screens.yml 생성
+- Feature_PRD/feature#1_auth/events.yml 생성
+- GitHub 라벨 feature:auth 생성
+
 ## [2026-03-04]
 
 ### Changed

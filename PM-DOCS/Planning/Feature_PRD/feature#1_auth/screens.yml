@@ -1,0 +1,186 @@
+# screens.yml - Feature 화면 정의서
+# Feature: 인증 & 계정 관리
+
+feature: 'auth'
+screens:
+  - id: 'SCR-001'
+    name: '로그인'
+    route: '/login'
+    description: '소셜 로그인 버튼(국가별) + 전화번호 로그인 선택'
+    entry_conditions:
+      - '비로그인 상태에서 앱/웹 진입'
+      - '세션 만료 후 재로그인 필요 시'
+    ui_elements:
+      - '소셜 로그인 버튼 (국가별 분기)'
+      - '한국: 카카오, 네이버, Google'
+      - '글로벌: Google, Facebook, Line, X'
+      - '전화번호 로그인 버튼'
+    states:
+      - name: '기본 (한국)'
+        description: '카카오/네이버/Google 버튼 + 전화번호 로그인'
+      - name: '기본 (글로벌)'
+        description: 'Google/Facebook/Line/X 버튼 + 전화번호 로그인'
+
+  - id: 'SCR-002'
+    name: '전화번호 인증'
+    route: '/login/phone'
+    description: '국가코드 + 전화번호 입력 → SMS 발송'
+    entry_conditions:
+      - 'SCR-001에서 전화번호 로그인 선택'
+    ui_elements:
+      - '국가코드 선택 드롭다운'
+      - '전화번호 입력 필드'
+      - 'SMS 발송 버튼'
+    states:
+      - name: '기본'
+        description: '전화번호 입력 대기'
+      - name: '발송 중'
+        description: 'SMS 발송 처리 중'
+      - name: '에러'
+        description: '유효하지 않은 전화번호 또는 발송 실패'
+
+  - id: 'SCR-003'
+    name: 'OTP 입력'
+    route: '/login/phone/verify'
+    description: 'SMS 인증코드 6자리 입력, 재발송(60초 쿨다운)'
+    entry_conditions:
+      - 'SCR-002에서 SMS 발송 완료'
+    ui_elements:
+      - '6자리 인증코드 입력 필드'
+      - '재발송 버튼 (60초 쿨다운 타이머)'
+      - '인증 확인 버튼'
+    states:
+      - name: '기본'
+        description: '인증코드 입력 대기'
+      - name: '재발송 쿨다운'
+        description: '재발송 버튼 비활성화 + 남은 시간 표시'
+      - name: '에러'
+        description: '잘못된 인증코드 입력 시 에러 메시지'
+
+  - id: 'SCR-004'
+    name: '닉네임 설정'
+    route: '/onboarding/nickname'
+    description: '최초 가입 시 닉네임 + 프로필 이미지 설정'
+    entry_conditions:
+      - '최초 가입 완료 후 (소셜 또는 전화번호)'
+    ui_elements:
+      - '닉네임 입력 필드'
+      - '프로필 이미지 업로드/촬영'
+      - '완료 버튼'
+    states:
+      - name: '기본'
+        description: '닉네임/이미지 입력 대기'
+      - name: '완료'
+        description: '가입 완료 → 홈으로 이동'
+
+  - id: 'SCR-005'
+    name: '프로필 편집'
+    route: '/settings/profile'
+    description: '닉네임/이미지 수정'
+    entry_conditions:
+      - '로그인 상태에서 설정 > 프로필 편집 진입'
+    ui_elements:
+      - '현재 닉네임 표시 + 수정 필드'
+      - '현재 프로필 이미지 표시 + 변경 버튼'
+      - '저장 버튼'
+    states:
+      - name: '기본'
+        description: '현재 프로필 정보 표시'
+      - name: '수정 중'
+        description: '변경사항 있음 → 저장 버튼 활성화'
+      - name: '저장 완료'
+        description: '변경 사항 즉시 반영'
+
+  - id: 'SCR-006'
+    name: '성인 인증 안내'
+    route: '(모달)'
+    description: '성인 콘텐츠 접근 시 인증 필요 안내'
+    entry_conditions:
+      - '성인인증 미완료 회원이 성인 콘텐츠에 접근 시도'
+    ui_elements:
+      - '성인 인증 필요 안내 메시지'
+      - '인증 시작 버튼'
+      - '닫기 버튼'
+    states:
+      - name: '기본'
+        description: '성인 인증 안내 모달 표시'
+
+  - id: 'SCR-007'
+    name: '성인 인증 - 한국'
+    route: '/settings/adult-verify/kr'
+    description: '전화번호 + 통신사 본인 확인'
+    entry_conditions:
+      - '한국 회원이 SCR-006에서 인증 시작 클릭'
+      - '설정에서 직접 진입'
+    ui_elements:
+      - '전화번호 입력 필드'
+      - '통신사 선택'
+      - '본인확인 동의 체크박스'
+      - '인증 시작 버튼'
+    states:
+      - name: '기본'
+        description: '본인확인 정보 입력 대기'
+      - name: '인증 중'
+        description: '통신사 본인확인 처리 중'
+      - name: '완료'
+        description: '성인 인증 승인 완료'
+      - name: '실패'
+        description: '본인확인 실패 → 재시도 안내'
+
+  - id: 'SCR-008'
+    name: '성인 인증 - 글로벌'
+    route: '/settings/adult-verify/global'
+    description: '여권 촬영/업로드 → OCR 판독 (AWS Textract AnalyzeID)'
+    entry_conditions:
+      - '글로벌 회원이 SCR-006에서 인증 시작 클릭'
+      - '설정에서 직접 진입'
+    ui_elements:
+      - '카메라 캡처 / 파일 업로드 버튼'
+      - '여권 가이드라인 (촬영 안내)'
+      - '촬영된 이미지 미리보기'
+      - '인증 요청 버튼'
+    states:
+      - name: '기본'
+        description: '여권 촬영/업로드 대기'
+      - name: '분석 중'
+        description: 'OCR 판독 처리 중 (S3 임시저장 → Textract → 이미지 즉시 삭제)'
+      - name: '완료'
+        description: '18세 이상 확인 → 성인 인증 완료'
+      - name: '실패'
+        description: 'OCR 판독 실패 → 재촬영 안내 (3회 실패 시 고객센터)'
+
+  - id: 'SCR-009'
+    name: '회원 탈퇴'
+    route: '/settings/withdrawal'
+    description: '탈퇴 사유 선택 → 탈퇴 요청 제출'
+    entry_conditions:
+      - '로그인 상태에서 설정 > 회원 탈퇴 진입'
+    ui_elements:
+      - '탈퇴 사유 선택 라디오 버튼'
+      - '탈퇴 안내 (30일 유예기간 설명)'
+      - '탈퇴 요청 버튼'
+      - '탈퇴 철회 버튼 (유예기간 중 표시)'
+    states:
+      - name: '기본'
+        description: '탈퇴 사유 선택 대기'
+      - name: '유예기간'
+        description: '탈퇴 요청 완료, 30일 유예기간 중 (계정 접근 가능, 철회 버튼 표시)'
+      - name: '탈퇴 완료'
+        description: '30일 경과 → 계정 + 데이터 영구 삭제'
+
+  - id: 'SCR-010'
+    name: '설정 메인'
+    route: '/settings'
+    description: '프로필/성인인증/탈퇴 등 진입점'
+    entry_conditions:
+      - '로그인 상태에서 설정 메뉴 진입'
+    ui_elements:
+      - '프로필 편집 링크'
+      - '성인 인증 상태 표시 + 인증 링크'
+      - '회원 탈퇴 링크'
+      - '로그아웃 버튼'
+    states:
+      - name: '기본'
+        description: '설정 메뉴 목록 표시'
+      - name: '성인인증 완료'
+        description: '성인 인증 상태가 "인증 완료"로 표시'
