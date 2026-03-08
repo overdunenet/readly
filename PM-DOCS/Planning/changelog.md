@@ -7,6 +7,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ### Added
 
+- Feature_PRD/feature#2_bookstore/PRD.md 생성 (draft)
 - F17 마이페이지 Feature 추가 (Tier 1 Foundation)
 
 ### Changed
