@@ -26,8 +26,8 @@ estimated_tokens: ~150
 
 ## 현재 상태
 
-- Roadmap: 아직 마일스톤 미작성 (템플릿 준비됨)
-- Feature PRD: 아직 PRD 미작성 (템플릿 준비됨)
+- Roadmap: M-001 (MVP 핵심 기능 구현) 작성 완료 - 17개 Feature, 7 Tier
+- Feature PRD: F1 인증 & 계정 관리 PRD 작성 완료, 나머지 미작성
 - `/pm` 커맨드로 기획 워크플로우 실행 가능
 
 ## 관련 Context

@@ -3,6 +3,19 @@
 All notable changes to PM planning documents will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [2026-03-09]
+
+### Added
+
+- F17 마이페이지 Feature 추가 (Tier 1 Foundation)
+
+### Changed
+
+- M-001: Feature 수 16개 → 17개
+- F2 서점 시스템 의존성: F1 → F1, F17
+- F8 구매 & 내 서재 의존성: F7 → F7, F17
+- 의존성 다이어그램 업데이트
+
 ## [2026-03-04]
 
 ### Changed
