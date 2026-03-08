@@ -33,7 +33,7 @@ events:
         pii: false
       - name: 'provider'
         type: 'string'
-        description: '소셜 Provider명 (kakao/naver/google/facebook/line/x/phone)'
+        description: '소셜 Provider명 (kakao/naver/google/facebook/line/phone)'
         required: true
         pii: false
     kpi: '가입 전환율'
@@ -82,7 +82,7 @@ events:
         pii: false
       - name: 'provider'
         type: 'string'
-        description: '소셜 Provider명 (kakao/naver/google/facebook/line/x/phone)'
+        description: '소셜 Provider명 (kakao/naver/google/facebook/line/phone)'
         required: true
         pii: false
     kpi: '로그인 성공률'
@@ -95,7 +95,7 @@ events:
     properties:
       - name: 'provider'
         type: 'string'
-        description: '소셜 Provider명 (kakao/naver/google/facebook/line/x)'
+        description: '소셜 Provider명 (kakao/naver/google/facebook/line)'
         required: true
         pii: false
     kpi: 'Provider별 선호도'
@@ -109,6 +109,11 @@ events:
       - name: 'country_code'
         type: 'string'
         description: '국가 코드 (예: +82, +1)'
+        required: true
+        pii: false
+      - name: 'daily_count'
+        type: 'number'
+        description: '해당 전화번호의 당일 발송 횟수'
         required: true
         pii: false
     kpi: 'OTP 발송 성공률'
@@ -132,7 +137,25 @@ events:
         description: '재발송 횟수'
         required: true
         pii: false
-    kpi: '재발송 빈도'
+    kpi: '재발송 빈도 (60초 쿨다운, 5회/시간, 10회/일)'
+    funnel: 'signup'
+
+  - name: 'phone_otp_rate_limited'
+    trigger: 'SMS 발송 제한 초과'
+    screen_id: 'SCR-002'
+    category: 'error'
+    properties:
+      - name: 'limit_type'
+        type: 'string'
+        description: '제한 유형 (cooldown_60s / hourly_5 / daily_10)'
+        required: true
+        pii: false
+      - name: 'phone_hash'
+        type: 'string'
+        description: '전화번호 해시 (개인정보 보호)'
+        required: true
+        pii: false
+    kpi: 'Rate Limit 도달 빈도'
     funnel: 'signup'
 
   - name: 'adult_verify_started'
@@ -158,6 +181,11 @@ events:
         description: '인증 방법 (kr_phone / global_ocr)'
         required: true
         pii: false
+      - name: 'age_threshold'
+        type: 'number'
+        description: '적용된 성인 나이 기준 (19 또는 20)'
+        required: true
+        pii: false
     kpi: '성인인증 전환율'
     funnel: 'adult_verification'
 
@@ -174,6 +202,11 @@ events:
       - name: 'error_type'
         type: 'string'
         description: '에러 유형 (ocr_failed / underage / verification_failed 등)'
+        required: true
+        pii: false
+      - name: 'age_threshold'
+        type: 'number'
+        description: '적용된 성인 나이 기준 (19 또는 20)'
         required: true
         pii: false
     kpi: '성인인증 실패율'
@@ -203,6 +236,19 @@ events:
         required: true
         pii: false
     kpi: '탈퇴율'
+    funnel: 'withdrawal'
+
+  - name: 'withdrawal_cancelled'
+    trigger: '탈퇴 철회 (유예기간 중 재로그인 후 동의)'
+    screen_id: 'SCR-001'
+    category: 'conversion'
+    properties:
+      - name: 'days_since_request'
+        type: 'number'
+        description: '탈퇴 요청 후 경과 일수'
+        required: true
+        pii: false
+    kpi: '탈퇴 철회율'
     funnel: 'withdrawal'
 
   - name: 'session_expired'

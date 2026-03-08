@@ -3,6 +3,20 @@
 All notable changes to PM planning documents will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [2026-03-09]
+
+### Changed
+
+- Feature_PRD/feature#1_auth/PRD.md 업데이트: 16개 개선 항목 반영 (X 제거, 국가 선택 UI, OTP 정책, 성인인증 정책, 탈퇴 플로우, SMS rate limiting, 성인 나이 한국 만19세/글로벌 만20세)
+- Feature_PRD/feature#1_auth/screens.yml 업데이트: SCR-001 국가 선택 UI, SCR-003 OTP 정책, SCR-007/008 성인인증 정책, SCR-009 탈퇴 플로우 반영
+- Feature_PRD/feature#1_auth/events.yml 업데이트: X 제거, SMS rate limiting 이벤트 추가, 탈퇴 철회 이벤트 추가 (16→18개)
+- events-index.yml 재집계 (18개)
+- IA-table.md 재렌더링
+
+### Added
+
+- Feature_PRD/feature#1_auth/IMPLEMENTATION_GUIDE.md 생성: Breaking Points 28개 + 최적 구현 순서 10 Phase
+
 ## [2026-03-08]
 
 ### Added

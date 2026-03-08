@@ -1,7 +1,7 @@
 # 전체 이벤트 통합본 (자동 집계 - 직접 수정 금지)
 # 각 Feature_PRD/*/events.yml에서 자동 통합됨
-last_updated: '2026-03-08'
-total_events: 16
+last_updated: '2026-03-09'
+total_events: 18
 events:
   - name: 'sign_up_started'
     screen_id: 'SCR-001'
@@ -39,6 +39,10 @@ events:
     screen_id: 'SCR-003'
     category: 'interaction'
     feature: 'auth'
+  - name: 'phone_otp_rate_limited'
+    screen_id: 'SCR-002'
+    category: 'error'
+    feature: 'auth'
   - name: 'adult_verify_started'
     screen_id: 'SCR-006'
     category: 'conversion'
@@ -59,8 +63,12 @@ events:
     screen_id: 'SCR-009'
     category: 'conversion'
     feature: 'auth'
+  - name: 'withdrawal_cancelled'
+    screen_id: 'SCR-001'
+    category: 'conversion'
+    feature: 'auth'
   - name: 'session_expired'
-    screen_id: '시스템'
+    screen_id: ''
     category: 'navigation'
     feature: 'auth'
   - name: 'logout'

@@ -1,6 +1,6 @@
 # 전역 화면 카탈로그 (자동 집계 - 직접 수정 금지)
 # 각 Feature_PRD/*/screens.yml에서 자동 통합됨
-last_updated: '2026-03-08'
+last_updated: '2026-03-09'
 total_screens: 10
 screens:
   - id: 'SCR-001'
