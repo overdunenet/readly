@@ -34,9 +34,9 @@ estimated_tokens: ~150
 
 ### Feature PRD
 
-| Feature                           | PRD                                 | Status   | Milestone |
-| --------------------------------- | ----------------------------------- | -------- | --------- |
-| feature#1_auth (인증 & 계정 관리) | `Feature_PRD/feature#1_auth/PRD.md` | approved | M-001     |
+| Feature                           | PRD                                 | Context 요약                                | Status   | Milestone |
+| --------------------------------- | ----------------------------------- | ------------------------------------------- | -------- | --------- |
+| feature#1_auth (인증 & 계정 관리) | `Feature_PRD/feature#1_auth/PRD.md` | [feature-1-auth.md](./feature-1-auth.md)    | approved | M-001     |
 
 - `/pm` 커맨드로 기획 워크플로우 실행 가능
 
