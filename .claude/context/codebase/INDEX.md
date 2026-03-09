@@ -24,6 +24,7 @@ estimated_tokens: ~150
 | [follow-module.md](./follow-module.md)             | Follow 모듈 (팔로우/언팔로우, BE+FE)   |
 | [post-editor.md](./post-editor.md)                | CKEditor 5 포스트 에디터 UI 및 스타일링 |
 | [post-manage-ui.md](./post-manage-ui.md)          | 에디터 포스트 목록 관리 UI (필터, 검색, 액션) |
+| [deploy-workflows.md](./deploy-workflows.md)      | API 배포 CI/CD 워크플로우 (ECR + Elastic Beanstalk) |
 
 ## 빠른 참조
 
