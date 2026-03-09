@@ -1,0 +1,273 @@
+# events.yml - Feature 이벤트 트래킹 정의서
+# Feature: 인증 & 계정 관리
+
+feature: 'auth'
+events:
+  - name: 'sign_up_started'
+    trigger: '가입 플로우 진입'
+    screen_id: 'SCR-001'
+    category: 'conversion'
+    properties:
+      - name: 'method'
+        type: 'string'
+        description: '가입 방법 (social / phone)'
+        required: true
+        pii: false
+    kpi: '가입 퍼널 시작'
+    funnel: 'signup'
+
+  - name: 'sign_up_completed'
+    trigger: '가입 완료 (닉네임 설정 후)'
+    screen_id: 'SCR-004'
+    category: 'conversion'
+    properties:
+      - name: 'method'
+        type: 'string'
+        description: '가입 방법 (social / phone)'
+        required: true
+        pii: false
+      - name: 'country'
+        type: 'string'
+        description: '사용자 국가 코드'
+        required: true
+        pii: false
+      - name: 'provider'
+        type: 'string'
+        description: '소셜 Provider명 (kakao/naver/google/facebook/line/phone)'
+        required: true
+        pii: false
+    kpi: '가입 전환율'
+    funnel: 'signup'
+
+  - name: 'sign_up_failed'
+    trigger: '가입 실패'
+    screen_id: 'SCR-001'
+    category: 'error'
+    properties:
+      - name: 'method'
+        type: 'string'
+        description: '가입 방법 (social / phone)'
+        required: true
+        pii: false
+      - name: 'error_type'
+        type: 'string'
+        description: '에러 유형 (oauth_failed / otp_failed / duplicate_phone 등)'
+        required: true
+        pii: false
+    kpi: '가입 실패율'
+    funnel: 'signup'
+
+  - name: 'login_started'
+    trigger: '로그인 시도'
+    screen_id: 'SCR-001'
+    category: 'conversion'
+    properties:
+      - name: 'method'
+        type: 'string'
+        description: '로그인 방법 (social / phone)'
+        required: true
+        pii: false
+    kpi: '로그인 퍼널 시작'
+    funnel: 'login'
+
+  - name: 'login_completed'
+    trigger: '로그인 성공'
+    screen_id: 'SCR-001'
+    category: 'conversion'
+    properties:
+      - name: 'method'
+        type: 'string'
+        description: '로그인 방법 (social / phone)'
+        required: true
+        pii: false
+      - name: 'provider'
+        type: 'string'
+        description: '소셜 Provider명 (kakao/naver/google/facebook/line/phone)'
+        required: true
+        pii: false
+    kpi: '로그인 성공률'
+    funnel: 'login'
+
+  - name: 'social_login_clicked'
+    trigger: '소셜 버튼 클릭'
+    screen_id: 'SCR-001'
+    category: 'interaction'
+    properties:
+      - name: 'provider'
+        type: 'string'
+        description: '소셜 Provider명 (kakao/naver/google/facebook/line)'
+        required: true
+        pii: false
+    kpi: 'Provider별 선호도'
+    funnel: 'signup'
+
+  - name: 'phone_otp_requested'
+    trigger: 'SMS 인증코드 발송'
+    screen_id: 'SCR-002'
+    category: 'interaction'
+    properties:
+      - name: 'country_code'
+        type: 'string'
+        description: '국가 코드 (예: +82, +1)'
+        required: true
+        pii: false
+      - name: 'daily_count'
+        type: 'number'
+        description: '해당 전화번호의 당일 발송 횟수'
+        required: true
+        pii: false
+    kpi: 'OTP 발송 성공률'
+    funnel: 'signup'
+
+  - name: 'phone_otp_verified'
+    trigger: 'OTP 인증 성공'
+    screen_id: 'SCR-003'
+    category: 'conversion'
+    properties: []
+    kpi: 'OTP 인증 성공률'
+    funnel: 'signup'
+
+  - name: 'phone_otp_resent'
+    trigger: '재발송 클릭'
+    screen_id: 'SCR-003'
+    category: 'interaction'
+    properties:
+      - name: 'retry_count'
+        type: 'number'
+        description: '재발송 횟수'
+        required: true
+        pii: false
+    kpi: '재발송 빈도 (60초 쿨다운, 5회/시간, 10회/일)'
+    funnel: 'signup'
+
+  - name: 'phone_otp_rate_limited'
+    trigger: 'SMS 발송 제한 초과'
+    screen_id: 'SCR-002'
+    category: 'error'
+    properties:
+      - name: 'limit_type'
+        type: 'string'
+        description: '제한 유형 (cooldown_60s / hourly_5 / daily_10)'
+        required: true
+        pii: false
+      - name: 'phone_hash'
+        type: 'string'
+        description: '전화번호 해시 (개인정보 보호)'
+        required: true
+        pii: false
+    kpi: 'Rate Limit 도달 빈도'
+    funnel: 'signup'
+
+  - name: 'adult_verify_started'
+    trigger: '성인 인증 시작'
+    screen_id: 'SCR-006'
+    category: 'conversion'
+    properties:
+      - name: 'method'
+        type: 'string'
+        description: '인증 방법 (kr_phone / global_ocr)'
+        required: true
+        pii: false
+    kpi: '성인인증 퍼널 시작'
+    funnel: 'adult_verification'
+
+  - name: 'adult_verify_completed'
+    trigger: '성인 인증 완료'
+    screen_id: 'SCR-007'
+    category: 'conversion'
+    properties:
+      - name: 'method'
+        type: 'string'
+        description: '인증 방법 (kr_phone / global_ocr)'
+        required: true
+        pii: false
+      - name: 'age_threshold'
+        type: 'number'
+        description: '적용된 성인 나이 기준 (19 또는 20)'
+        required: true
+        pii: false
+    kpi: '성인인증 전환율'
+    funnel: 'adult_verification'
+
+  - name: 'adult_verify_failed'
+    trigger: '성인 인증 실패'
+    screen_id: 'SCR-007'
+    category: 'error'
+    properties:
+      - name: 'method'
+        type: 'string'
+        description: '인증 방법 (kr_phone / global_ocr)'
+        required: true
+        pii: false
+      - name: 'error_type'
+        type: 'string'
+        description: '에러 유형 (ocr_failed / underage / verification_failed 등)'
+        required: true
+        pii: false
+      - name: 'age_threshold'
+        type: 'number'
+        description: '적용된 성인 나이 기준 (19 또는 20)'
+        required: true
+        pii: false
+    kpi: '성인인증 실패율'
+    funnel: 'adult_verification'
+
+  - name: 'profile_updated'
+    trigger: '프로필 수정 완료'
+    screen_id: 'SCR-005'
+    category: 'interaction'
+    properties:
+      - name: 'changed_fields'
+        type: 'string'
+        description: '변경된 필드 목록 (nickname / image / both)'
+        required: true
+        pii: false
+    kpi: '프로필 수정 빈도'
+    funnel: ''
+
+  - name: 'withdrawal_requested'
+    trigger: '탈퇴 요청 전송'
+    screen_id: 'SCR-009'
+    category: 'conversion'
+    properties:
+      - name: 'reason'
+        type: 'string'
+        description: '탈퇴 사유'
+        required: true
+        pii: false
+    kpi: '탈퇴율'
+    funnel: 'withdrawal'
+
+  - name: 'withdrawal_cancelled'
+    trigger: '탈퇴 철회 (유예기간 중 재로그인 후 동의)'
+    screen_id: 'SCR-001'
+    category: 'conversion'
+    properties:
+      - name: 'days_since_request'
+        type: 'number'
+        description: '탈퇴 요청 후 경과 일수'
+        required: true
+        pii: false
+    kpi: '탈퇴 철회율'
+    funnel: 'withdrawal'
+
+  - name: 'session_expired'
+    trigger: '세션 만료 → 재로그인'
+    screen_id: ''
+    category: 'navigation'
+    properties:
+      - name: 'platform'
+        type: 'string'
+        description: '플랫폼 (web / app)'
+        required: true
+        pii: false
+    kpi: '세션 만료 빈도'
+    funnel: ''
+
+  - name: 'logout'
+    trigger: '로그아웃 클릭'
+    screen_id: 'SCR-010'
+    category: 'interaction'
+    properties: []
+    kpi: '로그아웃 빈도'
+    funnel: ''

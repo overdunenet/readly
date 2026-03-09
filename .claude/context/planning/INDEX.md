@@ -26,8 +26,18 @@ estimated_tokens: ~150
 
 ## 현재 상태
 
-- Roadmap: 아직 마일스톤 미작성 (템플릿 준비됨)
-- Feature PRD: 아직 PRD 미작성 (템플릿 준비됨)
+### Roadmap
+
+| Milestone | 목표          | 기간                    | Feature 수 |
+| --------- | ------------- | ----------------------- | ---------- |
+| M-001     | MVP 핵심 기능 | 2026-03-04 ~ 2026-06-30 | 16개       |
+
+### Feature PRD
+
+| Feature                           | PRD                                 | Status   | Milestone |
+| --------------------------------- | ----------------------------------- | -------- | --------- |
+| feature#1_auth (인증 & 계정 관리) | `Feature_PRD/feature#1_auth/PRD.md` | approved | M-001     |
+
 - `/pm` 커맨드로 기획 워크플로우 실행 가능
 
 ## 관련 Context
