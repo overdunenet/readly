@@ -18,7 +18,7 @@ keywords:
     테스트,
     Jest,
   ]
-estimated_tokens: ~400
+user-invocable: false
 ---
 
 # 백엔드 개발 원칙

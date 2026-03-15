@@ -12,7 +12,6 @@ keywords:
     beforeLoad,
     guard,
   ]
-estimated_tokens: ~450
 ---
 
 # TanStack Router 패턴
