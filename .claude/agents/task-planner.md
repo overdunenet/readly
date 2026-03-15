@@ -1,6 +1,7 @@
 ---
 name: task-planner
 description: 복잡한 작업 시작 전 계획 수립 시 호출. 요구사항 명확화 질문, TaskList 생성, 파일별 수정 계획 작성, 의존성 순서 정의.
+skills: [Reporting]
 keywords:
   [
     TaskList,
@@ -14,6 +15,7 @@ keywords:
   ]
 model: opus
 color: green
+disallowedTools: [Edit, Write, NotebookEdit]
 ---
 
 # Task Planner Agent

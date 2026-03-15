@@ -2,7 +2,7 @@
 name: Documentation
 description: .claude 폴더 내 문서 생성/수정 시 사용. frontmatter 형식, Context/Skill/Agent 템플릿, 파일 분리 기준 제공.
 keywords: [문서, 작성, CLAUDE.md, context, skill, agent, frontmatter, 템플릿]
-estimated_tokens: ~1200
+user-invocable: false
 ---
 
 # .claude 문서 작성 스킬
@@ -20,10 +20,8 @@ estimated_tokens: ~1200
 .claude/
 ├── CLAUDE.md          # 프로젝트 전체 가이드 (인덱스 역할)
 ├── context/           # 사실/배경 정보 (읽기 전용)
-│   ├── architecture/
-│   ├── business/
-│   ├── codebase/
-│   └── planning/
+│   ├── architecture.md
+│   └── domain/
 ├── skills/            # 방법/절차 가이드 (액션 지침)
 │   ├── Coding/
 │   │   └── SKILL.md
@@ -56,7 +54,6 @@ estimated_tokens: ~1200
 name: file-name # 파일 식별자 (kebab-case)
 description: 한 줄 설명 # 파일 목적 (50자 이내)
 keywords: [키워드1, 키워드2] # 검색/매칭용 (한글, 영문 혼용)
-estimated_tokens: ~500 # 예상 토큰 수
 ---
 ```
 
@@ -105,7 +102,6 @@ user-invocable: true # 사용자가 /skill-name으로 호출 가능
 name: context-name
 description: 설명
 keywords: [키워드1, 키워드2]
-estimated_tokens: ~300
 ---
 
 # 제목
@@ -144,7 +140,6 @@ estimated_tokens: ~300
 name: skill-name
 description: 설명
 keywords: [키워드1, 키워드2]
-estimated_tokens: ~400
 ---
 
 # 스킬 제목

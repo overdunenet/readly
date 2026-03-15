@@ -16,7 +16,6 @@ keywords:
     mock,
     TestingModule,
   ]
-estimated_tokens: ~500
 ---
 
 # BDD 테스트 작성 규칙

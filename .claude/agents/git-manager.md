@@ -17,6 +17,19 @@ keywords:
   ]
 model: sonnet
 color: purple
+skills: [Git, Reporting]
+hooks:
+  PostToolUse:
+    - matcher: 'Bash'
+      hooks:
+        - type: command
+          command: '~/.claude/hooks/session-wrap-suggester.sh'
+  Stop:
+    - hooks:
+        - type: agent
+          model: claude-sonnet-4-6
+          prompt: "작업 완료 후 다음 단계를 추천하는 어드바이저로서 아래를 수행하세요.\n\n<steps>\n\nStep 1: 아래 소스를 순서대로 확인하세요.\n- .claude/plan/ 폴더의 plan.md, checklist.md (존재 시)\n- TaskList (TaskList 도구 사용)\n- 최근 git log 5건 (git log --oneline -5)\n\nStep 2: 현재 상태를 판단하세요.\n- 미완료 Task가 있는가?\n- checklist에 체크되지 않은 항목이 있는가?\n- 최근 커밋 흐름에서 논리적 다음 단계가 보이는가?\n\nStep 3: 다음 작업을 2-3개 추천하세요.\n\n</steps>\n\n<output_format>\n\n## 추천 다음 작업\n\n| 우선순위 | 작업 | 근거 |\n|---------|------|------|\n| 1 | ... | ... |\n| 2 | ... | ... |\n| 3 | ... | ... |\n\n</output_format>\n\n<rules>\n- Plan/TaskList가 모두 없고 단순 질문 응답인 경우: 추천 없이 빈 응답 반환\n- 추천은 구체적이고 실행 가능해야 한다\n- 150줄 이내로 출력한다\n</rules>"
+          timeout: 60
 ---
 
 # Git Manager Agent
@@ -146,7 +159,18 @@ git diff main...HEAD
 | **문제 (What)**     | 해결하려는 구체적 문제   | "catch 블록에서 에러를 무시하고 있었음"                  |
 | **해결 방법 (How)** | 어떻게 해결했는지        | "에러 핸들러를 추가하고 toast 알림으로 사용자에게 표시"  |
 
-### Step 4: PR 생성
+### Step 4: PR 본문 필수 검증
+
+PR 생성 전, 본문에 다음 3가지가 모두 포함되어 있는지 확인합니다.
+**하나라도 비어있으면 PR을 생성하지 않습니다.**
+
+| 항목                | 검증 기준                                     |
+| ------------------- | --------------------------------------------- |
+| **Why (의도)**      | 변경의 이유/배경이 구체적으로 작성되어 있는가 |
+| **What (문제)**     | 해결하려는 문제가 명확히 기술되어 있는가      |
+| **How (해결 방법)** | 접근 방식과 핵심 변경 내용이 설명되어 있는가  |
+
+### Step 5: PR 생성
 
 ````bash
 # 원격에 push (필요시)

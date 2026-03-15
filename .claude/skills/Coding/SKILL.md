@@ -14,7 +14,7 @@ keywords:
     삼항연산자,
     try-catch,
   ]
-estimated_tokens: ~500
+user-invocable: false
 ---
 
 # 공통 코딩 원칙

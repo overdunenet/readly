@@ -3,7 +3,7 @@ name: React
 description: React 컴포넌트 작성 시 사용. 파일/폴더 구조, useState/useEffect 규칙, props 설계, 렌더링 최적화 기법 제공.
 keywords:
   [React, 컴포넌트, useState, useEffect, 훅, props, 상태관리, 렌더링, 최적화]
-estimated_tokens: ~600
+user-invocable: false
 ---
 
 # React 개발 스킬
@@ -68,13 +68,12 @@ src/
 
 ### Hooks 규칙
 
-| 규칙               | 설명                                                                                           |
-| ------------------ | ---------------------------------------------------------------------------------------------- |
-| 최상위에서만 호출  | 조건문, 반복문 바깥의 최상위 레벨에서 호출                                                     |
-| 의존성 배열 정확히 | useEffect, useMemo, useCallback의 deps를 빠짐없이 명시                                         |
-| 커스텀 훅 추출     | 재사용 가능한 로직은 커스텀 훅으로 분리                                                        |
-| 훅 네이밍          | `use` 접두사 필수 (예: `useAuth`, `useFetch`)                                                  |
-| 훅 배치            | hooks도 컴포넌트의 한 종류로 보고 components/ 하위에 배치 (예: components/follow/useFollow.ts) |
+| 규칙               | 설명                                                   |
+| ------------------ | ------------------------------------------------------ |
+| 최상위에서만 호출  | 조건문, 반복문 바깥의 최상위 레벨에서 호출             |
+| 의존성 배열 정확히 | useEffect, useMemo, useCallback의 deps를 빠짐없이 명시 |
+| 커스텀 훅 추출     | 재사용 가능한 로직은 커스텀 훅으로 분리                |
+| 훅 네이밍          | `use` 접두사 필수 (예: `useAuth`, `useFetch`)          |
 
 </rules>
 

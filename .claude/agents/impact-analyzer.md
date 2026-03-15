@@ -1,6 +1,7 @@
 ---
 name: impact-analyzer
 description: 코드 수정 전 영향 범위 파악 시 호출. 호출 관계 추적, API 변경 영향, Breaking Change 탐지, 위험도 HIGH/MEDIUM/LOW 평가.
+skills: [Reporting]
 keywords:
   [
     사이드이펙트,
@@ -14,6 +15,7 @@ keywords:
   ]
 model: opus
 color: orange
+disallowedTools: [Edit, Write, NotebookEdit]
 ---
 
 # Impact Analyzer Agent
