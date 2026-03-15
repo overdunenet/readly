@@ -16,6 +16,7 @@ keywords: [프롬프트, XML태그, 긍정표현, 출력최적화, 토큰절약]
 | .claude/skills/PromptStructuring/xml-tags.md | XML 태그 표준 목록 | 태그 카탈로그, 파일 유형별 권장 조합 |
 | .claude/skills/PromptStructuring/positive-phrasing.md | 긍정 표현 전환 패턴 | 부정→긍정 변환 규칙, 예시 테이블 |
 | .claude/skills/PromptStructuring/output-optimization.md | 출력 토큰 최적화 기법 | Hook 출력 예산, 축약 기법, 삭제 대상 |
+| .claude/skills/PromptStructuring/skills-frontmatter.md | Skills 2.0 frontmatter 가이드 | skills 필드, preload 패턴, Agent-Skill 연결 |
 
 ## 핵심 흐름
 
