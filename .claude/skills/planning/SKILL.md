@@ -69,6 +69,7 @@ user-invocable: true
 - `Feature_PRD/feature#{N}_{name}/PRD.md`
 - `Feature_PRD/feature#{N}_{name}/screens.yml`
 - `Feature_PRD/feature#{N}_{name}/events.yml`
+- `Feature_PRD/feature#{N}_{name}/wireframes.html` (화면 구조도)
 - `feature:{name}` GitHub 라벨 자동 생성
 - screen-index.yml / events-index.yml 자동 집계
 - Planning/changelog.md 기록
@@ -164,6 +165,12 @@ gh issue list --label "feature:{name}" --state all --json number,state
 
 - `PM-DOCS/Planning/Feature_PRD/*/events.yml` 전체 스캔
 - events-index.yml 갱신
+
+### wireframes.html 자동 생성
+
+- Phase C에서 screens.yml 작성 완료 후 자동 생성
+- PM에게 뷰포트 선택(모바일/PC/둘다/화면별) 후 생성
+- 상세 규칙: `.claude/skills/wireframe/SKILL.md` 참조
 
 ### Archive 30일 자동 이동
 
