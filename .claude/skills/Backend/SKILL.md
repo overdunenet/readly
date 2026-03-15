@@ -191,6 +191,52 @@ const user = await this.userRepository.findOneBy({ id });
 
 </checklist>
 
+<rules>
+
+## Migration 작성 규칙
+
+> **Migration 파일은 반드시 `yarn migration:create` 명령어로 생성한다.**
+
+### 파일 생성
+
+```bash
+# API 디렉토리에서 실행
+cd apps/api && npx typeorm migration:create src/database/migration/<message>
+```
+
+- 수동으로 타임스탬프를 지정하여 파일을 만들지 않는다
+- `migration:create`가 생성한 빈 파일에 SQL을 작성한다
+
+### 작성 패턴
+
+```typescript
+import { MigrationInterface, QueryRunner } from 'typeorm';
+
+export class tableName1234567890 implements MigrationInterface {
+  name = 'tableName1234567890';
+
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    // CREATE TABLE, ALTER TABLE, CREATE INDEX 등
+    await queryRunner.query(`CREATE TABLE ...`);
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    // up의 역순으로 DROP
+    await queryRunner.query(`DROP TABLE ...`);
+  }
+}
+```
+
+### 규칙
+
+- `name` 프로퍼티를 클래스명과 동일하게 설정
+- raw SQL로 작성 (QueryBuilder 사용하지 않음)
+- `up`에서 CREATE → ALTER → INDEX 순서
+- `down`에서 INDEX → ALTER → TABLE 역순 DROP
+- 각 SQL문은 별도 `queryRunner.query()` 호출로 분리
+
+</rules>
+
 <reference>
 
 ## 관련 문서
