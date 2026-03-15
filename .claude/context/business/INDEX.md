@@ -20,6 +20,7 @@ estimated_tokens: ~150
 | [seo-strategy.md](./seo-strategy.md)                                | SEO 전략 목적 및 빌드 타임 프리렌더링 채택 배경            |
 | [developer-experience.md](./developer-experience.md)                | Claude Code 사용 경험 최적화                               |
 | [user-follow.md](./user-follow.md)                                  | 사용자 팔로우 기능 (에디터-팔로워 관계)                    |
+| [auth-account.md](./auth-account.md)                                | 인증 & 계정 관리 (소셜 로그인, OTP, 성인 인증, 회원 탈퇴) |
 
 ## 빠른 참조
 

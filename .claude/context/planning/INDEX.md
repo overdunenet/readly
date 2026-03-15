@@ -38,6 +38,11 @@ estimated_tokens: ~150
 | --------------------------------- | ----------------------------------- | -------- | --------- |
 | feature#1_auth (인증 & 계정 관리) | `Feature_PRD/feature#1_auth/PRD.md` | approved | M-001     |
 
+#### feature#1_auth 와이어프레임
+
+- 원본: `PM-DOCS/Planning/Feature_PRD/feature#1_auth/wireframes.html`
+- 화면 10개: 로그인, 전화번호 인증, OTP 입력, 닉네임 설정, 프로필 편집, 성인 인증(안내/한국/글로벌), 회원 탈퇴, 설정 메인
+
 - `/pm` 커맨드로 기획 워크플로우 실행 가능
 
 ## 관련 Context
