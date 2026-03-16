@@ -14,6 +14,12 @@ type AppJwtConfigType = {
   refresh: JwtConfigType;
 };
 
+type NaverOAuthConfigType = {
+  clientId: string;
+  clientSecret: string;
+  callbackUrl: string;
+};
+
 type CorsConfigType = {
   origin: boolean | string | string[];
   credentials: boolean;
@@ -39,6 +45,7 @@ export const ConfigProvider = {
       backoffice: config.get<AppJwtConfigType>('auth.jwt.backoffice'),
       user: config.get<AppJwtConfigType>('auth.jwt.user'),
     },
+    naver: config.get<NaverOAuthConfigType>('auth.naver'),
   },
   cors: config.get<CorsConfigType>('cors'),
 } as const;

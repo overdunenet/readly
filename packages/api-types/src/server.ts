@@ -5,6 +5,28 @@ const t = initTRPC.create();
 const publicProcedure = t.procedure;
 
 const appRouter = t.router({
+  auth: t.router({
+    socialLogin: publicProcedure
+      .input(
+        z.object({
+          provider: z.enum(['naver', 'kakao', 'google']),
+          code: z.string(),
+          state: z.string(),
+        })
+      )
+      .output(
+        z.object({
+          accessToken: z.string(),
+          user: z.object({
+            id: z.string(),
+            email: z.string(),
+            nickname: z.string(),
+            profileImage: z.string().nullable(),
+          }),
+        })
+      )
+      .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
+  }),
   follow: t.router({
     follow: publicProcedure
       .input(

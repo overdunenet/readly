@@ -1,11 +1,12 @@
 ---
 name: codebase-user-entity
-description: UserEntity 구조, 비밀번호 관리, JWT 인증 설정, 프론트엔드 User 타입 및 인증 스토어
-keywords: [UserEntity, JWT, bcrypt, 인증, 로그인, AccessToken, RefreshToken, Zustand, useAuthStore, UserMenu]
+description: UserEntity 구조, 비밀번호 관리, JWT 인증 설정, SocialAccount 관계, 프론트엔드 User 타입 및 인증 스토어
+keywords: [UserEntity, JWT, bcrypt, 인증, 로그인, AccessToken, RefreshToken, Zustand, useAuthStore, UserMenu, SocialAccount]
 estimated_tokens: ~500
 related_contexts:
   - business-overview
   - codebase-architecture-overview
+  - codebase-social-login
 ---
 
 # UserEntity 및 인증
@@ -18,8 +19,8 @@ export class UserEntity extends BaseEntity {
   @Column({ unique: true, type: 'varchar' })
   email: string;
 
-  @Column({ type: 'varchar' })
-  password: string; // bcrypt 해시
+  @Column({ type: 'varchar', nullable: true })
+  password: string | null; // bcrypt 해시, 소셜 로그인 시 null
 
   @Column({ type: 'varchar' })
   nickname: string;
@@ -29,6 +30,9 @@ export class UserEntity extends BaseEntity {
 
   @DeleteDateColumn()
   deletedAt: Date | null; // Soft Delete
+
+  @OneToOne(() => SocialAccountEntity, socialAccount => socialAccount.user)
+  socialAccount: SocialAccountEntity;
 }
 ```
 
@@ -42,8 +46,9 @@ async setPassword(plainPassword: string): Promise<void> {
   this.password = await bcrypt.hash(plainPassword, 10);
 }
 
-// 비밀번호 검증
+// 비밀번호 검증 (소셜 로그인 사용자는 false 반환)
 async checkPassword(plainPassword: string): Promise<boolean> {
+  if (!this.password) return false;
   return bcrypt.compare(plainPassword, this.password);
 }
 ```
@@ -82,10 +87,11 @@ export const getUserRepository = (source?) =>
 
 | 메서드                | 설명              |
 | --------------------- | ----------------- |
-| `register(input)`     | 회원가입          |
-| `login(credentials)`  | 로그인 (JWT 발급) |
-| `refreshToken(token)` | 토큰 갱신         |
-| `getMe(userId)`       | 내 정보 조회      |
+| `register(input)`      | 회원가입          |
+| `login(credentials)`   | 로그인 (JWT 발급) |
+| `refreshToken(token)`  | 토큰 갱신         |
+| `getMe(userId)`        | 내 정보 조회      |
+| `generateTokens(user)` | JWT 토큰 쌍 생성 (AuthService에서도 재사용) |
 
 ### 로그인 흐름
 
@@ -223,3 +229,4 @@ auth: {
 
 - `codebase/post-entity.md`: PostEntity와 User 관계
 - `codebase/architecture-overview.md`: API 아키텍처
+- `codebase/social-login.md`: 소셜 로그인 모듈 (AuthService, SocialAccountEntity)
