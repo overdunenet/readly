@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { TRPCError } from '@trpc/server';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
-import { Transactional } from '../shared/transaction/transaction.decorator';
-import { TransactionService } from '../shared/transaction/transaction.service';
 import { UserService } from '../user/user.service';
 import { NaverStrategy } from './strategies/naver.strategy';
 import {
@@ -27,7 +24,6 @@ export interface SocialLoginResponse {
 export class AuthService {
   constructor(
     private readonly repositoryProvider: RepositoryProvider,
-    private readonly transactionService: TransactionService,
     private readonly userService: UserService,
     private readonly naverStrategy: NaverStrategy
   ) {}
@@ -58,7 +54,6 @@ export class AuthService {
     throw new Error(`Unsupported provider: ${provider}`);
   }
 
-  @Transactional
   private async findOrCreateUser(
     profile: SocialUserProfile
   ): Promise<UserEntity> {
@@ -68,42 +63,45 @@ export class AuthService {
         profile.provider,
         profile.providerId
       );
-
     if (existingSocialAccount) {
-      const user = await this.repositoryProvider.UserRepository.findOneBy({
+      return this.repositoryProvider.UserRepository.findOneByOrFail({
         id: existingSocialAccount.userId,
       });
-      if (!user) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'User not found for linked social account',
-        });
-      }
-      return user;
     }
 
-    // 2. email로 기존 사용자 검색 (email이 있을 때만)
+    // 2. email로 기존 사용자에 SocialAccount 연결
     if (profile.email) {
-      const existingUser =
-        await this.repositoryProvider.UserRepository.findOneBy({
-          email: profile.email,
-        });
-
-      if (existingUser) {
-        const socialAccount = SocialAccountEntity.create(existingUser.id);
-        this.setProviderIdOnSocialAccount(
-          socialAccount,
-          profile.provider,
-          profile.providerId
-        );
-        await this.repositoryProvider.SocialAccountRepository.save(
-          socialAccount
-        );
-        return existingUser;
-      }
+      const existingUser = await this.linkSocialAccountToExistingUser(profile);
+      if (existingUser) return existingUser;
     }
 
     // 3. 새 사용자 생성
+    return this.createUserWithSocialAccount(profile);
+  }
+
+  private async linkSocialAccountToExistingUser(
+    profile: SocialUserProfile
+  ): Promise<UserEntity | null> {
+    const existingUser = await this.repositoryProvider.UserRepository.findOneBy(
+      {
+        email: profile.email,
+      }
+    );
+    if (!existingUser) return null;
+
+    const socialAccount = SocialAccountEntity.create(existingUser.id);
+    this.setProviderIdOnSocialAccount(
+      socialAccount,
+      profile.provider,
+      profile.providerId
+    );
+    await this.repositoryProvider.SocialAccountRepository.save(socialAccount);
+    return existingUser;
+  }
+
+  private async createUserWithSocialAccount(
+    profile: SocialUserProfile
+  ): Promise<UserEntity> {
     const email =
       profile.email ?? `naver_${profile.providerId}@social.readly.co.kr`;
     const nickname =
@@ -123,7 +121,6 @@ export class AuthService {
       profile.providerId
     );
     await this.repositoryProvider.SocialAccountRepository.save(socialAccount);
-
     return savedUser;
   }
 
