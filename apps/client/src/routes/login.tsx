@@ -44,6 +44,23 @@ function LoginPage() {
     }
   };
 
+  const handleNaverLogin = () => {
+    const clientId = import.meta.env.VITE_NAVER_CLIENT_ID;
+    if (!clientId) {
+      setError('네이버 로그인을 시작할 수 없습니다');
+      return;
+    }
+
+    const callbackUrl = encodeURIComponent(
+      import.meta.env.VITE_NAVER_CALLBACK_URL ||
+        `${window.location.origin}/auth/naver/callback`,
+    );
+    const state = crypto.randomUUID();
+    sessionStorage.setItem('naver_oauth_state', state);
+
+    window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${callbackUrl}&state=${state}`;
+  };
+
   return (
     <Container>
       <FormCard>
@@ -86,6 +103,16 @@ function LoginPage() {
         </Form>
 
         <Divider />
+
+        <SocialLoginSection>
+          <NaverLoginButton
+            type="button"
+            style={{ backgroundColor: '#03C75A' }}
+            onClick={handleNaverLogin}
+          >
+            네이버로 로그인
+          </NaverLoginButton>
+        </SocialLoginSection>
 
         <LinkContainer>
           <span>아직 계정이 없으신가요?</span>
@@ -213,4 +240,27 @@ const StyledLink = tw(Link)`
   text-blue-600
   hover:text-blue-500
   font-medium
+`;
+
+const SocialLoginSection = tw.div`
+  flex
+  flex-col
+  gap-3
+  w-full
+`;
+
+const NaverLoginButton = tw.button`
+  w-full
+  py-3
+  rounded-lg
+  text-white
+  font-medium
+  flex
+  items-center
+  justify-center
+  gap-2
+  transition-colors
+  duration-200
+  hover:opacity-90
+  cursor-pointer
 `;
