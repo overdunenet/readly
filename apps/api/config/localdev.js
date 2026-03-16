@@ -32,7 +32,10 @@ module.exports = {
           secret: 'JWT_USER_REFRESH_SECRET_DEV',
         }
       }
-    }
+    },
+    naver: {
+      callbackUrl: 'http://localhost:5173/auth/naver/callback',
+    },
   },
   cors: {
     origin: true,
