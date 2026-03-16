@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { TRPCError } from '@trpc/server';
 import * as crypto from 'crypto';
 import { ConfigProvider } from '@src/config';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { Transactional } from '../shared/transaction/transaction.decorator';
 import { TransactionService } from '../shared/transaction/transaction.service';
+import { UserService } from '../user/user.service';
 import { NaverStrategy } from './strategies/naver.strategy';
 import {
   SocialProvider,
@@ -30,7 +30,7 @@ export class AuthService {
   constructor(
     private readonly repositoryProvider: RepositoryProvider,
     private readonly transactionService: TransactionService,
-    private readonly jwtService: JwtService,
+    private readonly userService: UserService,
     private readonly naverStrategy: NaverStrategy
   ) {}
 
@@ -42,7 +42,7 @@ export class AuthService {
     const strategy = this.getStrategy(provider);
     const profile = await strategy.getUserProfile(code, state);
     const user = await this.findOrCreateUser(profile);
-    const tokens = await this.generateTokens(user);
+    const tokens = await this.userService.generateTokens(user);
 
     return {
       ...tokens,
@@ -149,28 +149,5 @@ export class AuthService {
     if (provider === 'naver') socialAccount.naverId = providerId;
     if (provider === 'kakao') socialAccount.kakaoId = providerId;
     if (provider === 'google') socialAccount.googleId = providerId;
-  }
-
-  private async generateTokens(
-    user: UserEntity
-  ): Promise<{ accessToken: string; refreshToken: string }> {
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      type: 'user',
-    };
-
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        secret: ConfigProvider.auth.jwt.user.access.secret,
-        expiresIn: ConfigProvider.auth.jwt.user.access.expiresIn as any,
-      }),
-      this.jwtService.signAsync(payload, {
-        secret: ConfigProvider.auth.jwt.user.refresh.secret,
-        expiresIn: ConfigProvider.auth.jwt.user.refresh.expiresIn as any,
-      }),
-    ]);
-
-    return { accessToken, refreshToken };
   }
 }

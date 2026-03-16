@@ -141,7 +141,7 @@ export class UserService {
     };
   }
 
-  private async generateTokens(
+  async generateTokens(
     user: UserEntity
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const payload = {
