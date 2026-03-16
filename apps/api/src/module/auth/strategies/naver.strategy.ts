@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { TRPCError } from '@trpc/server';
+import axios from 'axios';
 import { ConfigProvider } from '../../../config';
 import {
   SocialLoginStrategy,
@@ -29,31 +30,14 @@ export class NaverStrategy implements SocialLoginStrategy {
       state,
     });
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
-
     try {
-      const response = await fetch(
-        `https://nid.naver.com/oauth2.0/token?${params.toString()}`,
-        {
-          method: 'GET',
-          signal: controller.signal,
-        }
-      );
-
-      if (!response.ok) {
-        this.logger.error(`Naver token request failed: ${response.status}`);
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: '네이버 인증에 실패했습니다',
-        });
-      }
-
-      const data = (await response.json()) as {
+      const { data } = await axios.get<{
         access_token?: string;
         error?: string;
         error_description?: string;
-      };
+      }>(`https://nid.naver.com/oauth2.0/token?${params.toString()}`, {
+        timeout: 5000,
+      });
 
       if (data.error || !data.access_token) {
         this.logger.error(`Naver token error: ${data.error_description}`);
@@ -71,32 +55,14 @@ export class NaverStrategy implements SocialLoginStrategy {
         code: 'INTERNAL_SERVER_ERROR',
         message: '네이버 인증 중 오류가 발생했습니다',
       });
-    } finally {
-      clearTimeout(timeout);
     }
   }
 
   private async fetchUserProfile(
     accessToken: string
   ): Promise<SocialUserProfile> {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
-
     try {
-      const response = await fetch('https://openapi.naver.com/v1/nid/me', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        signal: controller.signal,
-      });
-
-      if (!response.ok) {
-        this.logger.error(`Naver profile request failed: ${response.status}`);
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: '네이버 프로필 조회에 실패했습니다',
-        });
-      }
-
-      const data = (await response.json()) as {
+      const { data } = await axios.get<{
         resultcode: string;
         message: string;
         response: {
@@ -105,7 +71,10 @@ export class NaverStrategy implements SocialLoginStrategy {
           nickname?: string;
           profile_image?: string;
         };
-      };
+      }>('https://openapi.naver.com/v1/nid/me', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        timeout: 5000,
+      });
 
       if (data.resultcode !== '00') {
         this.logger.error(`Naver profile error: ${data.message}`);
@@ -131,8 +100,6 @@ export class NaverStrategy implements SocialLoginStrategy {
         code: 'INTERNAL_SERVER_ERROR',
         message: '네이버 프로필 조회 중 오류가 발생했습니다',
       });
-    } finally {
-      clearTimeout(timeout);
     }
   }
 }
