@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { TRPCError } from '@trpc/server';
 import * as crypto from 'crypto';
 import { ConfigProvider } from '@src/config';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
+import { Transactional } from '../shared/transaction/transaction.decorator';
+import { TransactionService } from '../shared/transaction/transaction.service';
 import { NaverStrategy } from './strategies/naver.strategy';
 import {
   SocialProvider,
@@ -26,6 +29,7 @@ export interface SocialLoginResponse {
 export class AuthService {
   constructor(
     private readonly repositoryProvider: RepositoryProvider,
+    private readonly transactionService: TransactionService,
     private readonly jwtService: JwtService,
     private readonly naverStrategy: NaverStrategy
   ) {}
@@ -68,6 +72,7 @@ export class AuthService {
     throw new Error(`Unsupported provider: ${provider}`);
   }
 
+  @Transactional
   private async findOrCreateUser(
     profile: SocialUserProfile
   ): Promise<UserEntity> {
@@ -79,9 +84,16 @@ export class AuthService {
       );
 
     if (existingSocialAccount) {
-      return this.repositoryProvider.UserRepository.findOneByOrFail({
+      const user = await this.repositoryProvider.UserRepository.findOneBy({
         id: existingSocialAccount.userId,
       });
+      if (!user) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'User not found for linked social account',
+        });
+      }
+      return user;
     }
 
     // 2. email로 기존 사용자 검색 (email이 있을 때만)
