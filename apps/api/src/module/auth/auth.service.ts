@@ -69,6 +69,7 @@ export class AuthService {
       });
     }
 
+    // TODO: 추후 email이 아닌 본인인증을 통해 user와 연결 필요
     // 2. email로 기존 사용자에 SocialAccount 연결
     if (profile.email) {
       const existingUser = await this.linkSocialAccountToExistingUser(profile);
