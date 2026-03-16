@@ -16,8 +16,8 @@ export class UserEntity extends BaseEntity {
   @Column({ unique: true, type: 'varchar' })
   email: string;
 
-  @Column({ type: 'varchar' })
-  password: string;
+  @Column({ type: 'varchar', nullable: true })
+  password: string | null;
 
   @Column({ length: 30, type: 'varchar' })
   nickname: string;
@@ -36,6 +36,7 @@ export class UserEntity extends BaseEntity {
   }
 
   async checkPassword(plainPassword: string): Promise<boolean> {
+    if (!this.password) return false;
     return bcrypt.compare(plainPassword, this.password);
   }
 
