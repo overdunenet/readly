@@ -26,13 +26,6 @@ const appRouter = t.router({
         })
       )
       .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
-    naverLoginUrl: publicProcedure
-      .output(
-        z.object({
-          url: z.string(),
-        })
-      )
-      .query(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
   }),
   follow: t.router({
     follow: publicProcedure

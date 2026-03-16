@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Input, Query, Router, Mutation, Ctx } from 'nestjs-trpc-v2';
+import { Input, Router, Mutation, Ctx } from 'nestjs-trpc-v2';
 import { BaseTrpcRouter } from '../trpc/baseTrpcRouter';
 
 const socialLoginInputSchema = z.object({
@@ -16,10 +16,6 @@ const socialLoginOutputSchema = z.object({
     nickname: z.string(),
     profileImage: z.string().nullable(),
   }),
-});
-
-const naverLoginUrlOutputSchema = z.object({
-  url: z.string(),
 });
 
 @Router({ alias: 'auth' })
@@ -44,13 +40,5 @@ export class AuthRouter extends BaseTrpcRouter {
       accessToken: result.accessToken,
       user: result.user,
     };
-  }
-
-  @Query({
-    output: naverLoginUrlOutputSchema,
-  })
-  async naverLoginUrl() {
-    const url = await this.microserviceClient.send('auth.naverLoginUrl', {});
-    return { url };
   }
 }

@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { TRPCError } from '@trpc/server';
-import * as crypto from 'crypto';
-import { ConfigProvider } from '@src/config';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { Transactional } from '../shared/transaction/transaction.decorator';
 import { TransactionService } from '../shared/transaction/transaction.service';
@@ -53,18 +51,6 @@ export class AuthService {
         profileImage: user.profileImage,
       },
     };
-  }
-
-  getNaverLoginUrl(): string {
-    const { clientId, callbackUrl } = ConfigProvider.auth.naver;
-    const state = crypto.randomUUID();
-    const params = new URLSearchParams({
-      response_type: 'code',
-      client_id: clientId,
-      redirect_uri: callbackUrl,
-      state,
-    });
-    return `https://nid.naver.com/oauth2.0/authorize?${params.toString()}`;
   }
 
   private getStrategy(provider: SocialProvider) {

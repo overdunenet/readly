@@ -16,9 +16,4 @@ export class AuthController {
       data.state
     );
   }
-
-  @MessagePattern('auth.naverLoginUrl')
-  getNaverLoginUrl(): string {
-    return this.authService.getNaverLoginUrl();
-  }
 }
