@@ -36,8 +36,7 @@ export class AuthService {
     state: string
   ): Promise<SocialLoginResponse> {
     const strategy = this.getStrategy(provider);
-    const accessToken = await strategy.getAccessToken(code, state);
-    const profile = await strategy.getUserProfile(accessToken);
+    const profile = await strategy.getUserProfile(code, state);
     const user = await this.findOrCreateUser(profile);
     const tokens = await this.generateTokens(user);
 

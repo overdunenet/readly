@@ -9,6 +9,5 @@ export interface SocialUserProfile {
 }
 
 export interface SocialLoginStrategy {
-  getAccessToken(code: string, state: string): Promise<string>;
-  getUserProfile(accessToken: string): Promise<SocialUserProfile>;
+  getUserProfile(code: string, state: string): Promise<SocialUserProfile>;
 }

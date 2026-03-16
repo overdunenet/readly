@@ -10,7 +10,15 @@ import {
 export class NaverStrategy implements SocialLoginStrategy {
   private readonly logger = new Logger(NaverStrategy.name);
 
-  async getAccessToken(code: string, state: string): Promise<string> {
+  async getUserProfile(
+    code: string,
+    state: string
+  ): Promise<SocialUserProfile> {
+    const accessToken = await this.fetchAccessToken(code, state);
+    return this.fetchUserProfile(accessToken);
+  }
+
+  private async fetchAccessToken(code: string, state: string): Promise<string> {
     const { clientId, clientSecret } = ConfigProvider.auth.naver;
 
     const params = new URLSearchParams({
@@ -68,7 +76,9 @@ export class NaverStrategy implements SocialLoginStrategy {
     }
   }
 
-  async getUserProfile(accessToken: string): Promise<SocialUserProfile> {
+  private async fetchUserProfile(
+    accessToken: string
+  ): Promise<SocialUserProfile> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
 
