@@ -256,6 +256,35 @@ const appRouter = t.router({
       )
       .query(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
   }),
+  auth: t.router({
+    socialLogin: publicProcedure
+      .input(
+        z.object({
+          provider: z.enum(['naver', 'kakao', 'google']),
+          code: z.string(),
+          state: z.string(),
+        })
+      )
+      .output(
+        z.object({
+          accessToken: z.string(),
+          user: z.object({
+            id: z.string(),
+            email: z.string(),
+            nickname: z.string(),
+            profileImage: z.string().nullable(),
+          }),
+        })
+      )
+      .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
+    naverLoginUrl: publicProcedure
+      .output(
+        z.object({
+          url: z.string(),
+        })
+      )
+      .query(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
+  }),
   user: t.router({
     register: publicProcedure
       .input(
