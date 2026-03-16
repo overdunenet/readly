@@ -74,6 +74,8 @@ color: violet
 | CIS Innovation      | `.claude/skills/planning/cis-innovation-strategy.md` | Innovation Strategy 7-Phase 가이드 |
 | CIS Storytelling    | `.claude/skills/planning/cis-storytelling.md`        | Storytelling 6-Phase 가이드        |
 | 중앙 설정           | `.claude/skills/planning/pm-config.yml`              | GitHub Project ID, 경로, 라벨      |
+| 와이어프레임 가이드 | `.claude/skills/wireframe/SKILL.md`                  | 화면 구조도 생성 규칙              |
+| 와이어프레임 템플릿 | `PM-DOCS/Planning/templates/wireframe-template.html` | HTML 기본 골격                     |
 | PRD 템플릿          | `PM-DOCS/Planning/templates/PRD-TEMPLATE.md`         | PRD 파일 템플릿                    |
 | Milestone 템플릿    | `PM-DOCS/Planning/templates/milestone-template.md`   | Milestone 파일 템플릿              |
 
@@ -187,14 +189,15 @@ CIS 워크플로우(Context Making) 실행 시 각 Phase 완료 후 AskUserQuest
 
 ## 산출물 경로
 
-| 산출물      | 경로                                                          |
-| ----------- | ------------------------------------------------------------- |
-| PRD         | `PM-DOCS/Planning/Feature_PRD/feature#{N}_{name}/PRD.md`      |
-| 화면 정의   | `PM-DOCS/Planning/Feature_PRD/feature#{N}_{name}/screens.yml` |
-| 이벤트 정의 | `PM-DOCS/Planning/Feature_PRD/feature#{N}_{name}/events.yml`  |
-| Milestone   | `PM-DOCS/Planning/Roadmap/milestone-{NNN}.md`                 |
-| CIS 산출물  | `PM-DOCS/Context Output/{workflow}_{YYYY-MM-DD}_{topic}.md`   |
-| Changelog   | `PM-DOCS/Planning/changelog.md` (전역 1개)                    |
+| 산출물      | 경로                                                              |
+| ----------- | ----------------------------------------------------------------- |
+| PRD         | `PM-DOCS/Planning/Feature_PRD/feature#{N}_{name}/PRD.md`          |
+| 화면 정의   | `PM-DOCS/Planning/Feature_PRD/feature#{N}_{name}/screens.yml`     |
+| 이벤트 정의 | `PM-DOCS/Planning/Feature_PRD/feature#{N}_{name}/events.yml`      |
+| 화면 구조도 | `PM-DOCS/Planning/Feature_PRD/feature#{N}_{name}/wireframes.html` |
+| Milestone   | `PM-DOCS/Planning/Roadmap/milestone-{NNN}.md`                     |
+| CIS 산출물  | `PM-DOCS/Context Output/{workflow}_{YYYY-MM-DD}_{topic}.md`       |
+| Changelog   | `PM-DOCS/Planning/changelog.md` (전역 1개)                        |
 
 ## Feature 상태 계산 규칙
 

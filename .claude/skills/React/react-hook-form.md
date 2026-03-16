@@ -13,7 +13,6 @@ keywords:
     register,
     handleSubmit,
   ]
-estimated_tokens: ~500
 ---
 
 # React Hook Form + Zod 패턴

@@ -132,7 +132,27 @@ Phase E: 검증 & 저장
 3. `screens-template.yml` 기반 YAML 생성
 4. PRD §5 요약 테이블 + screens.yml 상세 파일 생성
 
-### C2: 이벤트 정의 (→ events.yml)
+### C2: 뷰포트 선택 & 와이어프레임 생성 (→ wireframes.html)
+
+> 참조: `.claude/skills/wireframe/SKILL.md`
+
+1. C1에서 screens.yml 작성 완료 후, PM에게 뷰포트를 선택받는다:
+   - AskUserQuestion으로 4가지 선택지 제시:
+     1. 모바일 전용 (Phone 375px)
+     2. PC 전용 (Desktop 1280px)
+     3. 모바일 + PC 둘 다
+     4. 화면별로 개별 선택
+   - "4. 화면별 개별 선택" 시: 각 화면(SCR-\*)에 대해 모바일/PC/둘다 선택
+2. wireframe SKILL 참조하여 `wireframes.html` 자동 생성:
+   - screens.yml + PRD 유저 플로우(§4) 기반
+   - 각 화면의 기본 상태 레이아웃
+   - 주요 에러/빈 상태 (선택적)
+   - 공통 영역(Header 등) + 공통 패턴(에러, 빈 상태)
+3. PM에게 확인 요청: "wireframes.html을 브라우저에서 열어 확인해주세요"
+4. 피드백 → 수정 → 재확인 루프
+5. 확인 완료 후 다음 단계(이벤트 정의)로 진행
+
+### C3: 이벤트 정의 (→ events.yml)
 
 1. B4+C1에서 트래킹 필요 행동 식별
 2. 각 이벤트에 대해 수집:
@@ -142,7 +162,7 @@ Phase E: 검증 & 저장
 3. `events-template.yml` 기반 YAML 생성
 4. PRD §6 요약 테이블 + events.yml 상세 파일 생성
 
-### C3: 수용 기준 (AC)
+### C4: 수용 기준 (AC)
 
 1. B3 유저스토리별 Given-When-Then 형식으로 AC 작성
 2. 유저스토리 ↔ AC 매핑 완전성 체크:
@@ -153,7 +173,7 @@ Phase E: 검증 & 저장
 ### C 완료 → Checkpoint (Continue/Adjust/Pause)
 
 - PRD.md 업데이트 (progress.phase_c: true)
-- screens.yml, events.yml 파일 저장
+- screens.yml, events.yml, wireframes.html 파일 저장
 
 ---
 
@@ -195,6 +215,7 @@ Phase E: 검증 & 저장
 3. **이벤트 ↔ 화면 연결 유효성**: events.yml의 screen_id가 screens.yml에 있는지
 4. **화면 ID 중복 검사**: 기존 screen-index.yml과 비교하여 ID 충돌 감지 (시나리오 #8)
 5. **누락 항목 체크**: PRD 11섹션 중 빈 섹션 없는지
+6. **와이어프레임 ↔ 화면 일치**: wireframes.html에 screens.yml의 모든 화면이 포함되었는지
 
 검증 실패 시 → 해당 Phase로 돌아가서 수정 유도
 
@@ -205,6 +226,7 @@ Phase E: 검증 & 저장
    - `PRD.md` (frontmatter progress 전체 true로 업데이트, status: "approved")
    - `screens.yml` (최종본)
    - `events.yml` (최종본)
+   - `wireframes.html` (최종본, screens.yml이 있는 경우)
 3. **Feature 라벨 생성**: `gh label create "feature:{name}" --color EDEDED` (이미 있으면 스킵)
 4. **screen-index.yml 자동 집계**:
    - `Feature_PRD/*/screens.yml` 전체 스캔
