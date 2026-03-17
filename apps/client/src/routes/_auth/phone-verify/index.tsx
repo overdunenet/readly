@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
+import Layout from '../../../components/layout/Layout';
+
 import { trpc } from '@/shared';
 
 const phoneSchema = z.object({
@@ -47,33 +49,41 @@ function PhoneVerifyPage() {
   };
 
   return (
-    <Container>
-      <BackButton onClick={() => navigate({ to: '/' })}>← 뒤로</BackButton>
-      <Title>전화번호 인증</Title>
-      <Description>본인확인을 위해 전화번호를 인증해주세요.</Description>
+    <Layout>
+      <PageContainer>
+        <BackLink onClick={() => navigate({ to: '/' })}>&larr; 뒤로</BackLink>
 
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <InputGroup>
-          <Label>전화번호</Label>
-          <InputWrapper>
-            <CountryCode>+82</CountryCode>
-            <Input
-              {...register('phone')}
-              type="tel"
-              placeholder="01012345678"
-              maxLength={11}
-            />
-          </InputWrapper>
-          {errors.phone && <ErrorText>{errors.phone.message}</ErrorText>}
-        </InputGroup>
+        <Title>전화번호 인증</Title>
+        <Description>본인확인을 위해 전화번호를 인증해주세요.</Description>
 
-        {error && <ErrorText>{error}</ErrorText>}
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <FormGroup>
+            <Label>전화번호</Label>
+            <InputWrapper>
+              <CountryCode>+82</CountryCode>
+              <Input
+                {...register('phone')}
+                type="tel"
+                placeholder="01012345678"
+                maxLength={11}
+              />
+            </InputWrapper>
+            {errors.phone && (
+              <ErrorMessage>{errors.phone.message}</ErrorMessage>
+            )}
+          </FormGroup>
 
-        <SubmitButton type="submit" disabled={!isValid || requestOtp.isPending}>
-          {requestOtp.isPending ? '전송 중...' : '인증번호 받기'}
-        </SubmitButton>
-      </Form>
-    </Container>
+          {error && <AlertBox>{error}</AlertBox>}
+
+          <SubmitButton
+            type="submit"
+            disabled={!isValid || requestOtp.isPending}
+          >
+            {requestOtp.isPending ? '전송 중...' : '인증번호 받기'}
+          </SubmitButton>
+        </Form>
+      </PageContainer>
+    </Layout>
   );
 }
 
@@ -82,41 +92,38 @@ export const Route = createFileRoute('/_auth/phone-verify/')({
 });
 
 // Styled Components
-const Container = tw.div`
-  min-h-screen
-  flex
-  flex-col
-  items-center
-  justify-center
+const PageContainer = tw.div`
   px-4
+  py-8
 `;
 
-const BackButton = tw.button`
-  self-start
-  mb-8
+const BackLink = tw.button`
+  text-sm
   text-gray-500
   hover:text-gray-700
+  mb-6
+  transition-colors
 `;
 
 const Title = tw.h1`
   text-2xl
   font-bold
+  text-gray-900
   mb-2
 `;
 
 const Description = tw.p`
+  text-sm
   text-gray-500
   mb-8
 `;
 
 const Form = tw.form`
-  w-full
-  max-w-sm
   space-y-6
 `;
 
-const InputGroup = tw.div`
-  space-y-2
+const FormGroup = tw.div`
+  space-y-1
 `;
 
 const Label = tw.label`
@@ -129,40 +136,65 @@ const Label = tw.label`
 const InputWrapper = tw.div`
   flex
   items-center
-  border
-  rounded-lg
-  overflow-hidden
+  mt-1
 `;
 
 const CountryCode = tw.span`
   px-3
-  py-3
+  py-2
   bg-gray-100
   text-gray-500
   text-sm
-  border-r
+  border
+  border-r-0
+  border-gray-300
+  rounded-l-md
 `;
 
 const Input = tw.input`
   flex-1
   px-3
-  py-3
-  outline-none
+  py-2
+  border
+  border-gray-300
+  rounded-r-md
+  focus:outline-none
+  focus:ring-2
+  focus:ring-blue-500
+  focus:border-transparent
   text-sm
 `;
 
-const ErrorText = tw.p`
-  text-red-500
+const ErrorMessage = tw.p`
   text-sm
+  text-red-600
+  mt-1
+`;
+
+const AlertBox = tw.div`
+  p-3
+  bg-red-50
+  border
+  border-red-200
+  rounded-md
+  text-sm
+  text-red-700
 `;
 
 const SubmitButton = tw.button`
   w-full
-  py-3
-  rounded-lg
-  bg-black
+  py-2
+  px-4
+  bg-blue-600
   text-white
   font-medium
+  rounded-md
+  hover:bg-blue-700
+  focus:outline-none
+  focus:ring-2
+  focus:ring-blue-500
+  focus:ring-offset-2
   disabled:opacity-50
   disabled:cursor-not-allowed
+  transition-colors
 `;

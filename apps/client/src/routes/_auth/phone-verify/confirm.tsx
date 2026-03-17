@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
+import Layout from '../../../components/layout/Layout';
 import { useAuthStore } from '../../../stores/auth';
 
 import { useOtpTimer } from '@/hooks/useOtpTimer';
@@ -60,50 +61,57 @@ function OtpConfirmPage() {
   };
 
   return (
-    <Container>
-      <BackButton onClick={() => navigate({ to: '/phone-verify' })}>
-        ← 뒤로
-      </BackButton>
-      <Title>인증번호 입력</Title>
-      <Description>
-        {formattedPhone}로 전송된 인증번호를 입력해주세요
-      </Description>
+    <Layout>
+      <PageContainer>
+        <BackLink onClick={() => navigate({ to: '/phone-verify' })}>
+          &larr; 뒤로
+        </BackLink>
 
-      <FormWrapper>
-        <CodeInput
-          type="text"
-          inputMode="numeric"
-          maxLength={6}
-          placeholder="인증번호 6자리"
-          value={code}
-          onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-        />
+        <Title>인증번호 입력</Title>
+        <Description>
+          {formattedPhone}로 전송된 인증번호를 입력해주세요
+        </Description>
 
-        <TimerText $expired={timer.isExpired}>
-          {timer.isExpired ? '인증번호가 만료되었습니다' : timer.formattedTime}
-        </TimerText>
+        <FormWrapper>
+          <CodeInput
+            type="text"
+            inputMode="numeric"
+            maxLength={6}
+            placeholder="인증번호 6자리"
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+          />
 
-        {error && <ErrorText>{error}</ErrorText>}
+          <TimerText $expired={timer.isExpired}>
+            {timer.isExpired
+              ? '인증번호가 만료되었습니다'
+              : timer.formattedTime}
+          </TimerText>
 
-        <VerifyButton
-          onClick={handleVerify}
-          disabled={code.length !== 6 || timer.isExpired || verifyOtp.isPending}
-        >
-          {verifyOtp.isPending ? '인증 중...' : '인증하기'}
-        </VerifyButton>
+          {error && <AlertBox>{error}</AlertBox>}
 
-        <ResendButton
-          onClick={handleResend}
-          disabled={!timer.canResend || requestOtp.isPending}
-        >
-          {requestOtp.isPending
-            ? '전송 중...'
-            : timer.canResend
-              ? '인증번호 재전송'
-              : `재전송 (${timer.resendSeconds}초)`}
-        </ResendButton>
-      </FormWrapper>
-    </Container>
+          <VerifyButton
+            onClick={handleVerify}
+            disabled={
+              code.length !== 6 || timer.isExpired || verifyOtp.isPending
+            }
+          >
+            {verifyOtp.isPending ? '인증 중...' : '인증하기'}
+          </VerifyButton>
+
+          <ResendButton
+            onClick={handleResend}
+            disabled={!timer.canResend || requestOtp.isPending}
+          >
+            {requestOtp.isPending
+              ? '전송 중...'
+              : timer.canResend
+                ? '인증번호 재전송'
+                : `재전송 (${timer.resendSeconds}초)`}
+          </ResendButton>
+        </FormWrapper>
+      </PageContainer>
+    </Layout>
   );
 }
 
@@ -113,84 +121,97 @@ export const Route = createFileRoute('/_auth/phone-verify/confirm')({
 });
 
 // Styled Components
-const Container = tw.div`
-  min-h-screen
-  flex
-  flex-col
-  items-center
-  justify-center
+const PageContainer = tw.div`
   px-4
+  py-8
 `;
 
-const BackButton = tw.button`
-  self-start
-  mb-8
+const BackLink = tw.button`
+  text-sm
   text-gray-500
   hover:text-gray-700
+  mb-6
+  transition-colors
 `;
 
 const Title = tw.h1`
   text-2xl
   font-bold
+  text-gray-900
   mb-2
 `;
 
 const Description = tw.p`
+  text-sm
   text-gray-500
   mb-8
-  text-center
 `;
 
 const FormWrapper = tw.div`
-  w-full
-  max-w-sm
   space-y-4
 `;
 
 const CodeInput = tw.input`
   w-full
-  px-4
-  py-3
+  px-3
+  py-2
   border
-  rounded-lg
+  border-gray-300
+  rounded-md
   text-center
   text-lg
   tracking-widest
-  outline-none
-  focus:border-black
+  focus:outline-none
+  focus:ring-2
+  focus:ring-blue-500
+  focus:border-transparent
 `;
 
 const TimerText = tw.p<{ $expired: boolean }>`
   text-center
   text-sm
-  ${(p: { $expired: boolean }) => (p.$expired ? 'text-red-500' : 'text-gray-500')}
+  ${(p: { $expired: boolean }) => (p.$expired ? 'text-red-600' : 'text-gray-500')}
 `;
 
-const ErrorText = tw.p`
-  text-red-500
+const AlertBox = tw.div`
+  p-3
+  bg-red-50
+  border
+  border-red-200
+  rounded-md
   text-sm
-  text-center
+  text-red-700
 `;
 
 const VerifyButton = tw.button`
   w-full
-  py-3
-  rounded-lg
-  bg-black
+  py-2
+  px-4
+  bg-blue-600
   text-white
   font-medium
+  rounded-md
+  hover:bg-blue-700
+  focus:outline-none
+  focus:ring-2
+  focus:ring-blue-500
+  focus:ring-offset-2
   disabled:opacity-50
   disabled:cursor-not-allowed
+  transition-colors
 `;
 
 const ResendButton = tw.button`
   w-full
-  py-3
-  rounded-lg
+  py-2
+  px-4
   border
   border-gray-300
   text-gray-700
   font-medium
+  rounded-md
+  hover:bg-gray-50
   disabled:opacity-50
   disabled:cursor-not-allowed
+  transition-colors
 `;
