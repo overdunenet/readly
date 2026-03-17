@@ -36,6 +36,9 @@ module.exports = {
     naver: {
       callbackUrl: 'http://localhost:5173/auth/naver/callback',
     },
+    kakao: {
+      callbackUrl: 'http://localhost:5173/auth/kakao/callback',
+    },
   },
   cors: {
     origin: true,

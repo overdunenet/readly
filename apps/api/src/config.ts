@@ -20,6 +20,12 @@ type NaverOAuthConfigType = {
   callbackUrl: string;
 };
 
+type KakaoOAuthConfigType = {
+  clientId: string;
+  clientSecret: string;
+  callbackUrl: string;
+};
+
 type CorsConfigType = {
   origin: boolean | string | string[];
   credentials: boolean;
@@ -46,6 +52,7 @@ export const ConfigProvider = {
       user: config.get<AppJwtConfigType>('auth.jwt.user'),
     },
     naver: config.get<NaverOAuthConfigType>('auth.naver'),
+    kakao: config.get<KakaoOAuthConfigType>('auth.kakao'),
   },
   cors: config.get<CorsConfigType>('cors'),
 } as const;
