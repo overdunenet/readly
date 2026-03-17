@@ -1,11 +1,17 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Transactional } from '../shared/transaction/transaction.decorator';
+import { TransactionService } from '../shared/transaction/transaction.service';
 import { AuthService, SocialLoginResponse } from './auth.service';
 
 @Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly transactionService: TransactionService
+  ) {}
 
+  @Transactional
   @MessagePattern('auth.socialLogin')
   async socialLogin(
     @Payload() data: { provider: string; code: string; state: string }
@@ -22,6 +28,7 @@ export class AuthController {
     return this.authService.requestPhoneOtp(data.phone);
   }
 
+  @Transactional
   @MessagePattern('auth.phoneOtpVerify')
   async phoneOtpVerify(
     @Payload() data: { userId: string; phone: string; code: string }

@@ -166,6 +166,11 @@ export class AuthService {
   }
 
   async verifyPhoneOtp(userId: string, phone: string, code: string) {
+    await this.validateOtp(phone, code);
+    return this.completePhoneVerification(userId, phone);
+  }
+
+  private async validateOtp(phone: string, code: string): Promise<void> {
     const otp = await this.repositoryProvider.OtpRepository.findByPhone(phone);
 
     if (!otp) {
@@ -191,56 +196,17 @@ export class AuthService {
     }
 
     await this.repositoryProvider.OtpRepository.deleteByPhone(phone);
+  }
 
-    const user = await this.repositoryProvider.UserRepository.findOneBy({
-      id: userId,
-    });
-
-    if (!user) {
-      throw new Error('사용자를 찾을 수 없습니다');
-    }
-
-    // 동일 phone을 가진 기존 유저 확인
+  private async completePhoneVerification(userId: string, phone: string) {
     const existingUserWithPhone =
       await this.repositoryProvider.UserRepository.findOne({
         where: { phone, deletedAt: IsNull() },
+        lock: { mode: 'pessimistic_write' },
       });
 
     if (existingUserWithPhone && existingUserWithPhone.id !== userId) {
-      // 임시 유저의 소셜 계정들을 기존 유저로 이전
-      const tempSocialAccounts =
-        await this.repositoryProvider.SocialAccountRepository.findByUserId(
-          userId
-        );
-
-      for (const tempSa of tempSocialAccounts) {
-        const existing =
-          await this.repositoryProvider.SocialAccountRepository.findByUserIdAndProvider(
-            existingUserWithPhone.id,
-            tempSa.provider
-          );
-
-        if (existing) {
-          // 기존 유저에 같은 provider가 이미 있으면 임시 것 soft delete
-          await this.repositoryProvider.SocialAccountRepository.softRemove(
-            tempSa
-          );
-        } else {
-          // 없으면 userId만 변경하여 이전
-          tempSa.userId = existingUserWithPhone.id;
-          await this.repositoryProvider.SocialAccountRepository.save(tempSa);
-        }
-      }
-
-      // 임시 유저 soft delete
-      const tempUser = await this.repositoryProvider.UserRepository.findOne({
-        where: { id: userId },
-      });
-      if (tempUser) {
-        await this.repositoryProvider.UserRepository.softRemove(tempUser);
-      }
-
-      // 기존 유저 기준으로 토큰 발급
+      await this.mergeUserAccounts(userId, existingUserWithPhone);
       const tokens = await this.userService.generateTokens(
         existingUserWithPhone
       );
@@ -252,7 +218,9 @@ export class AuthService {
       };
     }
 
-    // 기존 로직: 동일 phone 유저가 없는 경우
+    const user = await this.repositoryProvider.UserRepository.findOneOrFail({
+      where: { id: userId },
+    });
     user.phone = phone;
     await this.repositoryProvider.UserRepository.save(user);
 
@@ -263,5 +231,42 @@ export class AuthService {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };
+  }
+
+  private async mergeUserAccounts(
+    tempUserId: string,
+    targetUser: UserEntity
+  ): Promise<void> {
+    const tempSocialAccounts =
+      await this.repositoryProvider.SocialAccountRepository.findByUserId(
+        tempUserId
+      );
+
+    // 기존 유저의 소셜 계정을 한 번에 조회 (N+1 → 1+1)
+    const existingSocialAccounts =
+      await this.repositoryProvider.SocialAccountRepository.findByUserId(
+        targetUser.id
+      );
+    const existingProviders = new Set(
+      existingSocialAccounts.map(sa => sa.provider)
+    );
+
+    for (const tempSa of tempSocialAccounts) {
+      if (existingProviders.has(tempSa.provider)) {
+        await this.repositoryProvider.SocialAccountRepository.softRemove(
+          tempSa
+        );
+      } else {
+        tempSa.userId = targetUser.id;
+        await this.repositoryProvider.SocialAccountRepository.save(tempSa);
+      }
+    }
+
+    const tempUser = await this.repositoryProvider.UserRepository.findOne({
+      where: { id: tempUserId },
+    });
+    if (tempUser) {
+      await this.repositoryProvider.UserRepository.softRemove(tempUser);
+    }
   }
 }
