@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
-import Layout from '../../../components/layout/Layout';
+import SubLayout from '../../../components/layout/SubLayout';
 
 import { trpc } from '@/shared';
 
@@ -49,11 +49,8 @@ function PhoneVerifyPage() {
   };
 
   return (
-    <Layout>
+    <SubLayout title="전화번호 인증" onBack={() => navigate({ to: '/' })}>
       <PageContainer>
-        <BackLink onClick={() => navigate({ to: '/' })}>&larr; 뒤로</BackLink>
-
-        <Title>전화번호 인증</Title>
         <Description>본인확인을 위해 전화번호를 인증해주세요.</Description>
 
         <Form onSubmit={handleSubmit(onSubmit)}>
@@ -83,7 +80,7 @@ function PhoneVerifyPage() {
           </SubmitButton>
         </Form>
       </PageContainer>
-    </Layout>
+    </SubLayout>
   );
 }
 
@@ -95,21 +92,6 @@ export const Route = createFileRoute('/_auth/phone-verify/')({
 const PageContainer = tw.div`
   px-4
   py-8
-`;
-
-const BackLink = tw.button`
-  text-sm
-  text-gray-500
-  hover:text-gray-700
-  mb-6
-  transition-colors
-`;
-
-const Title = tw.h1`
-  text-2xl
-  font-bold
-  text-gray-900
-  mb-2
 `;
 
 const Description = tw.p`

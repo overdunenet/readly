@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
-import Layout from '../../../components/layout/Layout';
+import SubLayout from '../../../components/layout/SubLayout';
 import { useAuthStore } from '../../../stores/auth';
 
 import { useOtpTimer } from '@/hooks/useOtpTimer';
@@ -61,13 +61,11 @@ function OtpConfirmPage() {
   };
 
   return (
-    <Layout>
+    <SubLayout
+      title="인증번호 입력"
+      onBack={() => navigate({ to: '/phone-verify' })}
+    >
       <PageContainer>
-        <BackLink onClick={() => navigate({ to: '/phone-verify' })}>
-          &larr; 뒤로
-        </BackLink>
-
-        <Title>인증번호 입력</Title>
         <Description>
           {formattedPhone}로 전송된 인증번호를 입력해주세요
         </Description>
@@ -111,7 +109,7 @@ function OtpConfirmPage() {
           </ResendButton>
         </FormWrapper>
       </PageContainer>
-    </Layout>
+    </SubLayout>
   );
 }
 
@@ -124,21 +122,6 @@ export const Route = createFileRoute('/_auth/phone-verify/confirm')({
 const PageContainer = tw.div`
   px-4
   py-8
-`;
-
-const BackLink = tw.button`
-  text-sm
-  text-gray-500
-  hover:text-gray-700
-  mb-6
-  transition-colors
-`;
-
-const Title = tw.h1`
-  text-2xl
-  font-bold
-  text-gray-900
-  mb-2
 `;
 
 const Description = tw.p`
