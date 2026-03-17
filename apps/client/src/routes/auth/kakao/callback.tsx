@@ -6,11 +6,11 @@ import { useAuthStore } from '../../../stores/auth';
 import { SocialLoginCallback } from '@/components/auth/SocialLoginCallback';
 import { trpc } from '@/shared';
 
-export const Route = createFileRoute('/auth/naver/callback')({
-  component: NaverCallbackPage,
+export const Route = createFileRoute('/auth/kakao/callback')({
+  component: KakaoCallbackPage,
 });
 
-function NaverCallbackPage() {
+function KakaoCallbackPage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +29,7 @@ function NaverCallbackPage() {
       const errorParam = params.get('error');
 
       if (errorParam) {
-        setError('네이버 로그인이 취소되었습니다');
+        setError('카카오 로그인이 취소되었습니다');
         setIsLoading(false);
         return;
       }
@@ -41,18 +41,18 @@ function NaverCallbackPage() {
       }
 
       // state 검증
-      const savedState = sessionStorage.getItem('naver_oauth_state');
+      const savedState = sessionStorage.getItem('kakao_oauth_state');
       if (savedState !== state) {
         setError('인증 상태가 유효하지 않습니다');
         setIsLoading(false);
         return;
       }
-      sessionStorage.removeItem('naver_oauth_state');
+      sessionStorage.removeItem('kakao_oauth_state');
 
       // 소셜 로그인 API 호출
       socialLoginMutation
         .mutateAsync({
-          provider: 'naver',
+          provider: 'kakao',
           code,
           state,
         })
@@ -65,7 +65,7 @@ function NaverCallbackPage() {
         })
         .catch((err: unknown) => {
           const message =
-            err instanceof Error ? err.message : '네이버 로그인에 실패했습니다';
+            err instanceof Error ? err.message : '카카오 로그인에 실패했습니다';
           setError(message);
           setIsLoading(false);
         });
@@ -75,6 +75,6 @@ function NaverCallbackPage() {
   }, []);
 
   return (
-    <SocialLoginCallback provider="naver" isLoading={isLoading} error={error} />
+    <SocialLoginCallback provider="kakao" isLoading={isLoading} error={error} />
   );
 }

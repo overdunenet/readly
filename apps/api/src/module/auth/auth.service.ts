@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { UserService } from '../user/user.service';
+import { KakaoStrategy } from './strategies/kakao.strategy';
 import { NaverStrategy } from './strategies/naver.strategy';
 import {
   SocialProvider,
@@ -25,7 +26,8 @@ export class AuthService {
   constructor(
     private readonly repositoryProvider: RepositoryProvider,
     private readonly userService: UserService,
-    private readonly naverStrategy: NaverStrategy
+    private readonly naverStrategy: NaverStrategy,
+    private readonly kakaoStrategy: KakaoStrategy
   ) {}
 
   async socialLogin(
@@ -51,6 +53,7 @@ export class AuthService {
 
   private getStrategy(provider: SocialProvider) {
     if (provider === 'naver') return this.naverStrategy;
+    if (provider === 'kakao') return this.kakaoStrategy;
     throw new Error(`Unsupported provider: ${provider}`);
   }
 
@@ -104,7 +107,8 @@ export class AuthService {
     profile: SocialUserProfile
   ): Promise<UserEntity> {
     const email =
-      profile.email ?? `naver_${profile.providerId}@social.readly.co.kr`;
+      profile.email ??
+      `${profile.provider}_${profile.providerId}@social.readly.co.kr`;
     const nickname =
       profile.nickname ?? `user_${profile.providerId.slice(0, 8)}`;
 

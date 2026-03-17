@@ -42,7 +42,12 @@ module.exports = {
     naver: {
       clientId: process.env.NAVER_CLIENT_ID,
       clientSecret: process.env.NAVER_CLIENT_SECRET,
-      callbackUrl: process.env.NAVER_CALLBACK_URL,
+      callbackUrl: 'https://readly.co.kr/auth/naver/callback',
+    },
+    kakao: {
+      clientId: process.env.KAKAO_CLIENT_ID,
+      clientSecret: process.env.KAKAO_CLIENT_SECRET,
+      callbackUrl: 'https://readly.co.kr/auth/kakao/callback',
     },
   },
   cors: {

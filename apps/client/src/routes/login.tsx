@@ -61,6 +61,23 @@ function LoginPage() {
     window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${callbackUrl}&state=${state}`;
   };
 
+  const handleKakaoLogin = () => {
+    const clientId = import.meta.env.VITE_KAKAO_CLIENT_ID;
+    if (!clientId) {
+      setError('카카오 로그인을 시작할 수 없습니다');
+      return;
+    }
+
+    const callbackUrl = encodeURIComponent(
+      import.meta.env.VITE_KAKAO_CALLBACK_URL ||
+        `${window.location.origin}/auth/kakao/callback`,
+    );
+    const state = crypto.randomUUID();
+    sessionStorage.setItem('kakao_oauth_state', state);
+
+    window.location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${callbackUrl}&state=${state}`;
+  };
+
   return (
     <Container>
       <FormCard>
@@ -112,6 +129,13 @@ function LoginPage() {
           >
             네이버로 로그인
           </NaverLoginButton>
+          <KakaoLoginButton
+            type="button"
+            style={{ backgroundColor: '#FEE500', color: '#000000' }}
+            onClick={handleKakaoLogin}
+          >
+            카카오로 시작하기
+          </KakaoLoginButton>
         </SocialLoginSection>
 
         <LinkContainer>
@@ -254,6 +278,21 @@ const NaverLoginButton = tw.button`
   py-3
   rounded-lg
   text-white
+  font-medium
+  flex
+  items-center
+  justify-center
+  gap-2
+  transition-colors
+  duration-200
+  hover:opacity-90
+  cursor-pointer
+`;
+
+const KakaoLoginButton = tw.button`
+  w-full
+  py-3
+  rounded-lg
   font-medium
   flex
   items-center
