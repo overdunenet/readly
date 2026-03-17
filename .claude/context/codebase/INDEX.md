@@ -37,8 +37,8 @@ estimated_tokens: ~150
 
 ### Entity 요약
 
-**UserEntity**: email, password(bcrypt, nullable), nickname, profileImage, socialAccount
-**SocialAccountEntity**: userId, naverId, kakaoId, googleId (OneToOne with User)
+**UserEntity**: email, password(bcrypt, nullable), nickname, profileImage, phone, socialAccounts
+**SocialAccountEntity**: userId, provider, accountId (ManyToOne with User)
 **PostEntity**: freeContent, paidContent, accessLevel, status, price
 **FollowEntity**: followerId, followeeId (Unique Constraint)
 
