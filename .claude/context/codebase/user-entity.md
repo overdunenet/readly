@@ -31,8 +31,8 @@ export class UserEntity extends BaseEntity {
   @DeleteDateColumn()
   deletedAt: Date | null; // Soft Delete
 
-  @OneToOne(() => SocialAccountEntity, socialAccount => socialAccount.user)
-  socialAccount: SocialAccountEntity;
+  @OneToMany(() => SocialAccountEntity, socialAccount => socialAccount.user)
+  socialAccounts: SocialAccountEntity[];
 }
 ```
 
