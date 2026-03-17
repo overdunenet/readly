@@ -1,8 +1,8 @@
 ---
 name: codebase-otp-phone-verification
-description: OTP 기반 전화번호 인증 모듈 - OtpEntity, SMS 인증 플로우, 프론트엔드 인증 페이지
-keywords: [OTP, 전화번호, 인증, phone, verification, SMS]
-estimated_tokens: ~400
+description: OTP 기반 전화번호 인증 모듈 - OtpEntity, SMS 인증 플로우, 계정 병합, 프론트엔드 인증 페이지
+keywords: [OTP, 전화번호, 인증, phone, verification, SMS, 계정병합, mergeUserAccounts]
+estimated_tokens: ~500
 related_contexts:
   - codebase-social-login
   - codebase-user-entity
@@ -20,7 +20,7 @@ related_contexts:
 | apps/api/src/module/domain/otp.entity.ts | OTP Entity 및 Repository | OtpEntity, getOtpRepository(), findByPhone(), deleteByPhone() |
 | apps/api/src/database/migration/1773727712766-add-phone-otp.ts | 마이그레이션 | users.phone 컬럼 추가, otp_verifications 테이블 생성 |
 | apps/api/src/database/migration/1773732328642-add-otp-attempts.ts | 마이그레이션 | otp_verifications.attempts 컬럼 추가 |
-| apps/api/src/module/auth/auth.service.ts | OTP 비즈니스 로직 | requestPhoneOtp(), verifyPhoneOtp() |
+| apps/api/src/module/auth/auth.service.ts | OTP 비즈니스 로직 | requestPhoneOtp(), validateOtp(), completePhoneVerification(), mergeUserAccounts() |
 | apps/api/src/module/auth/auth.controller.ts | Microservice 핸들러 | @MessagePattern('auth.phoneOtpRequest'), @MessagePattern('auth.phoneOtpVerify') |
 | apps/api/src/module/auth/auth.router.ts | tRPC 라우터 | auth.phoneOtpRequest, auth.phoneOtpVerify mutations |
 | packages/api-types/src/server.ts | API 타입 정의 | phoneOtpRequest, phoneOtpVerify 스키마 |
@@ -38,8 +38,10 @@ related_contexts:
 ## 핵심 흐름
 
 1. **OTP 요청**: 사용자가 전화번호 입력 → `auth.phoneOtpRequest` 호출 → 60초 재발송 제한 확인 → 기존 OTP 삭제 → 6자리 코드 생성 (3분 만료) → DB 저장 → (TODO: SMS 발송)
-2. **OTP 검증**: 사용자가 코드 입력 → `auth.phoneOtpVerify` 호출 → 만료/코드 불일치 확인 → 5회 시도 초과 시 OTP 삭제 → 성공 시 `users.phone` 컬럼 업데이트
-3. **프론트엔드**: phone-verify 페이지에서 번호 입력 → confirm 페이지에서 코드 입력 → useOtpTimer로 남은 시간 표시
+2. **OTP 검증**: 사용자가 코드 입력 → `auth.phoneOtpVerify` 호출 → `validateOtp()`로 만료/코드 불일치/5회 초과 확인 → `completePhoneVerification()` 실행
+3. **계정 병합**: `completePhoneVerification()`에서 동일 phone의 기존 사용자 존재 시 → `mergeUserAccounts(sourceUser, targetUser)`로 소셜 계정 이전 + 임시 사용자 소프트 삭제 → targetUser로 새 JWT 발급
+4. **단순 인증**: 기존 사용자 미존재 시 → 현재 사용자의 `phone` 컬럼 업데이트 + 새 JWT 발급
+5. **프론트엔드**: phone-verify 페이지에서 번호 입력 → confirm 페이지에서 코드 입력 → 성공 시 accessToken 교체 + `phoneVerified: true` 설정 → 홈으로 이동
 
 ## 보안 규칙
 

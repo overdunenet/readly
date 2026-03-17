@@ -1,10 +1,11 @@
 ---
 name: codebase-social-login
-description: 소셜 로그인 모듈 - Strategy 패턴, OAuth 플로우 (네이버+카카오), SocialAccountEntity, 공통 콜백 UI
-keywords: [소셜로그인, Naver, Kakao, OAuth, Strategy, SocialAccount, 인증]
-estimated_tokens: ~600
+description: 소셜 로그인 모듈 - Strategy 패턴, OAuth 플로우 (네이버+카카오), SocialAccountEntity, 계정 병합, 공통 콜백 UI
+keywords: [소셜로그인, Naver, Kakao, OAuth, Strategy, SocialAccount, 인증, 계정병합, phoneVerified]
+estimated_tokens: ~700
 related_contexts:
   - codebase-user-entity
+  - codebase-otp-phone-verification
   - business-social-authentication
 ---
 
@@ -40,8 +41,10 @@ related_contexts:
 1. **프론트엔드**: 사용자가 "네이버/카카오로 로그인" 클릭 → `crypto.randomUUID()` state 생성 + `sessionStorage` 저장 → OAuth 페이지로 리다이렉트
 2. **콜백 처리**: `/auth/{provider}/callback`에서 code/state 수신 → sessionStorage의 state 검증 (React StrictMode 이중실행 방지를 위해 `useRef` 사용) → `auth.socialLogin` tRPC mutation 호출
 3. **AuthRouter**: refreshToken은 httpOnly 쿠키로 설정, accessToken + user 정보 응답
-4. **AuthService.socialLogin()**: `getStrategy(provider)`로 적절한 Strategy 선택 → 프로필 조회 → `findOrCreateUser()`로 사용자 매칭/생성 → `UserService.generateTokens()`로 JWT 발급
+4. **AuthService.socialLogin()**: `getStrategy(provider)`로 적절한 Strategy 선택 → 프로필 조회 → `findOrCreateUser()`로 사용자 매칭/생성 → `UserService.generateTokens()`로 JWT 발급 (응답에 `phoneVerified: !!user.phone` 포함)
 5. **findOrCreateUser()**: SocialAccount로 검색 → email로 기존 사용자 연결 → 새 사용자 생성 (3단계 순차 탐색)
+6. **전화번호 인증 게이트**: 콜백 페이지에서 `phoneVerified` 여부 확인 → 미인증 시 `/phone-verify`로 리다이렉트
+7. **계정 병합**: 전화번호 인증 완료 시 동일 phone의 기존 사용자가 있으면 `mergeUserAccounts()`로 소셜 계정 이전 + 임시 사용자 소프트 삭제
 
 ## Strategy 패턴
 
@@ -76,9 +79,29 @@ SocialLoginStrategy (인터페이스)
 ## 사용자 매칭 로직
 
 1. `findByProvider()`: SocialAccount에서 provider+providerId로 기존 사용자 검색
-2. `linkSocialAccountToExistingUser()`: email로 기존 사용자 찾아 SocialAccount 연결 (TODO: 본인인증으로 변경 필요)
+2. `linkSocialAccountToExistingUser()`: email로 기존 사용자 찾아 SocialAccount 연결
 3. `createUserWithSocialAccount()`: 새 UserEntity 생성 (password: null) + SocialAccount 생성
 4. 임시 email 생성: `{provider}_{providerId}@social.readly.co.kr` (provider별 접두사)
+
+## 계정 병합 로직
+
+전화번호 인증(`auth.phoneOtpVerify`) 완료 시 `completePhoneVerification()` → `mergeUserAccounts()` 실행:
+
+1. 동일 phone을 가진 기존 사용자(targetUser)가 존재하는지 확인
+2. 존재하면: 임시 사용자(sourceUser)의 소셜 계정을 targetUser로 이전
+3. 중복 소셜 계정(동일 provider+accountId)은 소프트 삭제
+4. sourceUser 소프트 삭제 후 targetUser로 새 JWT 발급
+5. 미존재 시: 현재 사용자의 phone 컬럼만 업데이트
+
+**트랜잭션**: `@Transactional` 데코레이터로 AuthController의 `socialLogin`, `phoneOtpVerify` 핸들러에 적용
+
+## 라우트 가드 (전화번호 인증 게이트)
+
+- `apps/client/src/routes/_auth.tsx`: TanStack Router `beforeLoad` 훅에서 인증 + phoneVerified 검사
+- 미인증 사용자 → `/login` 리다이렉트
+- `phoneVerified === false` → `/phone-verify` 리다이렉트
+- 인증 완료 상태에서 phone-verify 접근 → `/` 리다이렉트
+- OAuth 콜백 페이지(`kakao/callback`, `naver/callback`)에서도 `phoneVerified` 기반 분기
 
 ## 관련 Business Context
 
