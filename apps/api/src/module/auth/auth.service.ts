@@ -19,6 +19,7 @@ export interface SocialLoginResponse {
     email: string;
     nickname: string;
     profileImage: string | null;
+    phone: string | null;
   };
 }
 
@@ -48,6 +49,7 @@ export class AuthService {
         email: user.email,
         nickname: user.nickname,
         profileImage: user.profileImage,
+        phone: user.phone,
       },
     };
   }

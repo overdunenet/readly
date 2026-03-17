@@ -19,6 +19,7 @@ const socialLoginOutputSchema = z.object({
     email: z.string(),
     nickname: z.string(),
     profileImage: z.string().nullable(),
+    phone: z.string().nullable(),
   }),
 });
 

@@ -39,6 +39,7 @@ const loginResponseSchema = z.object({
     email: z.string().email(),
     nickname: z.string(),
     profileImage: z.string().nullable(),
+    phone: z.string().nullable(),
   }),
 });
 
@@ -47,6 +48,7 @@ const userSchema = z.object({
   email: z.string().email(),
   nickname: z.string(),
   profileImage: z.string().nullable(),
+  phone: z.string().nullable(),
 });
 
 @Router({ alias: 'user' })

@@ -22,6 +22,7 @@ const appRouter = t.router({
             email: z.string(),
             nickname: z.string(),
             profileImage: z.string().nullable(),
+            phone: z.string().nullable(),
           }),
         })
       )
@@ -335,6 +336,7 @@ const appRouter = t.router({
             email: z.string().email(),
             nickname: z.string(),
             profileImage: z.string().nullable(),
+            phone: z.string().nullable(),
           }),
         })
       )
@@ -349,6 +351,7 @@ const appRouter = t.router({
             email: z.string().email(),
             nickname: z.string(),
             profileImage: z.string().nullable(),
+            phone: z.string().nullable(),
           }),
         })
       )
@@ -364,6 +367,7 @@ const appRouter = t.router({
           email: z.string().email(),
           nickname: z.string(),
           profileImage: z.string().nullable(),
+          phone: z.string().nullable(),
         })
       )
       .query(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
