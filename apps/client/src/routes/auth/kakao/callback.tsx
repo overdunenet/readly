@@ -74,8 +74,10 @@ function KakaoCallbackPage() {
     return (
       <Container>
         <Card>
-          <Title>카카오 로그인 처리 중...</Title>
-          <Spinner />
+          <KakaoIcon />
+          <Title>카카오 로그인 처리 중</Title>
+          <SubText>잠시만 기다려주세요...</SubText>
+          <KakaoSpinner />
         </Card>
       </Container>
     );
@@ -133,12 +135,34 @@ const StyledLink = tw(Link)`
   font-medium
 `;
 
-const Spinner = tw.div`
+const SubText = tw.p`
+  text-sm
+  text-gray-500
+  mb-6
+`;
+
+const KakaoIcon = tw.div`
+  w-12
+  h-12
+  rounded-full
+  bg-[#FEE500]
+  mx-auto
+  mb-4
+  flex
+  items-center
+  justify-center
+  text-xl
+  font-bold
+  text-[#000000]
+  before:content-['K']
+`;
+
+const KakaoSpinner = tw.div`
   w-8
   h-8
   border-4
-  border-gray-200
-  border-t-blue-600
+  border-[#FEE500]/30
+  border-t-[#FEE500]
   rounded-full
   animate-spin
   mx-auto

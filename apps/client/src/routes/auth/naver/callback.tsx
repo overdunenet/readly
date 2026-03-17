@@ -74,8 +74,10 @@ function NaverCallbackPage() {
     return (
       <Container>
         <Card>
-          <Title>네이버 로그인 처리 중...</Title>
-          <Spinner />
+          <NaverIcon />
+          <Title>네이버 로그인 처리 중</Title>
+          <SubText>잠시만 기다려주세요...</SubText>
+          <NaverSpinner />
         </Card>
       </Container>
     );
@@ -133,12 +135,34 @@ const StyledLink = tw(Link)`
   font-medium
 `;
 
-const Spinner = tw.div`
+const SubText = tw.p`
+  text-sm
+  text-gray-500
+  mb-6
+`;
+
+const NaverIcon = tw.div`
+  w-12
+  h-12
+  rounded-full
+  bg-[#03C75A]
+  mx-auto
+  mb-4
+  flex
+  items-center
+  justify-center
+  text-xl
+  font-bold
+  text-white
+  before:content-['N']
+`;
+
+const NaverSpinner = tw.div`
   w-8
   h-8
   border-4
-  border-gray-200
-  border-t-blue-600
+  border-[#03C75A]/30
+  border-t-[#03C75A]
   rounded-full
   animate-spin
   mx-auto
