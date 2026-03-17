@@ -1,5 +1,6 @@
 import * as crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
+import { IsNull } from 'typeorm';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { UserService } from '../user/user.service';
 import { KakaoStrategy } from './strategies/kakao.strategy';
@@ -211,6 +212,73 @@ export class AuthService {
       throw new Error('사용자를 찾을 수 없습니다');
     }
 
+    // 동일 phone을 가진 기존 유저 확인
+    const existingUserWithPhone =
+      await this.repositoryProvider.UserRepository.findOne({
+        where: { phone, deletedAt: IsNull() },
+      });
+
+    if (existingUserWithPhone && existingUserWithPhone.id !== userId) {
+      // 병합: 임시 유저의 소셜 계정을 기존 유저로 이전
+      const tempSocialAccount =
+        await this.repositoryProvider.SocialAccountRepository.findByUserId(
+          userId
+        );
+      const existingSocialAccount =
+        await this.repositoryProvider.SocialAccountRepository.findByUserId(
+          existingUserWithPhone.id
+        );
+
+      if (tempSocialAccount && existingSocialAccount) {
+        // provider ID 병합 (기존 값이 없는 경우에만 설정)
+        if (tempSocialAccount.naverId && !existingSocialAccount.naverId) {
+          existingSocialAccount.naverId = tempSocialAccount.naverId;
+        }
+        if (tempSocialAccount.kakaoId && !existingSocialAccount.kakaoId) {
+          existingSocialAccount.kakaoId = tempSocialAccount.kakaoId;
+        }
+        if (tempSocialAccount.googleId && !existingSocialAccount.googleId) {
+          existingSocialAccount.googleId = tempSocialAccount.googleId;
+        }
+        await this.repositoryProvider.SocialAccountRepository.save(
+          existingSocialAccount
+        );
+      } else if (tempSocialAccount && !existingSocialAccount) {
+        // 기존 유저에 SocialAccount가 없는 경우 (이메일 회원가입 유저) - 임시 유저의 소셜 계정을 기존 유저로 이전
+        tempSocialAccount.userId = existingUserWithPhone.id;
+        await this.repositoryProvider.SocialAccountRepository.save(
+          tempSocialAccount
+        );
+      }
+
+      // 임시 유저의 소셜 계정 soft delete (이전된 경우 제외)
+      if (tempSocialAccount && existingSocialAccount) {
+        await this.repositoryProvider.SocialAccountRepository.softRemove(
+          tempSocialAccount
+        );
+      }
+
+      // 임시 유저 soft delete
+      const tempUser = await this.repositoryProvider.UserRepository.findOne({
+        where: { id: userId },
+      });
+      if (tempUser) {
+        await this.repositoryProvider.UserRepository.softRemove(tempUser);
+      }
+
+      // 기존 유저 기준으로 토큰 발급
+      const tokens = await this.userService.generateTokens(
+        existingUserWithPhone
+      );
+      return {
+        success: true,
+        phone,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      };
+    }
+
+    // 기존 로직: 동일 phone 유저가 없는 경우
     user.phone = phone;
     await this.repositoryProvider.UserRepository.save(user);
 
