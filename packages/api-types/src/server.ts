@@ -22,7 +22,7 @@ const appRouter = t.router({
             email: z.string(),
             nickname: z.string(),
             profileImage: z.string().nullable(),
-            phone: z.string().nullable(),
+            phoneVerified: z.boolean(),
           }),
         })
       )
@@ -47,6 +47,7 @@ const appRouter = t.router({
         z.object({
           success: z.boolean(),
           phone: z.string(),
+          accessToken: z.string(),
         })
       )
       .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
@@ -336,7 +337,7 @@ const appRouter = t.router({
             email: z.string().email(),
             nickname: z.string(),
             profileImage: z.string().nullable(),
-            phone: z.string().nullable(),
+            phoneVerified: z.boolean(),
           }),
         })
       )
@@ -351,7 +352,7 @@ const appRouter = t.router({
             email: z.string().email(),
             nickname: z.string(),
             profileImage: z.string().nullable(),
-            phone: z.string().nullable(),
+            phoneVerified: z.boolean(),
           }),
         })
       )
@@ -367,7 +368,7 @@ const appRouter = t.router({
           email: z.string().email(),
           nickname: z.string(),
           profileImage: z.string().nullable(),
-          phone: z.string().nullable(),
+          phoneVerified: z.boolean(),
         })
       )
       .query(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),

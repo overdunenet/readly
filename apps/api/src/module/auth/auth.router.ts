@@ -19,7 +19,7 @@ const socialLoginOutputSchema = z.object({
     email: z.string(),
     nickname: z.string(),
     profileImage: z.string().nullable(),
-    phone: z.string().nullable(),
+    phoneVerified: z.boolean(),
   }),
 });
 
@@ -33,18 +33,15 @@ export class AuthRouter extends BaseTrpcRouter {
     @Input() input: z.infer<typeof socialLoginInputSchema>,
     @Ctx() ctx: any
   ) {
-    const result = await this.microserviceClient.send(
+    const { refreshToken, ...response } = await this.microserviceClient.send(
       'auth.socialLogin',
       input
     );
 
     // Set refreshToken as httpOnly cookie
-    this.cookieService.setRefreshTokenCookie(ctx.res, result.refreshToken);
+    this.cookieService.setRefreshTokenCookie(ctx.res, refreshToken);
 
-    return {
-      accessToken: result.accessToken,
-      user: result.user,
-    };
+    return response;
   }
 
   @Mutation({
@@ -67,6 +64,7 @@ export class AuthRouter extends BaseTrpcRouter {
     output: z.object({
       success: z.boolean(),
       phone: z.string(),
+      accessToken: z.string(),
     }),
   })
   @UseMiddlewares(UserAuthMiddleware)
@@ -74,9 +72,13 @@ export class AuthRouter extends BaseTrpcRouter {
     @Input() input: { phone: string; code: string },
     @Ctx() ctx: UserAuthorizedContext
   ) {
-    return this.microserviceClient.send('auth.phoneOtpVerify', {
-      ...input,
-      userId: ctx.user.sub,
-    });
+    const { refreshToken, ...response } = await this.microserviceClient.send(
+      'auth.phoneOtpVerify',
+      { ...input, userId: ctx.user.sub }
+    );
+
+    this.cookieService.setRefreshTokenCookie(ctx.res, refreshToken);
+
+    return response;
   }
 }

@@ -34,8 +34,8 @@ export class UserEntity extends BaseEntity {
   @Column({ nullable: true, type: 'varchar' })
   phone: string | null; // 전화번호 인증 후 저장
 
-  @OneToOne(() => SocialAccountEntity, socialAccount => socialAccount.user)
-  socialAccount: SocialAccountEntity;
+  @OneToMany(() => SocialAccountEntity, socialAccount => socialAccount.user)
+  socialAccounts: SocialAccountEntity[];
 }
 ```
 

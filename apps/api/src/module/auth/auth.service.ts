@@ -1,15 +1,16 @@
 import * as crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
+import { IsNull } from 'typeorm';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { UserService } from '../user/user.service';
 import { KakaoStrategy } from './strategies/kakao.strategy';
 import { NaverStrategy } from './strategies/naver.strategy';
-import {
-  SocialProvider,
-  SocialUserProfile,
-} from './strategies/social-login.strategy';
+import { SocialUserProfile } from './strategies/social-login.strategy';
 import { UserEntity } from '../domain/user.entity';
-import { SocialAccountEntity } from '../domain/social-account.entity';
+import {
+  SocialAccountEntity,
+  SocialProvider,
+} from '../domain/social-account.entity';
 
 export interface SocialLoginResponse {
   accessToken: string;
@@ -19,7 +20,7 @@ export interface SocialLoginResponse {
     email: string;
     nickname: string;
     profileImage: string | null;
-    phone: string | null;
+    phoneVerified: boolean;
   };
 }
 
@@ -49,7 +50,7 @@ export class AuthService {
         email: user.email,
         nickname: user.nickname,
         profileImage: user.profileImage,
-        phone: user.phone,
+        phoneVerified: !!user.phone,
       },
     };
   }
@@ -96,9 +97,8 @@ export class AuthService {
     );
     if (!existingUser) return null;
 
-    const socialAccount = SocialAccountEntity.create(existingUser.id);
-    this.setProviderIdOnSocialAccount(
-      socialAccount,
+    const socialAccount = SocialAccountEntity.create(
+      existingUser.id,
       profile.provider,
       profile.providerId
     );
@@ -122,24 +122,13 @@ export class AuthService {
     user.profileImage = profile.profileImage;
     const savedUser = await this.repositoryProvider.UserRepository.save(user);
 
-    const socialAccount = SocialAccountEntity.create(savedUser.id);
-    this.setProviderIdOnSocialAccount(
-      socialAccount,
+    const socialAccount = SocialAccountEntity.create(
+      savedUser.id,
       profile.provider,
       profile.providerId
     );
     await this.repositoryProvider.SocialAccountRepository.save(socialAccount);
     return savedUser;
-  }
-
-  private setProviderIdOnSocialAccount(
-    socialAccount: SocialAccountEntity,
-    provider: SocialProvider,
-    providerId: string
-  ): void {
-    if (provider === 'naver') socialAccount.naverId = providerId;
-    if (provider === 'kakao') socialAccount.kakaoId = providerId;
-    if (provider === 'google') socialAccount.googleId = providerId;
   }
 
   async requestPhoneOtp(phone: string) {
@@ -177,6 +166,11 @@ export class AuthService {
   }
 
   async verifyPhoneOtp(userId: string, phone: string, code: string) {
+    await this.validateOtp(phone, code);
+    return this.completePhoneVerification(userId, phone);
+  }
+
+  private async validateOtp(phone: string, code: string): Promise<void> {
     const otp = await this.repositoryProvider.OtpRepository.findByPhone(phone);
 
     if (!otp) {
@@ -202,18 +196,77 @@ export class AuthService {
     }
 
     await this.repositoryProvider.OtpRepository.deleteByPhone(phone);
+  }
 
-    const user = await this.repositoryProvider.UserRepository.findOneBy({
-      id: userId,
-    });
+  private async completePhoneVerification(userId: string, phone: string) {
+    const existingUserWithPhone =
+      await this.repositoryProvider.UserRepository.findOne({
+        where: { phone, deletedAt: IsNull() },
+        lock: { mode: 'pessimistic_write' },
+      });
 
-    if (!user) {
-      throw new Error('사용자를 찾을 수 없습니다');
+    if (existingUserWithPhone && existingUserWithPhone.id !== userId) {
+      await this.mergeUserAccounts(userId, existingUserWithPhone);
+      const tokens = await this.userService.generateTokens(
+        existingUserWithPhone
+      );
+      return {
+        success: true,
+        phone,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      };
     }
 
+    const user = await this.repositoryProvider.UserRepository.findOneOrFail({
+      where: { id: userId },
+    });
     user.phone = phone;
     await this.repositoryProvider.UserRepository.save(user);
 
-    return { success: true, phone };
+    const tokens = await this.userService.generateTokens(user);
+    return {
+      success: true,
+      phone,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    };
+  }
+
+  private async mergeUserAccounts(
+    tempUserId: string,
+    targetUser: UserEntity
+  ): Promise<void> {
+    const tempSocialAccounts =
+      await this.repositoryProvider.SocialAccountRepository.findByUserId(
+        tempUserId
+      );
+
+    // 기존 유저의 소셜 계정을 한 번에 조회 (N+1 → 1+1)
+    const existingSocialAccounts =
+      await this.repositoryProvider.SocialAccountRepository.findByUserId(
+        targetUser.id
+      );
+    const existingProviders = new Set(
+      existingSocialAccounts.map(sa => sa.provider)
+    );
+
+    for (const tempSa of tempSocialAccounts) {
+      if (existingProviders.has(tempSa.provider)) {
+        await this.repositoryProvider.SocialAccountRepository.softRemove(
+          tempSa
+        );
+      } else {
+        tempSa.userId = targetUser.id;
+        await this.repositoryProvider.SocialAccountRepository.save(tempSa);
+      }
+    }
+
+    const tempUser = await this.repositoryProvider.UserRepository.findOne({
+      where: { id: tempUserId },
+    });
+    if (tempUser) {
+      await this.repositoryProvider.UserRepository.softRemove(tempUser);
+    }
   }
 }

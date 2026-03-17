@@ -25,6 +25,7 @@ related_contexts:
 | apps/api/src/module/auth/strategies/kakao.strategy.ts | 카카오 OAuth 구현 | KakaoStrategy, getUserProfile(), fetchAccessToken(), fetchUserProfile() |
 | apps/api/src/module/domain/social-account.entity.ts | 소셜 계정 Entity | SocialAccountEntity, create(), findByProvider() |
 | apps/api/src/database/migration/1773669013426-alter-user-nullable-password.ts | 마이그레이션 | password nullable 변경 |
+| apps/api/src/database/migration/1773748321334-refactor-social-accounts-to-one-to-many.ts | 마이그레이션 | social_accounts 1:1→1:N 구조 변환 (provider+accountId) |
 | apps/api/src/config.ts | OAuth 설정 | ConfigProvider.auth.naver, ConfigProvider.auth.kakao (clientId, clientSecret, callbackUrl) |
 | apps/api/config/default.js | 프로덕션 설정 | auth.naver, auth.kakao (callbackUrl 상수) |
 | apps/api/config/localdev.js | 로컬 개발 설정 | auth.naver, auth.kakao (localhost callbackUrl) |
@@ -66,9 +67,11 @@ SocialLoginStrategy (인터페이스)
 ## SocialAccountEntity 구조
 
 - 테이블: `social_accounts`
-- UserEntity와 OneToOne 관계 (userId FK)
-- Provider별 ID 컬럼: naverId, kakaoId, googleId (모두 nullable)
-- Repository 확장: `findByUserId()`, `findByProvider()`
+- UserEntity와 ManyToOne 관계 (userId FK) — 한 User가 여러 소셜 계정 보유 가능
+- 컬럼: `provider` (SocialProvider: 'naver' | 'kakao' | 'google'), `accountId` (provider별 고유 ID)
+- Unique Index: `(provider, account_id) WHERE deleted_at IS NULL`
+- Factory: `SocialAccountEntity.create(userId, provider, accountId)`
+- Repository 확장: `findByUserId()`, `findByProvider()`, `findByUserIdAndProvider()`
 
 ## 사용자 매칭 로직
 
