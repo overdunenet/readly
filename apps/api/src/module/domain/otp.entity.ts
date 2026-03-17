@@ -1,0 +1,33 @@
+import { Entity, Column, EntityManager, Unique } from 'typeorm';
+import { BaseEntity } from '@src/module/shared/entity/base.entity';
+import { TransactionService } from '../shared/transaction/transaction.service';
+import { getEntityManager } from '@src/database/datasources';
+
+@Entity('otp_verifications')
+@Unique('UQ_otp_phone', ['phone'])
+export class OtpEntity extends BaseEntity {
+  @Column({ type: 'varchar' })
+  phone: string;
+
+  @Column({ type: 'varchar', length: 6 })
+  code: string;
+
+  @Column({ type: 'timestamp' })
+  expiresAt: Date;
+
+  @Column({ type: 'int', default: 0 })
+  attempts: number;
+}
+
+export const getOtpRepository = (source?: TransactionService | EntityManager) =>
+  getEntityManager(source)
+    .getRepository(OtpEntity)
+    .extend({
+      async findByPhone(phone: string): Promise<OtpEntity | null> {
+        return this.findOneBy({ phone });
+      },
+
+      async deleteByPhone(phone: string): Promise<void> {
+        await this.delete({ phone });
+      },
+    });

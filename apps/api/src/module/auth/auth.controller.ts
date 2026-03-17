@@ -16,4 +16,16 @@ export class AuthController {
       data.state
     );
   }
+
+  @MessagePattern('auth.phoneOtpRequest')
+  async phoneOtpRequest(@Payload() data: { phone: string }) {
+    return this.authService.requestPhoneOtp(data.phone);
+  }
+
+  @MessagePattern('auth.phoneOtpVerify')
+  async phoneOtpVerify(
+    @Payload() data: { userId: string; phone: string; code: string }
+  ) {
+    return this.authService.verifyPhoneOtp(data.userId, data.phone, data.code);
+  }
 }

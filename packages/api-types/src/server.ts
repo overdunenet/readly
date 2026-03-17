@@ -22,7 +22,31 @@ const appRouter = t.router({
             email: z.string(),
             nickname: z.string(),
             profileImage: z.string().nullable(),
+            phone: z.string().nullable(),
           }),
+        })
+      )
+      .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
+    phoneOtpRequest: publicProcedure
+      .input(z.object({ phone: z.string().regex(/^01[0-9]{8,9}$/) }))
+      .output(
+        z.object({
+          expiresAt: z.string(),
+          resendAvailableAt: z.string(),
+        })
+      )
+      .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
+    phoneOtpVerify: publicProcedure
+      .input(
+        z.object({
+          phone: z.string().regex(/^01[0-9]{8,9}$/),
+          code: z.string().length(6),
+        })
+      )
+      .output(
+        z.object({
+          success: z.boolean(),
+          phone: z.string(),
         })
       )
       .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
@@ -312,6 +336,7 @@ const appRouter = t.router({
             email: z.string().email(),
             nickname: z.string(),
             profileImage: z.string().nullable(),
+            phone: z.string().nullable(),
           }),
         })
       )
@@ -326,6 +351,7 @@ const appRouter = t.router({
             email: z.string().email(),
             nickname: z.string(),
             profileImage: z.string().nullable(),
+            phone: z.string().nullable(),
           }),
         })
       )
@@ -341,6 +367,7 @@ const appRouter = t.router({
           email: z.string().email(),
           nickname: z.string(),
           profileImage: z.string().nullable(),
+          phone: z.string().nullable(),
         })
       )
       .query(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),

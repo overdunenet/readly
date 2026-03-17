@@ -22,6 +22,7 @@ export interface LoginResponse {
     email: string;
     nickname: string;
     profileImage: string | null;
+    phone: string | null;
   };
 }
 
@@ -112,6 +113,7 @@ export class UserService {
           email: user.email,
           nickname: user.nickname,
           profileImage: user.profileImage,
+          phone: user.phone,
         },
       };
     } catch (error) {
@@ -124,6 +126,7 @@ export class UserService {
     email: string;
     nickname: string;
     profileImage: string | null;
+    phone: string | null;
   }> {
     const user = await this.repositoryProvider.UserRepository.findOne({
       where: { id: userId, deletedAt: null },
@@ -138,6 +141,7 @@ export class UserService {
       email: user.email,
       nickname: user.nickname,
       profileImage: user.profileImage,
+      phone: user.phone,
     };
   }
 

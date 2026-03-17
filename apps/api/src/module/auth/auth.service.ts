@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { UserService } from '../user/user.service';
@@ -18,6 +19,7 @@ export interface SocialLoginResponse {
     email: string;
     nickname: string;
     profileImage: string | null;
+    phone: string | null;
   };
 }
 
@@ -47,6 +49,7 @@ export class AuthService {
         email: user.email,
         nickname: user.nickname,
         profileImage: user.profileImage,
+        phone: user.phone,
       },
     };
   }
@@ -137,5 +140,80 @@ export class AuthService {
     if (provider === 'naver') socialAccount.naverId = providerId;
     if (provider === 'kakao') socialAccount.kakaoId = providerId;
     if (provider === 'google') socialAccount.googleId = providerId;
+  }
+
+  async requestPhoneOtp(phone: string) {
+    const existingOtp =
+      await this.repositoryProvider.OtpRepository.findByPhone(phone);
+
+    if (
+      existingOtp &&
+      existingOtp.createdAt.getTime() + 60 * 1000 > Date.now()
+    ) {
+      throw new Error('1분 후 재전송 가능합니다');
+    }
+
+    await this.repositoryProvider.OtpRepository.deleteByPhone(phone);
+
+    const isDev =
+      process.env.NODE_ENV === 'development' ||
+      process.env.NODE_ENV === 'localdev';
+    const code = isDev ? '123456' : crypto.randomInt(100000, 999999).toString();
+    const expiresAt = new Date(Date.now() + 3 * 60 * 1000);
+
+    const otp = this.repositoryProvider.OtpRepository.create({
+      phone,
+      code,
+      expiresAt,
+    });
+    await this.repositoryProvider.OtpRepository.save(otp);
+
+    // TODO: SMS 발송 (SmsService.send(phone, code))
+
+    return {
+      expiresAt: otp.expiresAt.toISOString(),
+      resendAvailableAt: new Date(Date.now() + 60 * 1000).toISOString(),
+    };
+  }
+
+  async verifyPhoneOtp(userId: string, phone: string, code: string) {
+    const otp = await this.repositoryProvider.OtpRepository.findByPhone(phone);
+
+    if (!otp) {
+      throw new Error('인증번호를 먼저 요청해주세요');
+    }
+
+    if (otp.expiresAt < new Date()) {
+      throw new Error('인증번호가 만료되었습니다');
+    }
+
+    if (otp.code !== code) {
+      otp.attempts += 1;
+      await this.repositoryProvider.OtpRepository.save(otp);
+
+      if (otp.attempts >= 5) {
+        await this.repositoryProvider.OtpRepository.deleteByPhone(phone);
+        throw new Error(
+          '인증 시도 횟수를 초과했습니다. 인증번호를 다시 요청해주세요'
+        );
+      }
+
+      throw new Error('인증번호가 일치하지 않습니다');
+    }
+
+    await this.repositoryProvider.OtpRepository.deleteByPhone(phone);
+
+    const user = await this.repositoryProvider.UserRepository.findOneBy({
+      id: userId,
+    });
+
+    if (!user) {
+      throw new Error('사용자를 찾을 수 없습니다');
+    }
+
+    user.phone = phone;
+    await this.repositoryProvider.UserRepository.save(user);
+
+    return { success: true, phone };
   }
 }

@@ -1,6 +1,10 @@
 import { z } from 'zod';
-import { Input, Router, Mutation, Ctx } from 'nestjs-trpc-v2';
+import { Input, Router, Mutation, Ctx, UseMiddlewares } from 'nestjs-trpc-v2';
 import { BaseTrpcRouter } from '../trpc/baseTrpcRouter';
+import {
+  UserAuthMiddleware,
+  UserAuthorizedContext,
+} from '../user/user.auth.middleware';
 
 const socialLoginInputSchema = z.object({
   provider: z.enum(['naver', 'kakao', 'google']),
@@ -15,6 +19,7 @@ const socialLoginOutputSchema = z.object({
     email: z.string(),
     nickname: z.string(),
     profileImage: z.string().nullable(),
+    phone: z.string().nullable(),
   }),
 });
 
@@ -40,5 +45,38 @@ export class AuthRouter extends BaseTrpcRouter {
       accessToken: result.accessToken,
       user: result.user,
     };
+  }
+
+  @Mutation({
+    input: z.object({ phone: z.string().regex(/^01[0-9]{8,9}$/) }),
+    output: z.object({
+      expiresAt: z.string(),
+      resendAvailableAt: z.string(),
+    }),
+  })
+  @UseMiddlewares(UserAuthMiddleware)
+  async phoneOtpRequest(@Input() input: { phone: string }) {
+    return this.microserviceClient.send('auth.phoneOtpRequest', input);
+  }
+
+  @Mutation({
+    input: z.object({
+      phone: z.string().regex(/^01[0-9]{8,9}$/),
+      code: z.string().length(6),
+    }),
+    output: z.object({
+      success: z.boolean(),
+      phone: z.string(),
+    }),
+  })
+  @UseMiddlewares(UserAuthMiddleware)
+  async phoneOtpVerify(
+    @Input() input: { phone: string; code: string },
+    @Ctx() ctx: UserAuthorizedContext
+  ) {
+    return this.microserviceClient.send('auth.phoneOtpVerify', {
+      ...input,
+      userId: ctx.user.sub,
+    });
   }
 }

@@ -3,6 +3,7 @@ import { getUserRepository } from '@src/module/domain/user.entity';
 import { getPostRepository } from '@src/module/domain/post.entity';
 import { getFollowRepository } from '@src/module/domain/follow.entity';
 import { getSocialAccountRepository } from '@src/module/domain/social-account.entity';
+import { getOtpRepository } from '@src/module/domain/otp.entity';
 import { TransactionService } from '@src/module/shared/transaction/transaction.service';
 
 @Injectable()
@@ -23,5 +24,9 @@ export class RepositoryProvider {
 
   get SocialAccountRepository() {
     return getSocialAccountRepository(this.transaction);
+  }
+
+  get OtpRepository() {
+    return getOtpRepository(this.transaction);
   }
 }
