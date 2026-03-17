@@ -158,7 +158,6 @@ export class UserService {
       sub: user.id,
       email: user.email,
       type: 'user',
-      phoneVerified: !!user.phone,
     };
 
     const [accessToken, refreshToken] = await Promise.all([

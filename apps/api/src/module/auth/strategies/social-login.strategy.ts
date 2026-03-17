@@ -1,6 +1,4 @@
-import { SocialProvider } from '../../domain/social-account.entity';
-
-export { SocialProvider };
+import type { SocialProvider } from '../../domain/social-account.entity';
 
 export interface SocialUserProfile {
   providerId: string;

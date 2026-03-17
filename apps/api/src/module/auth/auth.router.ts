@@ -33,18 +33,15 @@ export class AuthRouter extends BaseTrpcRouter {
     @Input() input: z.infer<typeof socialLoginInputSchema>,
     @Ctx() ctx: any
   ) {
-    const result = await this.microserviceClient.send(
+    const { refreshToken, ...response } = await this.microserviceClient.send(
       'auth.socialLogin',
       input
     );
 
     // Set refreshToken as httpOnly cookie
-    this.cookieService.setRefreshTokenCookie(ctx.res, result.refreshToken);
+    this.cookieService.setRefreshTokenCookie(ctx.res, refreshToken);
 
-    return {
-      accessToken: result.accessToken,
-      user: result.user,
-    };
+    return response;
   }
 
   @Mutation({
@@ -75,17 +72,13 @@ export class AuthRouter extends BaseTrpcRouter {
     @Input() input: { phone: string; code: string },
     @Ctx() ctx: UserAuthorizedContext
   ) {
-    const result = await this.microserviceClient.send('auth.phoneOtpVerify', {
-      ...input,
-      userId: ctx.user.sub,
-    });
+    const { refreshToken, ...response } = await this.microserviceClient.send(
+      'auth.phoneOtpVerify',
+      { ...input, userId: ctx.user.sub }
+    );
 
-    this.cookieService.setRefreshTokenCookie(ctx.res, result.refreshToken);
+    this.cookieService.setRefreshTokenCookie(ctx.res, refreshToken);
 
-    return {
-      success: result.success,
-      phone: result.phone,
-      accessToken: result.accessToken,
-    };
+    return response;
   }
 }
