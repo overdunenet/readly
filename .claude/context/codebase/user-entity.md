@@ -31,6 +31,9 @@ export class UserEntity extends BaseEntity {
   @DeleteDateColumn()
   deletedAt: Date | null; // Soft Delete
 
+  @Column({ nullable: true, type: 'varchar' })
+  phone: string | null; // 전화번호 인증 후 저장
+
   @OneToMany(() => SocialAccountEntity, socialAccount => socialAccount.user)
   socialAccounts: SocialAccountEntity[];
 }
@@ -230,3 +233,4 @@ auth: {
 - `codebase/post-entity.md`: PostEntity와 User 관계
 - `codebase/architecture-overview.md`: API 아키텍처
 - `codebase/social-login.md`: 소셜 로그인 모듈 (AuthService, SocialAccountEntity)
+- `codebase/otp-phone-verification.md`: OTP 전화번호 인증 모듈

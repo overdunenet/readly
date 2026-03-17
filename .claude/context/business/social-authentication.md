@@ -20,6 +20,7 @@ estimated_tokens: ~350
 | 기존 계정 연결 | 동일 email의 기존 사용자에 소셜 계정 자동 연결 | 기존 계정 유지하면서 소셜 로그인 추가 |
 | 신규 가입 | 소셜 프로필로 자동 회원가입 | 별도 가입 절차 없이 바로 이용 |
 | 복수 Provider | 하나의 계정에 여러 소셜 계정 연결 가능 (1:N 관계) | 네이버/카카오/구글 중 편한 방법 선택 |
+| 전화번호 인증 | OTP 기반 전화번호 본인인증 | 소셜 로그인 후 전화번호 인증으로 보안 강화 |
 
 ## 사용자 흐름
 
@@ -39,6 +40,14 @@ estimated_tokens: ~350
 - email 기반 계정 연결은 추후 본인인증으로 전환 예정 (보안 강화)
 - CSRF 방지를 위해 OAuth state 파라미터를 sessionStorage에 저장하여 검증
 
+### 전화번호 인증 규칙
+
+- 소셜 로그인 후 전화번호 본인인증을 통해 사용자 신원 확인
+- OTP 6자리 코드를 SMS로 발송하여 인증 (유효시간 3분)
+- 60초 내 재발송 불가 (무분별한 SMS 발송 방지)
+- 5회 인증 실패 시 OTP 자동 삭제 (재요청 필요)
+- 인증 완료된 전화번호는 사용자 계정에 저장 (중복 불가)
+
 ## 지원 Provider
 
 | Provider | 상태 | 비고 |
@@ -50,3 +59,4 @@ estimated_tokens: ~350
 ## 관련 Codebase Context
 
 - [social-login.md](../codebase/social-login.md)
+- [otp-phone-verification.md](../codebase/otp-phone-verification.md)
