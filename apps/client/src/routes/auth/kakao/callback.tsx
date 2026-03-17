@@ -1,9 +1,9 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
-import tw from 'tailwind-styled-components';
 
 import { useAuthStore } from '../../../stores/auth';
 
+import { SocialLoginCallback } from '@/components/auth/SocialLoginCallback';
 import { trpc } from '@/shared';
 
 export const Route = createFileRoute('/auth/kakao/callback')({
@@ -74,100 +74,7 @@ function KakaoCallbackPage() {
     handleCallback();
   }, []);
 
-  if (isLoading && !error) {
-    return (
-      <Container>
-        <Card>
-          <KakaoIcon />
-          <Title>카카오 로그인 처리 중</Title>
-          <SubText>잠시만 기다려주세요...</SubText>
-          <KakaoSpinner />
-        </Card>
-      </Container>
-    );
-  }
-
-  if (error) {
-    return (
-      <Container>
-        <Card>
-          <Title>로그인 실패</Title>
-          <ErrorMessage>{error}</ErrorMessage>
-          <StyledLink to="/login">로그인 페이지로 돌아가기</StyledLink>
-        </Card>
-      </Container>
-    );
-  }
-
-  return null;
+  return (
+    <SocialLoginCallback provider="kakao" isLoading={isLoading} error={error} />
+  );
 }
-
-// Styled Components
-const Container = tw.div`
-  min-h-screen
-  flex
-  items-center
-  justify-center
-  bg-gray-50
-`;
-
-const Card = tw.div`
-  bg-white
-  p-8
-  rounded-lg
-  shadow-md
-  w-full
-  max-w-md
-  text-center
-`;
-
-const Title = tw.h2`
-  text-xl
-  font-semibold
-  text-gray-800
-  mb-4
-`;
-
-const ErrorMessage = tw.p`
-  text-red-600
-  mb-4
-`;
-
-const StyledLink = tw(Link)`
-  text-blue-600
-  hover:text-blue-800
-  font-medium
-`;
-
-const SubText = tw.p`
-  text-sm
-  text-gray-500
-  mb-6
-`;
-
-const KakaoIcon = tw.div`
-  w-12
-  h-12
-  rounded-full
-  bg-[#FEE500]
-  mx-auto
-  mb-4
-  flex
-  items-center
-  justify-center
-  text-xl
-  font-bold
-  text-[#000000]
-  before:content-['K']
-`;
-
-const KakaoSpinner = tw.div`
-  w-8
-  h-8
-  border-4
-  border-[#FEE500]/30
-  border-t-[#FEE500]
-  rounded-full
-  animate-spin
-  mx-auto
-`;
