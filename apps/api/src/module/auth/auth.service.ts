@@ -5,12 +5,12 @@ import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { UserService } from '../user/user.service';
 import { KakaoStrategy } from './strategies/kakao.strategy';
 import { NaverStrategy } from './strategies/naver.strategy';
-import {
-  SocialProvider,
-  SocialUserProfile,
-} from './strategies/social-login.strategy';
+import { SocialUserProfile } from './strategies/social-login.strategy';
 import { UserEntity } from '../domain/user.entity';
-import { SocialAccountEntity } from '../domain/social-account.entity';
+import {
+  SocialAccountEntity,
+  SocialProvider,
+} from '../domain/social-account.entity';
 
 export interface SocialLoginResponse {
   accessToken: string;
@@ -97,9 +97,8 @@ export class AuthService {
     );
     if (!existingUser) return null;
 
-    const socialAccount = SocialAccountEntity.create(existingUser.id);
-    this.setProviderIdOnSocialAccount(
-      socialAccount,
+    const socialAccount = SocialAccountEntity.create(
+      existingUser.id,
       profile.provider,
       profile.providerId
     );
@@ -123,24 +122,13 @@ export class AuthService {
     user.profileImage = profile.profileImage;
     const savedUser = await this.repositoryProvider.UserRepository.save(user);
 
-    const socialAccount = SocialAccountEntity.create(savedUser.id);
-    this.setProviderIdOnSocialAccount(
-      socialAccount,
+    const socialAccount = SocialAccountEntity.create(
+      savedUser.id,
       profile.provider,
       profile.providerId
     );
     await this.repositoryProvider.SocialAccountRepository.save(socialAccount);
     return savedUser;
-  }
-
-  private setProviderIdOnSocialAccount(
-    socialAccount: SocialAccountEntity,
-    provider: SocialProvider,
-    providerId: string
-  ): void {
-    if (provider === 'naver') socialAccount.naverId = providerId;
-    if (provider === 'kakao') socialAccount.kakaoId = providerId;
-    if (provider === 'google') socialAccount.googleId = providerId;
   }
 
   async requestPhoneOtp(phone: string) {
@@ -219,43 +207,29 @@ export class AuthService {
       });
 
     if (existingUserWithPhone && existingUserWithPhone.id !== userId) {
-      // 병합: 임시 유저의 소셜 계정을 기존 유저로 이전
-      const tempSocialAccount =
+      // 임시 유저의 소셜 계정들을 기존 유저로 이전
+      const tempSocialAccounts =
         await this.repositoryProvider.SocialAccountRepository.findByUserId(
           userId
         );
-      const existingSocialAccount =
-        await this.repositoryProvider.SocialAccountRepository.findByUserId(
-          existingUserWithPhone.id
-        );
 
-      if (tempSocialAccount && existingSocialAccount) {
-        // provider ID 병합 (기존 값이 없는 경우에만 설정)
-        if (tempSocialAccount.naverId && !existingSocialAccount.naverId) {
-          existingSocialAccount.naverId = tempSocialAccount.naverId;
-        }
-        if (tempSocialAccount.kakaoId && !existingSocialAccount.kakaoId) {
-          existingSocialAccount.kakaoId = tempSocialAccount.kakaoId;
-        }
-        if (tempSocialAccount.googleId && !existingSocialAccount.googleId) {
-          existingSocialAccount.googleId = tempSocialAccount.googleId;
-        }
-        await this.repositoryProvider.SocialAccountRepository.save(
-          existingSocialAccount
-        );
-      } else if (tempSocialAccount && !existingSocialAccount) {
-        // 기존 유저에 SocialAccount가 없는 경우 (이메일 회원가입 유저) - 임시 유저의 소셜 계정을 기존 유저로 이전
-        tempSocialAccount.userId = existingUserWithPhone.id;
-        await this.repositoryProvider.SocialAccountRepository.save(
-          tempSocialAccount
-        );
-      }
+      for (const tempSa of tempSocialAccounts) {
+        const existing =
+          await this.repositoryProvider.SocialAccountRepository.findByUserIdAndProvider(
+            existingUserWithPhone.id,
+            tempSa.provider
+          );
 
-      // 임시 유저의 소셜 계정 soft delete (이전된 경우 제외)
-      if (tempSocialAccount && existingSocialAccount) {
-        await this.repositoryProvider.SocialAccountRepository.softRemove(
-          tempSocialAccount
-        );
+        if (existing) {
+          // 기존 유저에 같은 provider가 이미 있으면 임시 것 soft delete
+          await this.repositoryProvider.SocialAccountRepository.softRemove(
+            tempSa
+          );
+        } else {
+          // 없으면 userId만 변경하여 이전
+          tempSa.userId = existingUserWithPhone.id;
+          await this.repositoryProvider.SocialAccountRepository.save(tempSa);
+        }
       }
 
       // 임시 유저 soft delete

@@ -1,4 +1,6 @@
-export type SocialProvider = 'naver' | 'kakao' | 'google';
+import { SocialProvider } from '../../domain/social-account.entity';
+
+export { SocialProvider };
 
 export interface SocialUserProfile {
   providerId: string;

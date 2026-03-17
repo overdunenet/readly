@@ -3,7 +3,7 @@ import {
   DeleteDateColumn,
   EntityManager,
   Entity,
-  OneToOne,
+  OneToMany,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
@@ -31,8 +31,8 @@ export class UserEntity extends BaseEntity {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @OneToOne(() => SocialAccountEntity, socialAccount => socialAccount.user)
-  socialAccount: SocialAccountEntity;
+  @OneToMany(() => SocialAccountEntity, socialAccount => socialAccount.user)
+  socialAccounts: SocialAccountEntity[];
 
   async setPassword(plainPassword: string): Promise<void> {
     this.password = await bcrypt.hash(plainPassword, 10);

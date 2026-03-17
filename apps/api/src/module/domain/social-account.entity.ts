@@ -1,41 +1,47 @@
 import {
   Entity,
   Column,
-  OneToOne,
+  ManyToOne,
   JoinColumn,
   DeleteDateColumn,
   EntityManager,
+  IsNull,
 } from 'typeorm';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { UserEntity } from './user.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
+export type SocialProvider = 'naver' | 'kakao' | 'google';
+
 @Entity('social_accounts')
 export class SocialAccountEntity extends BaseEntity {
   @Column({ type: 'uuid' })
   userId: string;
 
-  @OneToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity, user => user.socialAccounts)
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
-  @Column({ type: 'varchar', nullable: true })
-  naverId: string | null;
+  @Column({ type: 'varchar' })
+  provider: SocialProvider;
 
-  @Column({ type: 'varchar', nullable: true })
-  kakaoId: string | null;
-
-  @Column({ type: 'varchar', nullable: true })
-  googleId: string | null;
+  @Column({ type: 'varchar', name: 'account_id' })
+  accountId: string;
 
   @DeleteDateColumn()
   deletedAt: Date;
 
-  static create(userId: string): SocialAccountEntity {
-    const socialAccount = new SocialAccountEntity();
-    socialAccount.userId = userId;
-    return socialAccount;
+  static create(
+    userId: string,
+    provider: SocialProvider,
+    accountId: string
+  ): SocialAccountEntity {
+    const sa = new SocialAccountEntity();
+    sa.userId = userId;
+    sa.provider = provider;
+    sa.accountId = accountId;
+    return sa;
   }
 }
 
@@ -45,20 +51,25 @@ export const getSocialAccountRepository = (
   getEntityManager(source)
     .getRepository(SocialAccountEntity)
     .extend({
-      async findByUserId(userId: string): Promise<SocialAccountEntity | null> {
-        return this.findOneBy({ userId });
+      async findByUserId(userId: string): Promise<SocialAccountEntity[]> {
+        return this.find({ where: { userId, deletedAt: IsNull() } });
       },
 
       async findByProvider(
-        provider: 'naver' | 'kakao' | 'google',
-        providerId: string
+        provider: SocialProvider,
+        accountId: string
       ): Promise<SocialAccountEntity | null> {
-        if (provider === 'naver')
-          return this.findOneBy({ naverId: providerId });
-        if (provider === 'kakao')
-          return this.findOneBy({ kakaoId: providerId });
-        if (provider === 'google')
-          return this.findOneBy({ googleId: providerId });
-        return null;
+        return this.findOne({
+          where: { provider, accountId, deletedAt: IsNull() },
+        });
+      },
+
+      async findByUserIdAndProvider(
+        userId: string,
+        provider: SocialProvider
+      ): Promise<SocialAccountEntity | null> {
+        return this.findOne({
+          where: { userId, provider, deletedAt: IsNull() },
+        });
       },
     });
