@@ -61,7 +61,7 @@ function NaverCallbackPage() {
             accessToken: result.accessToken,
             user: result.user,
           });
-          navigate({ to: '/' });
+          navigate({ to: result.user.phoneVerified ? '/' : '/phone-verify' });
         })
         .catch((err: unknown) => {
           const message =

@@ -36,12 +36,14 @@ function OtpConfirmPage() {
       setError(null);
       const result = await verifyOtp.mutateAsync({ phone, code });
       if (result.success) {
+        // 새 accessToken 저장
+        useAuthStore.getState().setAccessToken(result.accessToken);
+        // user의 phoneVerified를 true로 업데이트
         const currentUser = useAuthStore.getState().user;
         if (currentUser) {
-          useAuthStore.getState().setUser({
-            ...currentUser,
-            phone: result.phone,
-          });
+          useAuthStore
+            .getState()
+            .setUser({ ...currentUser, phoneVerified: true });
         }
         navigate({ to: '/' });
       }

@@ -49,7 +49,7 @@ function PhoneVerifyPage() {
   };
 
   return (
-    <SubLayout title="전화번호 인증" onBack={() => navigate({ to: '/' })}>
+    <SubLayout title="전화번호 인증">
       <PageContainer>
         <Description>본인확인을 위해 전화번호를 인증해주세요.</Description>
 

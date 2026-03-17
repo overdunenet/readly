@@ -14,6 +14,15 @@ export const Route = createFileRoute('/_auth')({
         },
       });
     }
+
+    const isPhoneVerifyPage = location.pathname.startsWith('/phone-verify');
+
+    if (!user.phoneVerified && !isPhoneVerifyPage) {
+      throw redirect({ to: '/phone-verify' });
+    }
+    if (user.phoneVerified && isPhoneVerifyPage) {
+      throw redirect({ to: '/' });
+    }
   },
   component: AuthLayout,
 });

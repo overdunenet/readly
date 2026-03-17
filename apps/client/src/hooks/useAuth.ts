@@ -40,8 +40,8 @@ export const useAuth = () => {
       user: response.user,
     });
 
-    // role이 없으므로 기본적으로 홈으로 리다이렉트
-    navigate({ to: '/' });
+    // phoneVerified 여부에 따라 리다이렉트
+    navigate({ to: response.user.phoneVerified ? '/' : '/phone-verify' });
 
     return response;
   };
