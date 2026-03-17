@@ -84,3 +84,4 @@ SocialLoginStrategy (인터페이스)
 ## 관련 Codebase Context
 
 - [user-entity.md](./user-entity.md): UserEntity 구조 (password nullable 변경)
+- [otp-phone-verification.md](./otp-phone-verification.md): OTP 전화번호 인증 (AuthService 공유)
