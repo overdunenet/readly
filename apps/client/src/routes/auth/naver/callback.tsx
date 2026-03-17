@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import tw from 'tailwind-styled-components';
 
 import { useAuthStore } from '../../../stores/auth';
@@ -16,8 +16,12 @@ function NaverCallbackPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const socialLoginMutation = trpc.auth.socialLogin.useMutation();
+  const isProcessed = useRef(false);
 
   useEffect(() => {
+    if (isProcessed.current) return;
+    isProcessed.current = true;
+
     const handleCallback = () => {
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
