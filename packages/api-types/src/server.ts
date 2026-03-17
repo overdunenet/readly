@@ -26,6 +26,24 @@ const appRouter = t.router({
         })
       )
       .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
+    phoneOtpRequest: publicProcedure
+      .input(z.object({ phone: z.string() }))
+      .output(
+        z.object({
+          expiresAt: z.string(),
+          resendAvailableAt: z.string(),
+        })
+      )
+      .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
+    phoneOtpVerify: publicProcedure
+      .input(z.object({ phone: z.string(), code: z.string().length(6) }))
+      .output(
+        z.object({
+          success: z.boolean(),
+          phone: z.string(),
+        })
+      )
+      .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
   }),
   follow: t.router({
     follow: publicProcedure

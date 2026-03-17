@@ -138,4 +138,66 @@ export class AuthService {
     if (provider === 'kakao') socialAccount.kakaoId = providerId;
     if (provider === 'google') socialAccount.googleId = providerId;
   }
+
+  async requestPhoneOtp(phone: string) {
+    const existingOtp =
+      await this.repositoryProvider.OtpRepository.findByPhone(phone);
+
+    if (
+      existingOtp &&
+      existingOtp.createdAt.getTime() + 60 * 1000 > Date.now()
+    ) {
+      throw new Error('1분 후 재전송 가능합니다');
+    }
+
+    await this.repositoryProvider.OtpRepository.deleteByPhone(phone);
+
+    const code = '123456'; // TODO: 프로덕션에서 랜덤 6자리로 변경
+    const expiresAt = new Date(Date.now() + 3 * 60 * 1000);
+
+    const otp = this.repositoryProvider.OtpRepository.create({
+      phone,
+      code,
+      expiresAt,
+    });
+    await this.repositoryProvider.OtpRepository.save(otp);
+
+    // TODO: SMS 발송 (SmsService.send(phone, code))
+
+    return {
+      expiresAt: otp.expiresAt.toISOString(),
+      resendAvailableAt: new Date(Date.now() + 60 * 1000).toISOString(),
+    };
+  }
+
+  async verifyPhoneOtp(userId: string, phone: string, code: string) {
+    const otp = await this.repositoryProvider.OtpRepository.findByPhone(phone);
+
+    if (!otp) {
+      throw new Error('인증번호를 먼저 요청해주세요');
+    }
+
+    if (otp.expiresAt < new Date()) {
+      throw new Error('인증번호가 만료되었습니다');
+    }
+
+    if (otp.code !== code) {
+      throw new Error('인증번호가 일치하지 않습니다');
+    }
+
+    await this.repositoryProvider.OtpRepository.deleteByPhone(phone);
+
+    const user = await this.repositoryProvider.UserRepository.findOneBy({
+      id: userId,
+    });
+
+    if (!user) {
+      throw new Error('사용자를 찾을 수 없습니다');
+    }
+
+    user.phone = phone;
+    await this.repositoryProvider.UserRepository.save(user);
+
+    return { success: true, phone };
+  }
 }
