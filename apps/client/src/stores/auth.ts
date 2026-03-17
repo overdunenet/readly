@@ -6,6 +6,7 @@ export interface User {
   email: string;
   nickname: string;
   profileImage: string | null;
+  phone: string | null;
 }
 
 interface AuthState {
