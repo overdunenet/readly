@@ -27,7 +27,7 @@ const appRouter = t.router({
       )
       .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
     phoneOtpRequest: publicProcedure
-      .input(z.object({ phone: z.string() }))
+      .input(z.object({ phone: z.string().regex(/^01[0-9]{8,9}$/) }))
       .output(
         z.object({
           expiresAt: z.string(),
@@ -36,7 +36,12 @@ const appRouter = t.router({
       )
       .mutation(async () => 'PLACEHOLDER_DO_NOT_REMOVE' as any),
     phoneOtpVerify: publicProcedure
-      .input(z.object({ phone: z.string(), code: z.string().length(6) }))
+      .input(
+        z.object({
+          phone: z.string().regex(/^01[0-9]{8,9}$/),
+          code: z.string().length(6),
+        })
+      )
       .output(
         z.object({
           success: z.boolean(),

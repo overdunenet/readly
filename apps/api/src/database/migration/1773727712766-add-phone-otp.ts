@@ -1,6 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddPhoneOtp1773727712766 implements MigrationInterface {
+  name = 'AddPhoneOtp1773727712766';
+
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `ALTER TABLE "users" ADD COLUMN "phone" VARCHAR NULL`

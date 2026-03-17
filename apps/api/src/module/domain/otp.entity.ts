@@ -13,6 +13,9 @@ export class OtpEntity extends BaseEntity {
 
   @Column({ type: 'timestamp' })
   expiresAt: Date;
+
+  @Column({ type: 'int', default: 0 })
+  attempts: number;
 }
 
 export const getOtpRepository = (source?: TransactionService | EntityManager) =>

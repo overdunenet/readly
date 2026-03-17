@@ -47,7 +47,7 @@ export class AuthRouter extends BaseTrpcRouter {
   }
 
   @Mutation({
-    input: z.object({ phone: z.string() }),
+    input: z.object({ phone: z.string().regex(/^01[0-9]{8,9}$/) }),
     output: z.object({
       expiresAt: z.string(),
       resendAvailableAt: z.string(),
@@ -59,7 +59,10 @@ export class AuthRouter extends BaseTrpcRouter {
   }
 
   @Mutation({
-    input: z.object({ phone: z.string(), code: z.string().length(6) }),
+    input: z.object({
+      phone: z.string().regex(/^01[0-9]{8,9}$/),
+      code: z.string().length(6),
+    }),
     output: z.object({
       success: z.boolean(),
       phone: z.string(),

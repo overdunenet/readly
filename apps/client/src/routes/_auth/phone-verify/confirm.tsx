@@ -27,7 +27,7 @@ function OtpConfirmPage() {
 
   useEffect(() => {
     timer.reset(expiresAt, resendAvailableAt);
-  }, [expiresAt, resendAvailableAt]);
+  }, [expiresAt, resendAvailableAt, timer.reset]);
 
   const formattedPhone = phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
 

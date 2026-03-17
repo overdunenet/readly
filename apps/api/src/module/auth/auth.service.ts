@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { UserService } from '../user/user.service';
@@ -152,7 +153,10 @@ export class AuthService {
 
     await this.repositoryProvider.OtpRepository.deleteByPhone(phone);
 
-    const code = '123456'; // TODO: 프로덕션에서 랜덤 6자리로 변경
+    const isDev =
+      process.env.NODE_ENV === 'development' ||
+      process.env.NODE_ENV === 'localdev';
+    const code = isDev ? '123456' : crypto.randomInt(100000, 999999).toString();
     const expiresAt = new Date(Date.now() + 3 * 60 * 1000);
 
     const otp = this.repositoryProvider.OtpRepository.create({
@@ -182,6 +186,16 @@ export class AuthService {
     }
 
     if (otp.code !== code) {
+      otp.attempts += 1;
+      await this.repositoryProvider.OtpRepository.save(otp);
+
+      if (otp.attempts >= 5) {
+        await this.repositoryProvider.OtpRepository.deleteByPhone(phone);
+        throw new Error(
+          '인증 시도 횟수를 초과했습니다. 인증번호를 다시 요청해주세요'
+        );
+      }
+
       throw new Error('인증번호가 일치하지 않습니다');
     }
 
