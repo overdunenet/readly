@@ -25,6 +25,7 @@ estimated_tokens: ~150
 | [follow-module.md](./follow-module.md)             | Follow 모듈 (팔로우/언팔로우, BE+FE)   |
 | [post-editor.md](./post-editor.md)                | CKEditor 5 포스트 에디터 UI 및 스타일링 |
 | [post-manage-ui.md](./post-manage-ui.md)          | 에디터 포스트 목록 관리 UI (필터, 검색, 액션) |
+| [otp-phone-verification.md](./otp-phone-verification.md) | OTP 전화번호 인증 모듈 (Entity, SMS 인증 플로우) |
 
 ## 빠른 참조
 
@@ -37,9 +38,10 @@ estimated_tokens: ~150
 
 ### Entity 요약
 
-**UserEntity**: email, password(bcrypt, nullable), nickname, profileImage, socialAccount
+**UserEntity**: email, password(bcrypt, nullable), nickname, profileImage, phone(nullable), socialAccount
 **SocialAccountEntity**: userId, naverId, kakaoId, googleId (OneToOne with User)
 **PostEntity**: freeContent, paidContent, accessLevel, status, price
+**OtpEntity**: phone(unique), code(6자리), expiresAt, attempts (otp_verifications)
 **FollowEntity**: followerId, followeeId (Unique Constraint)
 
 ### 포트
