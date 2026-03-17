@@ -16,7 +16,7 @@ estimated_tokens: ~150
 | ------------------------------------------------------ | ----------------------------------- |
 | [architecture-overview.md](./architecture-overview.md) | 시스템 구성, 포트, 기술 스택        |
 | [user-entity.md](./user-entity.md)                     | UserEntity 구조, JWT 인증, SocialAccount 관계, 프론트엔드 인증 스토어 |
-| [social-login.md](./social-login.md)                   | 소셜 로그인 모듈 (Strategy 패턴, OAuth, SocialAccountEntity) |
+| [social-login.md](./social-login.md)                   | 소셜 로그인 모듈 (Strategy 패턴, 네이버+카카오 OAuth, 공통 콜백 UI) |
 | [post-entity.md](./post-entity.md)                     | PostEntity 구조, 권한 검증 로직, PostService |
 | [seo-implementation.md](./seo-implementation.md)       | 빌드 타임 프리렌더링 구현 (Vite Plugin, Helmet) |
 | [test-infrastructure.md](./test-infrastructure.md) | 통합 테스트 인프라 (트랜잭션 rollback 격리, CI 워크플로우) |
@@ -32,7 +32,7 @@ estimated_tokens: ~150
 
 - **Backend**: tRPC + NestJS + TypeORM + PostgreSQL
 - **Frontend**: React + Vite + TailwindCSS
-- **인증**: JWT (Access 15분, Refresh 7일) + 소셜 로그인 (네이버 OAuth)
+- **인증**: JWT (Access 15분, Refresh 7일) + 소셜 로그인 (네이버, 카카오 OAuth)
 - **SEO**: 빌드 타임 프리렌더링 (Vite Plugin + Puppeteer + react-helmet-async)
 
 ### Entity 요약
