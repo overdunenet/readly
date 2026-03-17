@@ -1,9 +1,10 @@
-import { Entity, Column, EntityManager } from 'typeorm';
+import { Entity, Column, EntityManager, Unique } from 'typeorm';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
 @Entity('otp_verifications')
+@Unique('UQ_otp_phone', ['phone'])
 export class OtpEntity extends BaseEntity {
   @Column({ type: 'varchar' })
   phone: string;

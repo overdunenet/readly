@@ -25,12 +25,12 @@ export class AddPhoneOtp1773727712766 implements MigrationInterface {
     `);
 
     await queryRunner.query(
-      `CREATE INDEX "IDX_otp_phone" ON "otp_verifications" ("phone")`
+      `CREATE UNIQUE INDEX "UQ_otp_phone" ON "otp_verifications" ("phone")`
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP INDEX "IDX_otp_phone"`);
+    await queryRunner.query(`DROP INDEX "UQ_otp_phone"`);
     await queryRunner.query(`DROP TABLE "otp_verifications"`);
     await queryRunner.query(`DROP INDEX "UQ_users_phone_active"`);
     await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "phone"`);
