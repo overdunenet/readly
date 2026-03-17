@@ -22,7 +22,7 @@ export interface LoginResponse {
     email: string;
     nickname: string;
     profileImage: string | null;
-    phone: string | null;
+    phoneVerified: boolean;
   };
 }
 
@@ -86,7 +86,13 @@ export class UserService {
 
     return {
       ...tokens,
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+        profileImage: user.profileImage,
+        phoneVerified: !!user.phone,
+      },
     };
   }
 
@@ -113,7 +119,7 @@ export class UserService {
           email: user.email,
           nickname: user.nickname,
           profileImage: user.profileImage,
-          phone: user.phone,
+          phoneVerified: !!user.phone,
         },
       };
     } catch (error) {
@@ -126,7 +132,7 @@ export class UserService {
     email: string;
     nickname: string;
     profileImage: string | null;
-    phone: string | null;
+    phoneVerified: boolean;
   }> {
     const user = await this.repositoryProvider.UserRepository.findOne({
       where: { id: userId, deletedAt: null },
@@ -141,7 +147,7 @@ export class UserService {
       email: user.email,
       nickname: user.nickname,
       profileImage: user.profileImage,
-      phone: user.phone,
+      phoneVerified: !!user.phone,
     };
   }
 
@@ -152,6 +158,7 @@ export class UserService {
       sub: user.id,
       email: user.email,
       type: 'user',
+      phoneVerified: !!user.phone,
     };
 
     const [accessToken, refreshToken] = await Promise.all([

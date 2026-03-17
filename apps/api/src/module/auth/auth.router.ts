@@ -19,7 +19,7 @@ const socialLoginOutputSchema = z.object({
     email: z.string(),
     nickname: z.string(),
     profileImage: z.string().nullable(),
-    phone: z.string().nullable(),
+    phoneVerified: z.boolean(),
   }),
 });
 
@@ -67,6 +67,7 @@ export class AuthRouter extends BaseTrpcRouter {
     output: z.object({
       success: z.boolean(),
       phone: z.string(),
+      accessToken: z.string(),
     }),
   })
   @UseMiddlewares(UserAuthMiddleware)
@@ -74,9 +75,17 @@ export class AuthRouter extends BaseTrpcRouter {
     @Input() input: { phone: string; code: string },
     @Ctx() ctx: UserAuthorizedContext
   ) {
-    return this.microserviceClient.send('auth.phoneOtpVerify', {
+    const result = await this.microserviceClient.send('auth.phoneOtpVerify', {
       ...input,
       userId: ctx.user.sub,
     });
+
+    this.cookieService.setRefreshTokenCookie(ctx.res, result.refreshToken);
+
+    return {
+      success: result.success,
+      phone: result.phone,
+      accessToken: result.accessToken,
+    };
   }
 }

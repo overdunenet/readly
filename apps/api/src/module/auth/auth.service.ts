@@ -19,7 +19,7 @@ export interface SocialLoginResponse {
     email: string;
     nickname: string;
     profileImage: string | null;
-    phone: string | null;
+    phoneVerified: boolean;
   };
 }
 
@@ -49,7 +49,7 @@ export class AuthService {
         email: user.email,
         nickname: user.nickname,
         profileImage: user.profileImage,
-        phone: user.phone,
+        phoneVerified: !!user.phone,
       },
     };
   }
@@ -214,6 +214,12 @@ export class AuthService {
     user.phone = phone;
     await this.repositoryProvider.UserRepository.save(user);
 
-    return { success: true, phone };
+    const tokens = await this.userService.generateTokens(user);
+    return {
+      success: true,
+      phone,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    };
   }
 }

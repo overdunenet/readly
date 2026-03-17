@@ -17,6 +17,7 @@ export interface UserAuthPayload {
   sub: string;
   email: string;
   type: 'user';
+  phoneVerified: boolean;
 }
 
 @Injectable()
