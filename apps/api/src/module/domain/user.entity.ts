@@ -25,6 +25,9 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   profileImage: string | null;
 
+  @Column({ type: 'varchar', nullable: true })
+  phone: string | null;
+
   @DeleteDateColumn()
   deletedAt: Date;
 
