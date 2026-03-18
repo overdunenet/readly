@@ -1,12 +1,13 @@
 ---
 name: codebase-user-entity
-description: UserEntity 구조, 비밀번호 관리, JWT 인증 설정, SocialAccount 관계, 프론트엔드 User 타입 및 인증 스토어
-keywords: [UserEntity, JWT, bcrypt, 인증, 로그인, AccessToken, RefreshToken, Zustand, useAuthStore, UserMenu, SocialAccount]
-estimated_tokens: ~500
+description: UserEntity 구조, 비밀번호 관리, JWT 인증 설정, SocialAccount 관계, phoneVerified 파생 필드, 프론트엔드 인증 스토어
+keywords: [UserEntity, JWT, bcrypt, 인증, 로그인, AccessToken, RefreshToken, Zustand, useAuthStore, UserMenu, SocialAccount, phoneVerified]
+estimated_tokens: ~550
 related_contexts:
   - business-overview
   - codebase-architecture-overview
   - codebase-social-login
+  - codebase-otp-phone-verification
 ---
 
 # UserEntity 및 인증
@@ -95,6 +96,7 @@ export const getUserRepository = (source?) =>
 | `refreshToken(token)`  | 토큰 갱신         |
 | `getMe(userId)`        | 내 정보 조회      |
 | `generateTokens(user)` | JWT 토큰 쌍 생성 (AuthService에서도 재사용) |
+| `mapUserToInfo(user)` | UserEntity → 응답 객체 변환 (`phoneVerified: !!user.phone`) |
 
 ### 로그인 흐름
 
@@ -211,7 +213,13 @@ auth: {
 ### User 타입 정의
 
 `stores/auth.ts`에서 `User` 인터페이스를 export하여 프론트엔드 전역에서 재사용합니다.
-필드: id, email, nickname, profileImage (API 응답과 동일한 구조)
+필드: id, email, nickname, profileImage, phoneVerified (API 응답과 동일한 구조)
+
+### phoneVerified 파생 필드
+
+- DB에 별도 컬럼 없음 — `!!user.phone`으로 서버에서 파생하여 응답에 포함
+- `user.login`, `user.me`, `user.refreshToken`, `auth.socialLogin` 모든 응답에 포함
+- 프론트엔드에서 라우트 가드 및 콜백 분기에 사용
 
 ### useAuthStore (Zustand)
 
@@ -219,6 +227,8 @@ auth: {
 | ----------- | ---- |
 | user | 현재 로그인 사용자 (User \| null) |
 | accessToken | JWT 액세스 토큰 |
+| setUser(user) | 사용자 정보만 업데이트 |
+| setAccessToken(token) | 토큰만 업데이트 |
 | login(data) | 사용자 정보 + 토큰 설정 |
 | logout() | 상태 초기화 |
 
