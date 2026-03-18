@@ -1,10 +1,30 @@
-import { Catch, RpcExceptionFilter, ArgumentsHost } from '@nestjs/common';
+import {
+  Catch,
+  RpcExceptionFilter,
+  ArgumentsHost,
+  Logger,
+  HttpException,
+} from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 
 @Catch()
 export class MicroserviceExceptionFilter implements RpcExceptionFilter<any> {
-  catch(exception: any, host: ArgumentsHost): Observable<any> {
-    // Return as Observable to maintain consistency with microservice pattern
+  private readonly logger = new Logger(MicroserviceExceptionFilter.name);
+
+  catch(exception: any, _host: ArgumentsHost): Observable<any> {
+    if (exception instanceof HttpException) {
+      const status = exception.getStatus();
+      if (status >= 500) {
+        this.logger.error(exception.message, exception.stack);
+      } else {
+        this.logger.warn(`${status}: ${exception.message}`);
+      }
+    } else if (exception instanceof Error) {
+      this.logger.error(exception.message, exception.stack);
+    } else {
+      this.logger.error(`Unknown error: ${String(exception)}`);
+    }
+
     return throwError(() => exception);
   }
 }
