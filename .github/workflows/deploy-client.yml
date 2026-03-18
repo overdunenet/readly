@@ -58,19 +58,27 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Build client
-        run: yarn workspace @readly/client build
-
-      - name: Get commit hash
-        id: hash
-        run: echo "short=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Fetch environment variables from Secrets Manager
+        run: |
+          aws secretsmanager get-secret-value \
+            --secret-id readly/prod \
+            --query SecretString \
+            --output text \
+          | jq -r 'to_entries[] | "\(.key)=\(.value)"' > apps/client/.env
+
+      - name: Build client
+        run: yarn workspace @readly/client build
+
+      - name: Get commit hash
+        id: hash
+        run: echo "short=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
       - name: Upload build to S3
         run: aws s3 sync apps/client/dist/ s3://${{ env.S3_BUCKET }}/build/${{ steps.hash.outputs.short }}/ --delete
