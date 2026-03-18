@@ -26,6 +26,7 @@ estimated_tokens: ~150
 | [post-editor.md](./post-editor.md)                | CKEditor 5 포스트 에디터 UI 및 스타일링 |
 | [post-manage-ui.md](./post-manage-ui.md)          | 에디터 포스트 목록 관리 UI (필터, 검색, 액션) |
 | [otp-phone-verification.md](./otp-phone-verification.md) | OTP 전화번호 인증 모듈 (Entity, SMS 인증 플로우) |
+| [ci-workflows.md](./ci-workflows.md) | GitHub Actions CI/CD 워크플로우 (코드 리뷰, Context 생성, 테스트) |
 
 ## 빠른 참조
 
