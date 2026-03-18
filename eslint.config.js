@@ -95,6 +95,7 @@ export default [
       'coverage/',
       '*.min.js',
       'eslint.config.js', // 설정 파일 자체는 무시
+      'packages/api-types/src/server.ts', // tRPC AppRouter 타입 정의 (자동 생성)
     ],
   },
 ];
