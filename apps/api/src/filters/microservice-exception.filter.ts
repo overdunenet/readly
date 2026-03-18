@@ -9,9 +9,9 @@ import { Observable, throwError } from 'rxjs';
 
 @Catch()
 export class MicroserviceExceptionFilter implements RpcExceptionFilter<any> {
-  private readonly logger = new Logger('Microservice');
+  private readonly logger = new Logger(MicroserviceExceptionFilter.name);
 
-  catch(exception: any, host: ArgumentsHost): Observable<any> {
+  catch(exception: any, _host: ArgumentsHost): Observable<any> {
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
       if (status >= 500) {
