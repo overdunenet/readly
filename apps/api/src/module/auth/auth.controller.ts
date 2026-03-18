@@ -11,8 +11,8 @@ export class AuthController {
     private readonly transactionService: TransactionService
   ) {}
 
-  @Transactional
   @MessagePattern('auth.socialLogin')
+  @Transactional
   async socialLogin(
     @Payload() data: { provider: string; code: string; state: string }
   ): Promise<SocialLoginResponse> {
@@ -28,8 +28,8 @@ export class AuthController {
     return this.authService.requestPhoneOtp(data.phone);
   }
 
-  @Transactional
   @MessagePattern('auth.phoneOtpVerify')
+  @Transactional
   async phoneOtpVerify(
     @Payload() data: { userId: string; phone: string; code: string }
   ) {
