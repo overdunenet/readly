@@ -26,6 +26,7 @@ estimated_tokens: ~150
 | [post-editor.md](./post-editor.md)                | CKEditor 5 포스트 에디터 UI 및 스타일링 |
 | [post-manage-ui.md](./post-manage-ui.md)          | 에디터 포스트 목록 관리 UI (필터, 검색, 액션) |
 | [otp-phone-verification.md](./otp-phone-verification.md) | OTP 전화번호 인증 모듈 (Entity, SMS 인증 플로우) |
+| [error-handling.md](./error-handling.md)             | API 에러 처리 (MicroserviceExceptionFilter, 로깅 전략) |
 
 ## 빠른 참조
 
