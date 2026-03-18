@@ -1,0 +1,141 @@
+name: Deploy Client
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/client/**'
+      - 'packages/**'
+
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Deploy action'
+        required: true
+        type: choice
+        options:
+          - deploy-production
+      build_hash:
+        description: 'Build commit hash (비워두면 최신 빌드 사용)'
+        required: false
+        type: string
+
+env:
+  AWS_REGION: ap-northeast-2
+  S3_BUCKET: readly-client-s3-bucket
+
+jobs:
+  build-and-deploy-dev:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get yarn cache directory
+        id: yarn-cache
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ steps.yarn-cache.outputs.dir }}
+            node_modules
+            apps/*/node_modules
+            packages/*/node_modules
+          key: yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build client
+        run: yarn workspace @readly/client build
+
+      - name: Get commit hash
+        id: hash
+        run: echo "short=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload build to S3
+        run: aws s3 sync apps/client/dist/ s3://${{ env.S3_BUCKET }}/build/${{ steps.hash.outputs.short }}/ --delete
+
+      - name: Update LATEST marker
+        run: echo "${{ steps.hash.outputs.short }}" | aws s3 cp - s3://${{ env.S3_BUCKET }}/build/LATEST
+
+      - name: Deploy to develop
+        run: |
+          aws s3 rm s3://${{ env.S3_BUCKET }}/develop/ --recursive
+          aws s3 cp s3://${{ env.S3_BUCKET }}/build/${{ steps.hash.outputs.short }}/ s3://${{ env.S3_BUCKET }}/develop/ --recursive
+
+      - name: Invalidate CloudFront cache (dev)
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ vars.CF_DISTRIBUTION_DEV }} \
+            --paths "/*"
+
+      - name: Summary
+        run: |
+          echo "### Deploy Client (Dev) :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build**: \`${{ steps.hash.outputs.short }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **S3**: \`s3://${{ env.S3_BUCKET }}/develop/\`" >> $GITHUB_STEP_SUMMARY
+
+  deploy-production:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy-production'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Resolve build hash
+        id: resolve
+        run: |
+          if [ -n "${{ github.event.inputs.build_hash }}" ]; then
+            echo "hash=${{ github.event.inputs.build_hash }}" >> $GITHUB_OUTPUT
+          else
+            LATEST=$(aws s3 cp s3://${{ env.S3_BUCKET }}/build/LATEST -)
+            echo "hash=$LATEST" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Verify build exists
+        run: |
+          if ! aws s3 ls s3://${{ env.S3_BUCKET }}/build/${{ steps.resolve.outputs.hash }}/ 2>&1 | grep -q .; then
+            echo "::error::Build '${{ steps.resolve.outputs.hash }}' not found in S3"
+            exit 1
+          fi
+
+      - name: Deploy to production
+        run: |
+          aws s3 rm s3://${{ env.S3_BUCKET }}/production/ --recursive
+          aws s3 cp s3://${{ env.S3_BUCKET }}/build/${{ steps.resolve.outputs.hash }}/ s3://${{ env.S3_BUCKET }}/production/ --recursive
+
+      - name: Invalidate CloudFront cache (production)
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ vars.CF_DISTRIBUTION_PROD }} \
+            --paths "/*"
+
+      - name: Summary
+        run: |
+          echo "### Deploy Client (Production) :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build**: \`${{ steps.resolve.outputs.hash }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **S3**: \`s3://${{ env.S3_BUCKET }}/production/\`" >> $GITHUB_STEP_SUMMARY
