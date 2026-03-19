@@ -29,7 +29,8 @@ export const Route = createFileRoute('/_auth')({
         }
         break;
       case 'INACTIVE':
-        throw redirect({ to: '/login' });
+        useAuthStore.getState().logout();
+        throw redirect({ to: '/inactive' });
       case 'ACTIVE':
         if (
           pathname.startsWith('/phone-verify') ||

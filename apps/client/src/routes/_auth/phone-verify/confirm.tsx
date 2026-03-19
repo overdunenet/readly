@@ -8,6 +8,7 @@ import { useAuthStore } from '../../../stores/auth';
 
 import { useOtpTimer } from '@/hooks/useOtpTimer';
 import { trpc } from '@/shared';
+import { getRedirectPathByStatus } from '../../../shared/utils/auth';
 
 const searchSchema = z.object({
   phone: z.string(),
@@ -42,16 +43,7 @@ function OtpConfirmPage() {
           // 서버에서 반환한 user 객체로 갱신
           useAuthStore.getState().setUser(result.user);
 
-          // status 기반 다음 목적지
-          switch (result.user.status) {
-            case 'PENDING_PROFILE':
-              navigate({ to: '/onboarding/nickname' });
-              break;
-            case 'ACTIVE':
-            default:
-              navigate({ to: '/' });
-              break;
-          }
+          navigate({ to: getRedirectPathByStatus(result.user.status) });
         }
       })
       .catch((err: unknown) => {

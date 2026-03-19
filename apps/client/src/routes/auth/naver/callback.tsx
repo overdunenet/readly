@@ -5,6 +5,7 @@ import { useAuthStore } from '../../../stores/auth';
 
 import { SocialLoginCallback } from '@/components/auth/SocialLoginCallback';
 import { trpc } from '@/shared';
+import { getRedirectPathByStatus } from '../../../shared/utils/auth';
 
 export const Route = createFileRoute('/auth/naver/callback')({
   component: NaverCallbackPage,
@@ -62,20 +63,7 @@ function NaverCallbackPage() {
             user: result.user,
           });
 
-          switch (result.user.status) {
-            case 'PENDING_PHONE':
-              navigate({ to: '/phone-verify' });
-              break;
-            case 'PENDING_PROFILE':
-              navigate({ to: '/onboarding/nickname' });
-              break;
-            case 'ACTIVE':
-              navigate({ to: '/' });
-              break;
-            case 'INACTIVE':
-              navigate({ to: '/login' });
-              break;
-          }
+          navigate({ to: getRedirectPathByStatus(result.user.status) });
         })
         .catch((err: unknown) => {
           const message =
