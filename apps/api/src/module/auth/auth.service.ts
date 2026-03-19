@@ -118,7 +118,6 @@ export class AuthService {
     const user = new UserEntity();
     user.email = email;
     user.nickname = nickname;
-    user.password = null;
     user.profileImage = profile.profileImage;
     const savedUser = await this.repositoryProvider.UserRepository.save(user);
 
