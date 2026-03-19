@@ -1,12 +1,18 @@
 import { create } from 'zustand';
 
+export type UserStatus =
+  | 'PENDING_PHONE'
+  | 'PENDING_PROFILE'
+  | 'ACTIVE'
+  | 'INACTIVE';
+
 // API 응답과 동일한 User 타입 정의
 export interface User {
   id: string;
   email: string;
   nickname: string;
   profileImage: string | null;
-  phoneVerified: boolean;
+  status: UserStatus;
 }
 
 interface AuthState {

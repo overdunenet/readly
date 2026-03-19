@@ -61,7 +61,21 @@ function KakaoCallbackPage() {
             accessToken: result.accessToken,
             user: result.user,
           });
-          navigate({ to: result.user.phoneVerified ? '/' : '/phone-verify' });
+
+          switch (result.user.status) {
+            case 'PENDING_PHONE':
+              navigate({ to: '/phone-verify' });
+              break;
+            case 'PENDING_PROFILE':
+              navigate({ to: '/onboarding/nickname' });
+              break;
+            case 'ACTIVE':
+              navigate({ to: '/' });
+              break;
+            case 'INACTIVE':
+              navigate({ to: '/login' });
+              break;
+          }
         })
         .catch((err: unknown) => {
           const message =

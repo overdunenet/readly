@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserEntity } from '../domain/user.entity';
+import { UserEntity, UserStatus } from '../domain/user.entity';
 import { ConfigProvider } from '@src/config';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 
@@ -16,7 +16,7 @@ export interface LoginResponse {
     email: string;
     nickname: string;
     profileImage: string | null;
-    phoneVerified: boolean;
+    status: UserStatus;
   };
 }
 
@@ -50,7 +50,7 @@ export class UserService {
           email: user.email,
           nickname: user.nickname,
           profileImage: user.profileImage,
-          phoneVerified: !!user.phone,
+          status: user.status,
         },
       };
     } catch (error) {
@@ -63,7 +63,7 @@ export class UserService {
     email: string;
     nickname: string;
     profileImage: string | null;
-    phoneVerified: boolean;
+    status: UserStatus;
   }> {
     const user = await this.repositoryProvider.UserRepository.findOne({
       where: { id: userId, deletedAt: null },
@@ -78,7 +78,43 @@ export class UserService {
       email: user.email,
       nickname: user.nickname,
       profileImage: user.profileImage,
-      phoneVerified: !!user.phone,
+      status: user.status,
+    };
+  }
+
+  async updateProfile(
+    userId: string,
+    nickname: string
+  ): Promise<{
+    id: string;
+    email: string;
+    nickname: string;
+    profileImage: string | null;
+    status: UserStatus;
+  }> {
+    const user = await this.repositoryProvider.UserRepository.findOne({
+      where: { id: userId, deletedAt: null },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.nickname = nickname;
+
+    // PENDING_PROFILE 상태에서 프로필 설정 시 ACTIVE로 전환
+    if (user.status === UserStatus.PENDING_PROFILE) {
+      user.status = UserStatus.ACTIVE;
+    }
+
+    await this.repositoryProvider.UserRepository.save(user);
+
+    return {
+      id: user.id,
+      email: user.email,
+      nickname: user.nickname,
+      profileImage: user.profileImage,
+      status: user.status,
     };
   }
 

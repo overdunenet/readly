@@ -5,6 +5,7 @@ import {
   UserAuthMiddleware,
   UserAuthorizedContext,
 } from '../user/user.auth.middleware';
+import { UserStatus } from '../domain/user.entity';
 
 const socialLoginInputSchema = z.object({
   provider: z.enum(['naver', 'kakao', 'google']),
@@ -19,7 +20,7 @@ const socialLoginOutputSchema = z.object({
     email: z.string(),
     nickname: z.string(),
     profileImage: z.string().nullable(),
-    phoneVerified: z.boolean(),
+    status: z.nativeEnum(UserStatus),
   }),
 });
 
@@ -65,6 +66,13 @@ export class AuthRouter extends BaseTrpcRouter {
       success: z.boolean(),
       phone: z.string(),
       accessToken: z.string(),
+      user: z.object({
+        id: z.string(),
+        email: z.string(),
+        nickname: z.string(),
+        profileImage: z.string().nullable(),
+        status: z.nativeEnum(UserStatus),
+      }),
     }),
   })
   @UseMiddlewares(UserAuthMiddleware)

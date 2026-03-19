@@ -1,10 +1,18 @@
 import { z } from 'zod';
-import { Query, Router, Mutation, UseMiddlewares, Ctx } from 'nestjs-trpc-v2';
+import {
+  Query,
+  Router,
+  Mutation,
+  UseMiddlewares,
+  Ctx,
+  Input,
+} from 'nestjs-trpc-v2';
 import { BaseTrpcRouter } from '../trpc/baseTrpcRouter';
 import {
   UserAuthMiddleware,
   UserAuthorizedContext,
 } from './user.auth.middleware';
+import { UserStatus } from '../domain/user.entity';
 
 const loginResponseSchema = z.object({
   accessToken: z.string(),
@@ -13,7 +21,7 @@ const loginResponseSchema = z.object({
     email: z.string().email(),
     nickname: z.string(),
     profileImage: z.string().nullable(),
-    phoneVerified: z.boolean(),
+    status: z.nativeEnum(UserStatus),
   }),
 });
 
@@ -22,7 +30,7 @@ const userSchema = z.object({
   email: z.string().email(),
   nickname: z.string(),
   profileImage: z.string().nullable(),
-  phoneVerified: z.boolean(),
+  status: z.nativeEnum(UserStatus),
 });
 
 @Router({ alias: 'user' })
@@ -78,6 +86,27 @@ export class UserRouter extends BaseTrpcRouter {
   async me(@Ctx() ctx: UserAuthorizedContext) {
     const result = await this.microserviceClient.send('user.getMe', {
       userId: ctx.user.sub,
+    });
+    return result;
+  }
+
+  /**
+   * 사용자 프로필 업데이트 (닉네임 설정)
+   */
+  @UseMiddlewares(UserAuthMiddleware)
+  @Mutation({
+    input: z.object({
+      nickname: z.string().min(1).max(30),
+    }),
+    output: userSchema,
+  })
+  async updateProfile(
+    @Ctx() ctx: UserAuthorizedContext,
+    @Input() input: { nickname: string }
+  ) {
+    const result = await this.microserviceClient.send('user.updateProfile', {
+      userId: ctx.user.sub,
+      nickname: input.nickname,
     });
     return result;
   }

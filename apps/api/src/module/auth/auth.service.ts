@@ -6,7 +6,7 @@ import { UserService } from '../user/user.service';
 import { KakaoStrategy } from './strategies/kakao.strategy';
 import { NaverStrategy } from './strategies/naver.strategy';
 import { SocialUserProfile } from './strategies/social-login.strategy';
-import { UserEntity } from '../domain/user.entity';
+import { UserEntity, UserStatus } from '../domain/user.entity';
 import {
   SocialAccountEntity,
   SocialProvider,
@@ -20,7 +20,7 @@ export interface SocialLoginResponse {
     email: string;
     nickname: string;
     profileImage: string | null;
-    phoneVerified: boolean;
+    status: UserStatus;
   };
 }
 
@@ -50,7 +50,7 @@ export class AuthService {
         email: user.email,
         nickname: user.nickname,
         profileImage: user.profileImage,
-        phoneVerified: !!user.phone,
+        status: user.status,
       },
     };
   }
@@ -216,6 +216,13 @@ export class AuthService {
         phone,
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
+        user: {
+          id: existingUserWithPhone.id,
+          email: existingUserWithPhone.email,
+          nickname: existingUserWithPhone.nickname,
+          profileImage: existingUserWithPhone.profileImage,
+          status: existingUserWithPhone.status,
+        },
       };
     }
 
@@ -223,6 +230,7 @@ export class AuthService {
       where: { id: userId },
     });
     user.phone = phone;
+    user.status = UserStatus.PENDING_PROFILE;
     await this.repositoryProvider.UserRepository.save(user);
 
     const tokens = await this.userService.generateTokens(user);
@@ -231,6 +239,13 @@ export class AuthService {
       phone,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+        profileImage: user.profileImage,
+        status: user.status,
+      },
     };
   }
 
