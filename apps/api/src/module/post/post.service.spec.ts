@@ -16,15 +16,14 @@ describe('PostService - getAccessiblePosts', () => {
   let entityManager: EntityManager;
 
   const createTestUser = async (
-    overrides?: Partial<{ email: string; nickname: string; password: string }>
+    overrides?: Partial<{ email: string; nickname: string }>
   ) => {
-    const input = {
-      email: `test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@example.com`,
-      password: 'password123',
-      nickname: `user-${Math.random().toString(36).slice(2, 7)}`,
-      ...overrides,
-    };
-    const user = await UserEntity.register(input);
+    const user = new UserEntity();
+    user.email =
+      overrides?.email ??
+      `test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@example.com`;
+    user.nickname =
+      overrides?.nickname ?? `user-${Math.random().toString(36).slice(2, 7)}`;
     return testingRepositoryProvider.UserRepository.save(user);
   };
 
