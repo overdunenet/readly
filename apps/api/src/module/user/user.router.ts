@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { nicknameSchema } from '../shared/schemas';
 import {
   Query,
   Router,
@@ -96,7 +97,7 @@ export class UserRouter extends BaseTrpcRouter {
   @UseMiddlewares(UserAuthMiddleware)
   @Mutation({
     input: z.object({
-      nickname: z.string().min(1).max(30),
+      nickname: nicknameSchema,
     }),
     output: userSchema,
   })

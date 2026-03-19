@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import tw from 'tailwind-styled-components';
 import { z } from 'zod';
+import { nicknameSchema as nicknameFieldSchema } from '../../../shared/schemas';
 
 import SubLayout from '../../../components/layout/SubLayout';
 import { useAuthStore } from '../../../stores/auth';
@@ -11,10 +12,7 @@ import { useAuthStore } from '../../../stores/auth';
 import { trpc } from '@/shared';
 
 const nicknameSchema = z.object({
-  nickname: z
-    .string()
-    .min(1, '닉네임을 입력해주세요')
-    .max(30, '닉네임은 30자 이내로 입력해주세요'),
+  nickname: nicknameFieldSchema,
 });
 
 type NicknameForm = z.infer<typeof nicknameSchema>;
@@ -33,7 +31,7 @@ function NicknameSettingPage() {
     resolver: zodResolver(nicknameSchema),
     mode: 'onChange',
     defaultValues: {
-      nickname: user?.nickname || '',
+      nickname: user?.nickname?.startsWith('user_') ? '' : user?.nickname || '',
     },
   });
 
