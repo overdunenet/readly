@@ -13,7 +13,7 @@ export const Transactional = (
 ) => {
   const originalMethod = descriptor.value;
 
-  descriptor.value = new Proxy(originalMethod, {
+  const proxy = new Proxy(originalMethod, {
     apply: function (target, thisArg, args) {
       if (
         thisArg.transactionService &&
@@ -29,6 +29,18 @@ export const Transactional = (
       }
     },
   });
+
+  // 원본 함수의 메타데이터를 Proxy로 복사 (데코레이터 순서에 관계없이 동작하도록 방어)
+  const metadataKeys = Reflect.getMetadataKeys(originalMethod);
+  metadataKeys.forEach(key => {
+    Reflect.defineMetadata(
+      key,
+      Reflect.getMetadata(key, originalMethod),
+      proxy
+    );
+  });
+
+  descriptor.value = proxy;
 
   return descriptor;
 };
