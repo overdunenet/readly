@@ -7,17 +7,12 @@ import { JwtService } from '@nestjs/jwt';
 import { UserEntity, UserStatus } from '../domain/user.entity';
 import { ConfigProvider } from '@src/config';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
+import { UserResponse } from './user.types';
 
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
-  user: {
-    id: string;
-    email: string;
-    nickname: string;
-    profileImage: string | null;
-    status: UserStatus;
-  };
+  user: UserResponse;
 }
 
 @Injectable()
@@ -58,13 +53,7 @@ export class UserService {
     }
   }
 
-  async getMe(userId: string): Promise<{
-    id: string;
-    email: string;
-    nickname: string;
-    profileImage: string | null;
-    status: UserStatus;
-  }> {
+  async getMe(userId: string): Promise<UserEntity> {
     const user = await this.repositoryProvider.UserRepository.findOne({
       where: { id: userId, deletedAt: null },
     });
@@ -73,25 +62,10 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    return {
-      id: user.id,
-      email: user.email,
-      nickname: user.nickname,
-      profileImage: user.profileImage,
-      status: user.status,
-    };
+    return user;
   }
 
-  async updateProfile(
-    userId: string,
-    nickname: string
-  ): Promise<{
-    id: string;
-    email: string;
-    nickname: string;
-    profileImage: string | null;
-    status: UserStatus;
-  }> {
+  async updateProfile(userId: string, nickname: string): Promise<UserEntity> {
     const user = await this.repositoryProvider.UserRepository.findOne({
       where: { id: userId, deletedAt: null },
     });
@@ -109,13 +83,7 @@ export class UserService {
 
     await this.repositoryProvider.UserRepository.save(user);
 
-    return {
-      id: user.id,
-      email: user.email,
-      nickname: user.nickname,
-      profileImage: user.profileImage,
-      status: user.status,
-    };
+    return user;
   }
 
   async generateTokens(

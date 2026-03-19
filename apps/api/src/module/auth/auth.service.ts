@@ -11,17 +11,12 @@ import {
   SocialAccountEntity,
   SocialProvider,
 } from '../domain/social-account.entity';
+import { UserResponse } from '../user/user.types';
 
 export interface SocialLoginResponse {
   accessToken: string;
   refreshToken: string;
-  user: {
-    id: string;
-    email: string;
-    nickname: string;
-    profileImage: string | null;
-    status: UserStatus;
-  };
+  user: UserResponse;
 }
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UserService, LoginResponse } from './user.service';
-import { UserStatus } from '../domain/user.entity';
+import { UserResponse } from './user.types';
 
 @Controller()
 export class UserController {
@@ -13,18 +13,31 @@ export class UserController {
   }
 
   @MessagePattern('user.getMe')
-  async getMe(@Payload() data: { userId: string }): Promise<{
-    id: string;
-    email: string;
-    nickname: string;
-    profileImage: string | null;
-    status: UserStatus;
-  }> {
-    return this.userService.getMe(data.userId);
+  async getMe(@Payload() data: { userId: string }): Promise<UserResponse> {
+    const user = await this.userService.getMe(data.userId);
+    return {
+      id: user.id,
+      email: user.email,
+      nickname: user.nickname,
+      profileImage: user.profileImage,
+      status: user.status,
+    };
   }
 
   @MessagePattern('user.updateProfile')
-  async updateProfile(@Payload() data: { userId: string; nickname: string }) {
-    return this.userService.updateProfile(data.userId, data.nickname);
+  async updateProfile(
+    @Payload() data: { userId: string; nickname: string }
+  ): Promise<UserResponse> {
+    const user = await this.userService.updateProfile(
+      data.userId,
+      data.nickname
+    );
+    return {
+      id: user.id,
+      email: user.email,
+      nickname: user.nickname,
+      profileImage: user.profileImage,
+      status: user.status,
+    };
   }
 }
