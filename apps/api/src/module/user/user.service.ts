@@ -104,7 +104,7 @@ export class UserService {
 
     // PENDING_PROFILE 상태에서 프로필 설정 시 ACTIVE로 전환
     if (user.status === UserStatus.PENDING_PROFILE) {
-      user.status = UserStatus.ACTIVE;
+      user.updateStatus(UserStatus.ACTIVE);
     }
 
     await this.repositoryProvider.UserRepository.save(user);

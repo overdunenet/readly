@@ -43,6 +43,26 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => SocialAccountEntity, socialAccount => socialAccount.user)
   socialAccounts: SocialAccountEntity[];
+
+  private static readonly ALLOWED_TRANSITIONS: Record<
+    UserStatus,
+    UserStatus[]
+  > = {
+    [UserStatus.PENDING_PHONE]: [UserStatus.PENDING_PROFILE],
+    [UserStatus.PENDING_PROFILE]: [UserStatus.ACTIVE],
+    [UserStatus.ACTIVE]: [UserStatus.INACTIVE],
+    [UserStatus.INACTIVE]: [],
+  };
+
+  updateStatus(nextStatus: UserStatus): void {
+    const allowed = UserEntity.ALLOWED_TRANSITIONS[this.status];
+    if (!allowed.includes(nextStatus)) {
+      throw new Error(
+        `${this.status} 상태에서 ${nextStatus} 상태로 변경할 수 없습니다`
+      );
+    }
+    this.status = nextStatus;
+  }
 }
 
 export const getUserRepository = (

@@ -230,7 +230,7 @@ export class AuthService {
       where: { id: userId },
     });
     user.phone = phone;
-    user.status = UserStatus.PENDING_PROFILE;
+    user.updateStatus(UserStatus.PENDING_PROFILE);
     await this.repositoryProvider.UserRepository.save(user);
 
     const tokens = await this.userService.generateTokens(user);
