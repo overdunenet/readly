@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import tw from 'tailwind-styled-components';
 import { z } from 'zod';
-import { nicknameSchema as nicknameFieldSchema } from '../../../shared/schemas';
 
 import SubLayout from '../../../components/layout/SubLayout';
+import { nicknameSchema as nicknameFieldSchema } from '../../../shared/schemas';
 import { useAuthStore } from '../../../stores/auth';
 
 import { trpc } from '@/shared';

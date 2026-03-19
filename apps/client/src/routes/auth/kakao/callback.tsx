@@ -1,11 +1,11 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 
+import { getRedirectPathByStatus } from '../../../shared/utils/auth';
 import { useAuthStore } from '../../../stores/auth';
 
 import { SocialLoginCallback } from '@/components/auth/SocialLoginCallback';
 import { trpc } from '@/shared';
-import { getRedirectPathByStatus } from '../../../shared/utils/auth';
 
 export const Route = createFileRoute('/auth/kakao/callback')({
   component: KakaoCallbackPage,

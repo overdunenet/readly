@@ -4,11 +4,11 @@ import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
 import SubLayout from '../../../components/layout/SubLayout';
+import { getRedirectPathByStatus } from '../../../shared/utils/auth';
 import { useAuthStore } from '../../../stores/auth';
 
 import { useOtpTimer } from '@/hooks/useOtpTimer';
 import { trpc } from '@/shared';
-import { getRedirectPathByStatus } from '../../../shared/utils/auth';
 
 const searchSchema = z.object({
   phone: z.string(),
