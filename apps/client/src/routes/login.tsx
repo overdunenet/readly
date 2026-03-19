@@ -10,6 +10,7 @@ function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleNaverLogin = () => {
+    setError(null);
     const clientId = import.meta.env.VITE_NAVER_CLIENT_ID;
     if (!clientId) {
       setError('네이버 로그인을 시작할 수 없습니다');
@@ -27,6 +28,7 @@ function LoginPage() {
   };
 
   const handleKakaoLogin = () => {
+    setError(null);
     const clientId = import.meta.env.VITE_KAKAO_CLIENT_ID;
     if (!clientId) {
       setError('카카오 로그인을 시작할 수 없습니다');
