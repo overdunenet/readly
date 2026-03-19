@@ -30,14 +30,14 @@ related_contexts:
 | apps/api/config/default.js | 프로덕션 설정 | auth.naver, auth.kakao (callbackUrl 상수) |
 | apps/api/config/localdev.js | 로컬 개발 설정 | auth.naver, auth.kakao (localhost callbackUrl) |
 | packages/api-types/src/server.ts | API 타입 정의 | auth.socialLogin mutation 스키마 |
-| apps/client/src/routes/login.tsx | 로그인 페이지 | handleNaverLogin(), handleKakaoLogin() (OAuth URL 생성 + state 저장) |
+| apps/client/src/routes/login.tsx | 로그인 페이지 | handleNaverLogin(), handleKakaoLogin() (이전 에러 초기화 + OAuth URL 생성 + state 저장) |
 | apps/client/src/components/auth/SocialLoginCallback.tsx | 공통 콜백 UI 컴포넌트 | SocialLoginCallback (로딩/에러 상태 표시, Provider별 브랜드 색상) |
 | apps/client/src/routes/auth/naver/callback.tsx | 네이버 콜백 처리 | NaverCallbackPage (code/state 검증 → API 호출 → 로그인) |
 | apps/client/src/routes/auth/kakao/callback.tsx | 카카오 콜백 처리 | KakaoCallbackPage (code/state 검증 → API 호출 → 로그인) |
 
 ## 핵심 흐름
 
-1. **프론트엔드**: 사용자가 "네이버/카카오로 로그인" 클릭 → `crypto.randomUUID()` state 생성 + `sessionStorage` 저장 → OAuth 페이지로 리다이렉트
+1. **프론트엔드**: 사용자가 "네이버/카카오로 로그인" 클릭 → 이전 에러 상태 초기화(`setError(null)`) → `crypto.randomUUID()` state 생성 + `sessionStorage` 저장 → OAuth 페이지로 리다이렉트
 2. **콜백 처리**: `/auth/{provider}/callback`에서 code/state 수신 → sessionStorage의 state 검증 (React StrictMode 이중실행 방지를 위해 `useRef` 사용) → `auth.socialLogin` tRPC mutation 호출
 3. **AuthRouter**: refreshToken은 httpOnly 쿠키로 설정, accessToken + user 정보 응답
 4. **AuthService.socialLogin()**: `getStrategy(provider)`로 적절한 Strategy 선택 → 프로필 조회 → `findOrCreateUser()`로 사용자 매칭/생성 → `UserService.generateTokens()`로 JWT 발급
@@ -86,5 +86,5 @@ SocialLoginStrategy (인터페이스)
 
 ## 관련 Codebase Context
 
-- [user-entity.md](./user-entity.md): UserEntity 구조 (password nullable 변경)
+- [user-entity.md](./user-entity.md): UserEntity 구조 (password 컬럼 제거됨)
 - [otp-phone-verification.md](./otp-phone-verification.md): OTP 전화번호 인증 (AuthService 공유)
