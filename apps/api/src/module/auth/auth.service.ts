@@ -146,7 +146,9 @@ export class AuthService {
 
     const isDev =
       process.env.NODE_ENV === 'development' ||
-      process.env.NODE_ENV === 'localdev';
+      process.env.NODE_ENV === 'localdev' ||
+      // TODO: 문자인증 연동이후 처리 제거
+      1;
     const code = isDev ? '123456' : crypto.randomInt(100000, 999999).toString();
     const expiresAt = new Date(Date.now() + 3 * 60 * 1000);
 
