@@ -233,30 +233,6 @@ const appRouter = t.router({
     }))).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   }),
   user: t.router({
-    register: publicProcedure.input(z.object({
-      email: z.string().email(),
-      password: z.string().min(8, '비밀번호는 최소 8자 이상이어야 합니다'),
-      nickname: z.string().min(2).max(20),
-    })).output(z.object({
-      user: z.object({
-        id: z.string(),
-        email: z.string().email(),
-        nickname: z.string(),
-      }),
-    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-    login: publicProcedure.input(z.object({
-      email: z.string().email(),
-      password: z.string(),
-    })).output(z.object({
-      accessToken: z.string(),
-      user: z.object({
-        id: z.string(),
-        email: z.string().email(),
-        nickname: z.string(),
-        profileImage: z.string().nullable(),
-        phoneVerified: z.boolean(),
-      }),
-    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     refreshToken: publicProcedure.input(z.object({})).output(z.object({
       accessToken: z.string(),
       user: z.object({
