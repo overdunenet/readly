@@ -1,18 +1,12 @@
 import {
   Injectable,
   UnauthorizedException,
-  ConflictException,
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from '../domain/user.entity';
 import { ConfigProvider } from '@src/config';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
-
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
 
 export interface LoginResponse {
   accessToken: string;
@@ -26,75 +20,12 @@ export interface LoginResponse {
   };
 }
 
-export interface RegisterInput {
-  email: string;
-  password: string;
-  nickname: string;
-}
-
-export interface RegisterResponse {
-  user: {
-    id: string;
-    email: string;
-    nickname: string;
-  };
-}
-
 @Injectable()
 export class UserService {
   constructor(
     private readonly repositoryProvider: RepositoryProvider,
     private readonly jwtService: JwtService
   ) {}
-
-  async register(input: RegisterInput): Promise<RegisterResponse> {
-    // 이메일 중복 체크
-    const exists = await this.repositoryProvider.UserRepository.exist({
-      where: { email: input.email },
-    });
-
-    if (exists) {
-      throw new ConflictException('Email already exists');
-    }
-
-    // 새 사용자 생성
-    const user = await this.repositoryProvider.UserRepository.register(input);
-
-    return {
-      user,
-    };
-  }
-
-  async login(credentials: LoginCredentials): Promise<LoginResponse> {
-    const { email, password } = credentials;
-
-    // 이메일로 사용자 조회
-    const user = await this.repositoryProvider.UserRepository.findOneByOrFail({
-      email,
-    }).catch(() => {
-      throw new UnauthorizedException('Invalid email or password');
-    });
-
-    // 비밀번호 검증
-    const isPasswordValid = await user.checkPassword(password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-
-    // 토큰 생성
-    const tokens = await this.generateTokens(user);
-
-    return {
-      ...tokens,
-      user: {
-        id: user.id,
-        email: user.email,
-        nickname: user.nickname,
-        profileImage: user.profileImage,
-        phoneVerified: !!user.phone,
-      },
-    };
-  }
 
   async refreshToken(refreshToken: string): Promise<LoginResponse> {
     try {
