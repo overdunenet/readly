@@ -3428,7 +3428,6 @@ __metadata:
     "@nestjs/testing": ^11.1.2
     "@nestjs/typeorm": ^11.0.0
     "@trpc/server": ^11.1.3
-    "@types/bcrypt": ^5.0.2
     "@types/config": ^3.3.5
     "@types/cookie-parser": ^1.4.7
     "@types/express": ^4.17.13
@@ -3439,7 +3438,6 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^8.33.1
     "@typescript-eslint/parser": ^8.24.0
     axios: ^1.13.6
-    bcrypt: ^6.0.0
     class-transformer: ^0.5.1
     class-validator: ^0.14.0
     config: ^3.3.12
@@ -4737,15 +4735,6 @@ __metadata:
   dependencies:
     "@babel/types": ^7.20.7
   checksum: 2a2e5ad29c34a8b776162b0fe81c9ccb6459b2b46bf230f756ba0276a0258fcae1cbcfdccbb93a1e8b1df44f4939784ee8a1a269f95afe0c78b24b9cb6d50dd1
-  languageName: node
-  linkType: hard
-
-"@types/bcrypt@npm:^5.0.2":
-  version: 5.0.2
-  resolution: "@types/bcrypt@npm:5.0.2"
-  dependencies:
-    "@types/node": "*"
-  checksum: b1f97532ffe6079cb57a464f28b5b37a30bc9620f43469e1f27ab9c979c8a114be5b667e7b115a5556fd5be463b65968da9bb32573c6faf74fecf6e565d8974b
   languageName: node
   linkType: hard
 
@@ -6136,17 +6125,6 @@ __metadata:
   version: 5.1.0
   resolution: "basic-ftp@npm:5.1.0"
   checksum: 883670e2bb7bc89e542f2f4aa649dab142b4ac852195dea3e08f892e4ac2d0772bde1f689fd8cf6e7113535bb0b61d9ed6351334f5e5b56a17cac64a9b58d351
-  languageName: node
-  linkType: hard
-
-"bcrypt@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "bcrypt@npm:6.0.0"
-  dependencies:
-    node-addon-api: ^8.3.0
-    node-gyp: latest
-    node-gyp-build: ^4.8.4
-  checksum: 004e1920fab7a7183b15467257f3010b45f5db73ad91448fb108c9070dfe56c4e35cb16e12987dd88b9e03b997f08a6070494802cb5fd2a90e1664279ab8aef5
   languageName: node
   linkType: hard
 
@@ -12027,32 +12005,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-addon-api@npm:^8.3.0":
-  version: 8.4.0
-  resolution: "node-addon-api@npm:8.4.0"
-  dependencies:
-    node-gyp: latest
-  checksum: 66835ac32920532ec9617444e81818810ca861adace4d0c7bf58616cd7ffe4956bdc88b7f67f65e757229b56783e0c33ce1469bfae4b10fd3dfcca58f65325be
-  languageName: node
-  linkType: hard
-
 "node-emoji@npm:1.11.0":
   version: 1.11.0
   resolution: "node-emoji@npm:1.11.0"
   dependencies:
     lodash: ^4.17.21
   checksum: e8c856c04a1645062112a72e59a98b203505ed5111ff84a3a5f40611afa229b578c7d50f1e6a7f17aa62baeea4a640d2e2f61f63afc05423aa267af10977fb2b
-  languageName: node
-  linkType: hard
-
-"node-gyp-build@npm:^4.8.4":
-  version: 4.8.4
-  resolution: "node-gyp-build@npm:4.8.4"
-  bin:
-    node-gyp-build: bin.js
-    node-gyp-build-optional: optional.js
-    node-gyp-build-test: build-test.js
-  checksum: 8b81ca8ffd5fa257ad8d067896d07908a36918bc84fb04647af09d92f58310def2d2b8614d8606d129d9cd9b48890a5d2bec18abe7fcff54818f72bedd3a7d74
   languageName: node
   linkType: hard
 
