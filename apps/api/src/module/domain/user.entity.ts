@@ -20,7 +20,7 @@ export enum UserStatus {
 
 @Index('IDX_users_nickname_unique', ['nickname'], {
   unique: true,
-  where: '"deletedAt" IS NULL',
+  where: '"deleted_at" IS NULL',
 })
 @Entity('users')
 export class UserEntity extends BaseEntity {
