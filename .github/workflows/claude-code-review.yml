@@ -31,4 +31,4 @@ jobs:
           plugins: 'code-review@claude-code-plugins'
           use_sticky_comment: true
           claude_args: '--model opus --allowedTools "Bash(git:*),Bash(ls:*),Bash(mkdir:*),Read,Write,Edit,Glob,Grep"'
-          prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
+          prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }} --comment'
