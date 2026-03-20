@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 
+import { getRedirectPathByStatus } from '../../../shared/utils/auth';
 import { useAuthStore } from '../../../stores/auth';
 
 import { SocialLoginCallback } from '@/components/auth/SocialLoginCallback';
@@ -61,7 +62,8 @@ function KakaoCallbackPage() {
             accessToken: result.accessToken,
             user: result.user,
           });
-          navigate({ to: result.user.phoneVerified ? '/' : '/phone-verify' });
+
+          navigate({ to: getRedirectPathByStatus(result.user.status) });
         })
         .catch((err: unknown) => {
           const message =

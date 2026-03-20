@@ -4,6 +4,7 @@ import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
 import SubLayout from '../../../components/layout/SubLayout';
+import { getRedirectPathByStatus } from '../../../shared/utils/auth';
 import { useAuthStore } from '../../../stores/auth';
 
 import { useOtpTimer } from '@/hooks/useOtpTimer';
@@ -31,35 +32,35 @@ function OtpConfirmPage() {
 
   const formattedPhone = phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
 
-  const handleVerify = async () => {
-    try {
-      setError(null);
-      const result = await verifyOtp.mutateAsync({ phone, code });
-      if (result.success) {
-        // 새 accessToken 저장
-        useAuthStore.getState().setAccessToken(result.accessToken);
-        // user의 phoneVerified를 true로 업데이트
-        const currentUser = useAuthStore.getState().user;
-        if (currentUser) {
-          useAuthStore
-            .getState()
-            .setUser({ ...currentUser, phoneVerified: true });
+  const handleVerify = () => {
+    setError(null);
+    verifyOtp
+      .mutateAsync({ phone, code })
+      .then((result) => {
+        if (result.success) {
+          // 새 accessToken 저장
+          useAuthStore.getState().setAccessToken(result.accessToken);
+          // 서버에서 반환한 user 객체로 갱신
+          useAuthStore.getState().setUser(result.user);
+
+          navigate({ to: getRedirectPathByStatus(result.user.status) });
         }
-        navigate({ to: '/' });
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '인증에 실패했습니다');
-    }
+      })
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : '인증에 실패했습니다');
+      });
   };
 
-  const handleResend = async () => {
-    try {
-      setError(null);
-      const result = await requestOtp.mutateAsync({ phone });
-      timer.reset(result.expiresAt, result.resendAvailableAt);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '재전송에 실패했습니다');
-    }
+  const handleResend = () => {
+    setError(null);
+    requestOtp
+      .mutateAsync({ phone })
+      .then((result) => {
+        timer.reset(result.expiresAt, result.resendAvailableAt);
+      })
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : '재전송에 실패했습니다');
+      });
   };
 
   return (

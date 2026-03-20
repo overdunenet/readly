@@ -143,6 +143,44 @@ src/
 └── shared/              # 유틸리티
 ```
 
+## Service Layer 반환 규칙
+
+> **Service는 Entity 객체를 그대로 반환한다. 응답 형태 변환은 Controller/Router에서 수행한다.**
+
+| 레이어                | 반환              | 설명                               |
+| --------------------- | ----------------- | ---------------------------------- |
+| **Service**           | Entity 객체       | 비즈니스 로직 결과를 Entity로 반환 |
+| **Controller/Router** | DTO/Response 객체 | Entity → 응답 형태로 변환          |
+
+<examples>
+<example type="good">
+```typescript
+// ✅ Service: Entity 그대로 반환
+async getMe(userId: string): Promise<UserEntity> {
+  const user = await this.repository.findOne({ where: { id: userId } });
+  return user;
+}
+
+// ✅ Controller: Entity → Response 변환
+async getMe(data: { userId: string }): Promise<UserResponse> {
+const user = await this.userService.getMe(data.userId);
+return { id: user.id, email: user.email, nickname: user.nickname };
+}
+
+````
+</example>
+<example type="bad">
+```typescript
+// ❌ Service에서 응답 형태 변환
+async getMe(userId: string): Promise<{ id: string; email: string }> {
+  const user = await this.repository.findOne({ where: { id: userId } });
+  return { id: user.id, email: user.email };
+}
+````
+
+</example>
+</examples>
+
 </rules>
 
 ---
@@ -153,7 +191,7 @@ src/
 
 ### try-catch vs then-catch
 
-> **Promise 처리 시 `then-catch` 패턴을 사용한다.**
+> **비동기(Promise) 처리 시 `then-catch` 패턴을 사용한다. 동기 함수의 에러 처리는 `try-catch`를 유지한다.**
 
 <examples>
 <example type="bad">

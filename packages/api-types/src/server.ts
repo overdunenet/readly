@@ -17,7 +17,7 @@ const appRouter = t.router({
         email: z.string(),
         nickname: z.string(),
         profileImage: z.string().nullable(),
-        phoneVerified: z.boolean(),
+        status: z.enum(['PENDING_PHONE', 'PENDING_PROFILE', 'ACTIVE', 'INACTIVE']),
       }),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     phoneOtpRequest: publicProcedure.input(z.object({ phone: z.string().regex(/^01[0-9]{8,9}$/) })).output(z.object({
@@ -31,6 +31,13 @@ const appRouter = t.router({
       success: z.boolean(),
       phone: z.string(),
       accessToken: z.string(),
+      user: z.object({
+        id: z.string(),
+        email: z.string(),
+        nickname: z.string(),
+        profileImage: z.string().nullable(),
+        status: z.enum(['PENDING_PHONE', 'PENDING_PROFILE', 'ACTIVE', 'INACTIVE']),
+      }),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   }),
   follow: t.router({
@@ -240,7 +247,7 @@ const appRouter = t.router({
         email: z.string().email(),
         nickname: z.string(),
         profileImage: z.string().nullable(),
-        phoneVerified: z.boolean(),
+        status: z.enum(['PENDING_PHONE', 'PENDING_PROFILE', 'ACTIVE', 'INACTIVE']),
       }),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     logout: publicProcedure.input(z.object({})).output(z.boolean()).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
@@ -249,8 +256,17 @@ const appRouter = t.router({
       email: z.string().email(),
       nickname: z.string(),
       profileImage: z.string().nullable(),
-      phoneVerified: z.boolean(),
-    })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+      status: z.enum(['PENDING_PHONE', 'PENDING_PROFILE', 'ACTIVE', 'INACTIVE']),
+    })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    updateProfile: publicProcedure.input(z.object({
+      nickname: z.string().min(1).max(30),
+    })).output(z.object({
+      id: z.string(),
+      email: z.string().email(),
+      nickname: z.string(),
+      profileImage: z.string().nullable(),
+      status: z.enum(['PENDING_PHONE', 'PENDING_PROFILE', 'ACTIVE', 'INACTIVE']),
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   })
 });
 export type AppRouter = typeof appRouter;

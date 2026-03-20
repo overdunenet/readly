@@ -1,6 +1,6 @@
 ---
 name: Backend
-description: NestJS/TypeORM 백엔드 개발 시 사용. 레이어 객체 변환, find vs queryBuilder 선택 기준, BDD 테스트 작성 규칙 제공.
+description: NestJS/TypeORM 백엔드 개발 시 사용. 레이어 객체 변환, find vs queryBuilder 선택 기준, Migration 생성 규칙(반드시 migration:create 사용), BDD 테스트 작성 규칙 제공.
 keywords:
   [
     Backend,
@@ -13,6 +13,8 @@ keywords:
     TypeORM,
     find,
     queryBuilder,
+    migration,
+    마이그레이션,
     test,
     BDD,
     테스트,
@@ -195,45 +197,54 @@ const user = await this.userRepository.findOneBy({ id });
 
 ## Migration 작성 규칙
 
-> **Migration 파일은 반드시 `yarn migration:create` 명령어로 생성한다.**
+> **Migration 파일은 반드시 CLI 명령어로 생성한다. 수동으로 타임스탬프를 지정하여 파일을 만들지 않는다.**
 
-### 파일 생성
+### 파일 생성 (필수)
 
 ```bash
-# API 디렉토리에서 실행
-cd apps/api && npx typeorm migration:create src/database/migration/<message>
+# apps/api 디렉토리에서 실행 (yarn 3.x에서 함수 문법 이슈로 npx 직접 사용)
+cd apps/api && npx typeorm migration:create src/database/migration/<MigrationName>
 ```
 
-- 수동으로 타임스탬프를 지정하여 파일을 만들지 않는다
-- `migration:create`가 생성한 빈 파일에 SQL을 작성한다
+- **절대 수동으로 타임스탬프 파일명을 만들지 않는다** (예: `1774100000000-xxx.ts` 직접 생성 금지)
+- TypeORM CLI가 자동 생성한 타임스탬프 + 클래스명을 그대로 사용한다
+- `migration:create`가 생성한 빈 `up()`/`down()` 메서드에 SQL을 채운다
+- MigrationName은 PascalCase로 작성한다 (예: `AddUserStatus`, `CreatePostsTable`)
 
 ### 작성 패턴
 
 ```typescript
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class tableName1234567890 implements MigrationInterface {
-  name = 'tableName1234567890';
+export class AddUserStatus1773926438602 implements MigrationInterface {
+  name = 'AddUserStatus1773926438602';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // CREATE TABLE, ALTER TABLE, CREATE INDEX 등
-    await queryRunner.query(`CREATE TABLE ...`);
+    // CREATE TYPE → CREATE TABLE → ALTER TABLE → CREATE INDEX 순서
+    await queryRunner.query(`CREATE TYPE "user_status" AS ENUM (...)`);
+    await queryRunner.query(`ALTER TABLE "users" ADD COLUMN ...`);
+    await queryRunner.query(`CREATE INDEX ...`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // up의 역순으로 DROP
-    await queryRunner.query(`DROP TABLE ...`);
+    // up의 역순: DROP INDEX → ALTER TABLE DROP → DROP TYPE
+    await queryRunner.query(`DROP INDEX ...`);
+    await queryRunner.query(`ALTER TABLE "users" DROP COLUMN ...`);
+    await queryRunner.query(`DROP TYPE ...`);
   }
 }
 ```
 
 ### 규칙
 
-- `name` 프로퍼티를 클래스명과 동일하게 설정
-- raw SQL로 작성 (QueryBuilder 사용하지 않음)
-- `up`에서 CREATE → ALTER → INDEX 순서
-- `down`에서 INDEX → ALTER → TABLE 역순 DROP
-- 각 SQL문은 별도 `queryRunner.query()` 호출로 분리
+- `name` 프로퍼티를 클래스명과 동일하게 설정한다
+- raw SQL로 작성한다 (QueryBuilder 사용하지 않음)
+- `up`에서 CREATE TYPE → CREATE TABLE → ALTER TABLE → CREATE INDEX 순서
+- `down`에서 DROP INDEX → ALTER TABLE → DROP TABLE → DROP TYPE 역순
+- 각 SQL문은 별도 `queryRunner.query()` 호출로 분리한다
+- 기존 데이터 마이그레이션(UPDATE)은 DDL 뒤에 배치한다
+- 실행: `yarn workspace @readly/api migration:run`
+- 롤백: `yarn workspace @readly/api migration:revert`
 
 </rules>
 

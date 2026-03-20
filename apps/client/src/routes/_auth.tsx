@@ -15,13 +15,30 @@ export const Route = createFileRoute('/_auth')({
       });
     }
 
-    const isPhoneVerifyPage = location.pathname.startsWith('/phone-verify');
+    const pathname = location.pathname;
 
-    if (!user.phoneVerified && !isPhoneVerifyPage) {
-      throw redirect({ to: '/phone-verify' });
-    }
-    if (user.phoneVerified && isPhoneVerifyPage) {
-      throw redirect({ to: '/' });
+    switch (user.status) {
+      case 'PENDING_PHONE':
+        if (!pathname.startsWith('/phone-verify')) {
+          throw redirect({ to: '/phone-verify' });
+        }
+        break;
+      case 'PENDING_PROFILE':
+        if (!pathname.startsWith('/onboarding')) {
+          throw redirect({ to: '/onboarding/nickname' });
+        }
+        break;
+      case 'INACTIVE':
+        useAuthStore.getState().logout();
+        throw redirect({ to: '/inactive' });
+      case 'ACTIVE':
+        if (
+          pathname.startsWith('/phone-verify') ||
+          pathname.startsWith('/onboarding')
+        ) {
+          throw redirect({ to: '/' });
+        }
+        break;
     }
   },
   component: AuthLayout,
