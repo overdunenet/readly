@@ -1,7 +1,6 @@
-import { create } from 'zustand';
-
-import type { inferRouterOutputs } from '@trpc/server';
 import type { AppRouter } from '@readly/api-types/src/server';
+import type { inferRouterOutputs } from '@trpc/server';
+import { create } from 'zustand';
 
 type RouterOutputs = inferRouterOutputs<AppRouter>;
 type UserFromRouter = RouterOutputs['user']['me'];
