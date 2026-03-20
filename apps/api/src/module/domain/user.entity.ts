@@ -3,6 +3,7 @@ import {
   DeleteDateColumn,
   EntityManager,
   Entity,
+  Index,
   OneToMany,
 } from 'typeorm';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
@@ -17,6 +18,10 @@ export enum UserStatus {
   INACTIVE = 'INACTIVE',
 }
 
+@Index('IDX_users_nickname_unique', ['nickname'], {
+  unique: true,
+  where: '"deletedAt" IS NULL',
+})
 @Entity('users')
 export class UserEntity extends BaseEntity {
   @Column({ unique: true, type: 'varchar' })

@@ -2,6 +2,8 @@ import {
   Injectable,
   UnauthorizedException,
   NotFoundException,
+  ConflictException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity, UserStatus } from '../domain/user.entity';
@@ -72,6 +74,20 @@ export class UserService {
 
     if (!user) {
       throw new NotFoundException('User not found');
+    }
+
+    // 프로필 수정 허용 상태: PENDING_PROFILE (온보딩), ACTIVE (프로필 수정)
+    const allowedStatuses = [UserStatus.PENDING_PROFILE, UserStatus.ACTIVE];
+    if (!allowedStatuses.includes(user.status)) {
+      throw new ForbiddenException('현재 상태에서 프로필을 수정할 수 없습니다');
+    }
+
+    // 닉네임 중복 검증 (@DeleteDateColumn이 삭제된 유저를 자동 제외)
+    const existingUser = await this.repositoryProvider.UserRepository.findOne({
+      where: { nickname },
+    });
+    if (existingUser && existingUser.id !== userId) {
+      throw new ConflictException('이미 사용 중인 닉네임입니다');
     }
 
     user.nickname = nickname;
