@@ -6,6 +6,7 @@ import {
 } from '@test/jest-util';
 import { TestingModule } from '@nestjs/testing';
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   NotFoundException,
@@ -252,6 +253,32 @@ describe('UserService', () => {
           await expect(
             service.updateProfile(user.id, { nickname: 'not-allowed' })
           ).rejects.toThrow(ForbiddenException);
+        });
+      });
+    });
+
+    describe('Given: 빈 문자열 닉네임으로 요청할 때', () => {
+      describe('When: nickname이 빈 문자열이면', () => {
+        it('Then: BadRequestException이 발생한다', async () => {
+          const user = await createTestUser({
+            status: UserStatus.ACTIVE,
+          });
+
+          await expect(
+            service.updateProfile(user.id, { nickname: '' })
+          ).rejects.toThrow(BadRequestException);
+        });
+      });
+
+      describe('When: nickname이 공백만 포함하면', () => {
+        it('Then: BadRequestException이 발생한다', async () => {
+          const user = await createTestUser({
+            status: UserStatus.ACTIVE,
+          });
+
+          await expect(
+            service.updateProfile(user.id, { nickname: '   ' })
+          ).rejects.toThrow(BadRequestException);
         });
       });
     });

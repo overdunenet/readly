@@ -4,6 +4,7 @@ import {
   NotFoundException,
   ConflictException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity, UserStatus } from '../domain/user.entity';
@@ -85,6 +86,10 @@ export class UserService {
     }
 
     if (data.nickname !== undefined) {
+      if (data.nickname.trim().length === 0) {
+        throw new BadRequestException('닉네임은 비어있을 수 없습니다');
+      }
+
       // 닉네임 중복 검증 (@DeleteDateColumn이 삭제된 유저를 자동 제외)
       const existingUser = await this.repositoryProvider.UserRepository.findOne(
         {
