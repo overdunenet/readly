@@ -1,19 +1,13 @@
 import { create } from 'zustand';
 
-export type UserStatus =
-  | 'PENDING_PHONE'
-  | 'PENDING_PROFILE'
-  | 'ACTIVE'
-  | 'INACTIVE';
+import type { inferRouterOutputs } from '@trpc/server';
+import type { AppRouter } from '@readly/api-types/src/server';
 
-// API 응답과 동일한 User 타입 정의
-export interface User {
-  id: string;
-  email: string;
-  nickname: string;
-  profileImage: string | null;
-  status: UserStatus;
-}
+type RouterOutputs = inferRouterOutputs<AppRouter>;
+type UserFromRouter = RouterOutputs['user']['me'];
+
+export type UserStatus = UserFromRouter['status'];
+export type User = UserFromRouter;
 
 interface AuthState {
   user: User | null;
