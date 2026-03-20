@@ -26,12 +26,17 @@ export class UserController {
 
   @MessagePattern('user.updateProfile')
   async updateProfile(
-    @Payload() data: { userId: string; nickname: string }
+    @Payload()
+    data: {
+      userId: string;
+      nickname?: string;
+      profileImage?: string | null;
+    }
   ): Promise<UserResponse> {
-    const user = await this.userService.updateProfile(
-      data.userId,
-      data.nickname
-    );
+    const user = await this.userService.updateProfile(data.userId, {
+      nickname: data.nickname,
+      profileImage: data.profileImage,
+    });
     return {
       id: user.id,
       email: user.email,

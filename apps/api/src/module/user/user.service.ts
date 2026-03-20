@@ -66,7 +66,10 @@ export class UserService {
     return user;
   }
 
-  async updateProfile(userId: string, nickname: string): Promise<UserEntity> {
+  async updateProfile(
+    userId: string,
+    data: { nickname?: string; profileImage?: string | null }
+  ): Promise<UserEntity> {
     const user = await this.repositoryProvider.UserRepository.findOne({
       where: { id: userId, deletedAt: null },
     });
@@ -81,15 +84,23 @@ export class UserService {
       throw new ForbiddenException('현재 상태에서 프로필을 수정할 수 없습니다');
     }
 
-    // 닉네임 중복 검증 (@DeleteDateColumn이 삭제된 유저를 자동 제외)
-    const existingUser = await this.repositoryProvider.UserRepository.findOne({
-      where: { nickname },
-    });
-    if (existingUser && existingUser.id !== userId) {
-      throw new ConflictException('이미 사용 중인 닉네임입니다');
+    if (data.nickname !== undefined) {
+      // 닉네임 중복 검증 (@DeleteDateColumn이 삭제된 유저를 자동 제외)
+      const existingUser = await this.repositoryProvider.UserRepository.findOne(
+        {
+          where: { nickname: data.nickname },
+        }
+      );
+      if (existingUser && existingUser.id !== userId) {
+        throw new ConflictException('이미 사용 중인 닉네임입니다');
+      }
+
+      user.nickname = data.nickname;
     }
 
-    user.nickname = nickname;
+    if (data.profileImage !== undefined) {
+      user.profileImage = data.profileImage;
+    }
 
     // PENDING_PROFILE 상태에서 프로필 설정 시 ACTIVE로 전환
     if (user.status === UserStatus.PENDING_PROFILE) {
