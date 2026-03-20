@@ -24,23 +24,24 @@ export class UserService {
     private readonly jwtService: JwtService
   ) {}
 
-  async refreshToken(refreshToken: string): Promise<LoginResponse> {
+  refreshToken(refreshToken: string): Promise<LoginResponse> {
+    // 동기 함수: try-catch 유지
+    let payload;
     try {
-      const payload = this.jwtService.verify(refreshToken, {
+      payload = this.jwtService.verify(refreshToken, {
         secret: ConfigProvider.auth.jwt.user.refresh.secret,
       });
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
 
-      const user = await this.repositoryProvider.UserRepository.findOne({
-        where: { id: payload.sub, deletedAt: null },
-      });
+    // 비동기 함수: then-catch 적용
+    return this.repositoryProvider.UserRepository.findOne({
+      where: { id: payload.sub, deletedAt: null },
+    }).then(user => {
+      if (!user) throw new UnauthorizedException('Invalid refresh token');
 
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-
-      const tokens = await this.generateTokens(user);
-
-      return {
+      return this.generateTokens(user).then(tokens => ({
         ...tokens,
         user: {
           id: user.id,
@@ -49,10 +50,8 @@ export class UserService {
           profileImage: user.profileImage,
           status: user.status,
         },
-      };
-    } catch (error) {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
+      }));
+    });
   }
 
   async getMe(userId: string): Promise<UserEntity> {

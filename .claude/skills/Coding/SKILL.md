@@ -191,7 +191,7 @@ async getMe(userId: string): Promise<{ id: string; email: string }> {
 
 ### try-catch vs then-catch
 
-> **Promise 처리 시 `then-catch` 패턴을 사용한다.**
+> **비동기(Promise) 처리 시 `then-catch` 패턴을 사용한다. 동기 함수의 에러 처리는 `try-catch`를 유지한다.**
 
 <examples>
 <example type="bad">
