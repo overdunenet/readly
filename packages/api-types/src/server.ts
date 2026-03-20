@@ -259,7 +259,8 @@ const appRouter = t.router({
       status: z.enum(['PENDING_PHONE', 'PENDING_PROFILE', 'ACTIVE', 'INACTIVE']),
     })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     updateProfile: publicProcedure.input(z.object({
-      nickname: z.string().min(1).max(30),
+      nickname: z.string().min(1).max(30).optional(),
+      profileImage: z.string().url().nullable().optional(),
     })).output(z.object({
       id: z.string(),
       email: z.string().email(),

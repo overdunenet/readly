@@ -96,18 +96,24 @@ export class UserRouter extends BaseTrpcRouter {
    */
   @UseMiddlewares(UserAuthMiddleware)
   @Mutation({
-    input: z.object({
-      nickname: nicknameSchema,
-    }),
+    input: z
+      .object({
+        nickname: nicknameSchema.optional(),
+        profileImage: z.string().url().nullable().optional(),
+      })
+      .refine(
+        data => data.nickname !== undefined || data.profileImage !== undefined,
+        { message: '최소 하나의 필드를 입력해주세요' }
+      ),
     output: userSchema,
   })
   async updateProfile(
     @Ctx() ctx: UserAuthorizedContext,
-    @Input() input: { nickname: string }
+    @Input() input: { nickname?: string; profileImage?: string | null }
   ) {
     const result = await this.microserviceClient.send('user.updateProfile', {
       userId: ctx.user.sub,
-      nickname: input.nickname,
+      ...input,
     });
     return result;
   }
