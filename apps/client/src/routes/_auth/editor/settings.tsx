@@ -6,7 +6,7 @@ import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
 import { nicknameSchema as nicknameFieldSchema } from '../../../shared/schemas';
-import { type User, useAuthStore } from '../../../stores/auth';
+import { useAuthStore } from '../../../stores/auth';
 
 import { trpc } from '@/shared';
 
@@ -20,8 +20,7 @@ function SettingsPage() {
   const { user, setUser } = useAuthStore();
   const updateProfile = trpc.user.updateProfile.useMutation();
   const [isEditing, setIsEditing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
 
   const {
     register,
@@ -38,31 +37,24 @@ function SettingsPage() {
 
   const handleEdit = () => {
     setIsEditing(true);
-    setSuccess(null);
-    setError(null);
+    updateProfile.reset();
   };
 
   const handleCancel = () => {
     reset({ nickname: user?.nickname || '' });
     setIsEditing(false);
-    setError(null);
+    updateProfile.reset();
   };
 
   const onSubmit = (data: ProfileForm) => {
-    setError(null);
     updateProfile
       .mutateAsync({ nickname: data.nickname })
-      .then((result: User) => {
+      .then((result) => {
         setUser(result);
         reset({ nickname: result.nickname });
         setIsEditing(false);
-        setSuccess('프로필이 수정되었습니다');
       })
-      .catch((err: unknown) => {
-        setError(
-          err instanceof Error ? err.message : '프로필 수정에 실패했습니다',
-        );
-      });
+      .catch(() => {});
   };
 
   // 프로필 이미지: user.profileImage 있으면 img, 없으면 닉네임 첫글자 아바타
@@ -84,26 +76,22 @@ function SettingsPage() {
           )}
         </SectionHeader>
 
-        {success && <SuccessBox>{success}</SuccessBox>}
+        {updateProfile.isSuccess && !isEditing && (
+          <SuccessBox>프로필이 수정되었습니다</SuccessBox>
+        )}
 
         <Form onSubmit={handleSubmit(onSubmit)}>
           {/* 아바타 영역 */}
           <AvatarSection>
-            {user?.profileImage ? (
+            {user?.profileImage && !imageError ? (
               <AvatarImage
                 src={user.profileImage}
                 alt={user.nickname}
-                onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.nextElementSibling?.classList.remove(
-                    'hidden',
-                  );
-                }}
+                onError={() => setImageError(true)}
               />
-            ) : null}
-            <AvatarFallback className={user?.profileImage ? 'hidden' : ''}>
-              {avatarLetter}
-            </AvatarFallback>
+            ) : (
+              <AvatarFallback>{avatarLetter}</AvatarFallback>
+            )}
             {isEditing && <AvatarHint>이미지 변경은 준비 중입니다</AvatarHint>}
           </AvatarSection>
 
@@ -132,7 +120,9 @@ function SettingsPage() {
             <ReadOnlyValue>{user?.email || ''}</ReadOnlyValue>
           </FormGroup>
 
-          {error && <AlertBox>{error}</AlertBox>}
+          {updateProfile.isError && (
+            <AlertBox>{updateProfile.error?.message}</AlertBox>
+          )}
 
           {/* 편집 모드 버튼 */}
           {isEditing && (
