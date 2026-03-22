@@ -1,6 +1,7 @@
 import { Entity, Column, ManyToOne, JoinColumn, EntityManager } from 'typeorm';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { UserEntity } from './user.entity';
+import { CashEntity } from './cash.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
@@ -68,9 +69,16 @@ export class PaymentEntity extends BaseEntity {
   })
   cancelledAt: Date | null;
 
+  @Column({ type: 'uuid', nullable: true, comment: '연결된 캐시 ID' })
+  cashId: string | null;
+
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
+
+  @ManyToOne(() => CashEntity, { nullable: true })
+  @JoinColumn({ name: 'cash_id' })
+  cash: CashEntity | null;
 
   static create(userId: string, amount: number): PaymentEntity {
     const payment = new PaymentEntity();

@@ -2,14 +2,12 @@ import {
   Entity,
   Column,
   ManyToOne,
-  OneToOne,
   JoinColumn,
   Check,
   EntityManager,
 } from 'typeorm';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { UserEntity } from './user.entity';
-import { PaymentEntity } from './payment.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
@@ -25,23 +23,15 @@ export class CashEntity extends BaseEntity {
   @Column({ type: 'integer', comment: '잔여 금액' })
   currentAmount: number;
 
-  @Column({ type: 'uuid', unique: true, comment: '결제 ID' })
-  paymentId: string;
-
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
-  @OneToOne(() => PaymentEntity)
-  @JoinColumn({ name: 'payment_id' })
-  payment: PaymentEntity;
-
-  static create(userId: string, amount: number, paymentId: string): CashEntity {
+  static create(userId: string, amount: number): CashEntity {
     const cash = new CashEntity();
     cash.userId = userId;
     cash.initialAmount = amount;
     cash.currentAmount = amount;
-    cash.paymentId = paymentId;
     return cash;
   }
 }
