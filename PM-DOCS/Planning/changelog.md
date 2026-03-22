@@ -3,6 +3,25 @@
 All notable changes to PM planning documents will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [2026-03-22]
+
+### Added
+
+- Feature_PRD/feature#2_bookstore/PRD.md Phase A~E 완료 (approved)
+- Feature_PRD/feature#2_bookstore/screens.yml 생성 (9개 화면, SCR-011~019)
+- Feature_PRD/feature#2_bookstore/events.yml 생성 (5개 독자향 이벤트)
+- Feature_PRD/feature#2_bookstore/wireframes.html 생성 (모바일+PC)
+- Feature_PRD/feature#2_bookstore/IMPLEMENTATION_GUIDE.md 생성
+- Context Output/design-thinking_2026-03-21_bookstore-system.md 생성 (CIS)
+
+### Changed
+
+- Feature_PRD/feature#2_bookstore/PRD.md: draft → approved (Phase A~E 완료)
+- US-1~7에 스코프 컬럼 추가 (MVP/Growth 구분)
+- 유저플로우 Flow 1~7에 [MVP]/[Growth] 태그 추가
+- screens.yml에 scope 필드 추가 (mvp/growth)
+- F1 선행 수정 필요 항목 3건 명시 (country, redirect, FollowButton)
+
 ## [2026-03-09]
 
 ### Added

@@ -1,0 +1,206 @@
+# screens.yml - Feature 화면 정의서
+# Feature: 서점 시스템
+
+feature: 'bookstore'
+screens:
+  - id: 'SCR-011'
+    name: '서점 오픈 폼'
+    route: '/bookstore/open'
+    viewport: [phone, desktop]
+    scope: mvp
+    description: '필명 + 서점명 입력 → 약관 동의 → 서점 생성. 한국 유저만 접근 가능.'
+    entry_conditions:
+      - '로그인 상태'
+      - '한국 유저 (국가: KR)'
+      - '아직 서점을 오픈하지 않은 유저'
+      - '마이페이지에서 "서점 오픈하기" 버튼 클릭'
+    ui_elements:
+      - '필명(편명) 입력 필드'
+      - '서점명 입력 필드'
+      - '약관 동의 체크박스'
+      - '서점 오픈 버튼'
+    states:
+      - name: '기본'
+        description: '필명 + 서점명 입력 대기'
+      - name: '유효성 에러'
+        description: '필명 중복 또는 서점명 규칙 위반'
+      - name: '비한국 유저 차단'
+        description: '"현재 한국 유저만 서점 오픈 가능" 안내'
+      - name: '이미 서점 보유'
+        description: '서점 관리 페이지로 리다이렉트'
+
+  - id: 'SCR-012'
+    name: '서점 관리 메인'
+    route: '/my-bookstore'
+    viewport: [phone, desktop]
+    scope: mvp
+    description: '서점 관리 대시보드. 프로필, 발행 설정, 작품 관리, 업로드로의 진입점.'
+    entry_conditions:
+      - '로그인 상태'
+      - '서점 보유 유저'
+    ui_elements:
+      - '서점 프로필 요약 (필명, 이미지, 서점명)'
+      - '프로필 편집 버튼'
+      - '발행 설정 버튼'
+      - '작품 목록 탭'
+      - '작품 업로드 버튼'
+      - '서점 미리보기 링크'
+    states:
+      - name: '기본'
+        description: '서점 관리 대시보드'
+      - name: '작품 없음'
+        description: '첫 작품 업로드 유도 안내'
+
+  - id: 'SCR-013'
+    name: '서점 프로필 편집'
+    route: '/my-bookstore/profile'
+    viewport: [phone, desktop]
+    scope: mvp
+    description: '필명, 소개글, 프로필 이미지 수정.'
+    entry_conditions:
+      - 'SCR-012에서 프로필 편집 클릭'
+    ui_elements:
+      - '필명 수정 필드'
+      - '소개글 텍스트 영역'
+      - '프로필 이미지 업로드/변경'
+      - '저장 버튼'
+    states:
+      - name: '기본'
+        description: '현재 프로필 정보 표시, 수정 대기'
+      - name: '저장 완료'
+        description: '성공 메시지 표시'
+
+  - id: 'SCR-014'
+    name: '서점 발행 설정'
+    route: '/my-bookstore/settings'
+    viewport: [phone, desktop]
+    scope: growth
+    description: '단편/시리즈별 발행 디폴트 설정 (유/무료, 가격, 성인/전체 이용가).'
+    entry_conditions:
+      - 'SCR-012에서 발행 설정 클릭'
+    ui_elements:
+      - '단편 기본값 섹션'
+      - '  유료/무료 토글'
+      - '  구매 가격 입력'
+      - '  성인/전체 이용가 선택'
+      - '저장 버튼'
+    states:
+      - name: '기본'
+        description: '현재 디폴트 설정 표시'
+      - name: '저장 완료'
+        description: '성공 메시지 표시'
+
+  - id: 'SCR-015'
+    name: '작품 업로드'
+    route: '/my-bookstore/upload'
+    viewport: [phone, desktop]
+    scope: growth
+    description: 'Word/HWP 파일 업로드 또는 직접 입력으로 작품 등록.'
+    entry_conditions:
+      - 'SCR-012에서 작품 업로드 클릭'
+    ui_elements:
+      - '업로드 방식 선택 (파일 업로드 / 직접 입력)'
+      - '파일 드래그앤드롭 영역 (Word/HWP)'
+      - '제목 입력 필드'
+      - '본문 에디터 (직접 입력 시)'
+      - '단편/시리즈 분류 선택'
+      - '시리즈 선택 드롭다운 (기존 시리즈 / 새 시리즈 생성)'
+      - '썸네일 업로드'
+      - '발행 설정 (디폴트 적용, 편별 수정 가능)'
+      - '저장 / 발행 버튼'
+    states:
+      - name: '방식 선택'
+        description: '파일 업로드 / 직접 입력 선택 대기'
+      - name: '파일 업로드'
+        description: '파일 드래그앤드롭 또는 선택'
+      - name: '파싱 결과 확인'
+        description: '파일에서 추출된 제목/본문 확인, 수정 가능'
+      - name: '파싱 실패'
+        description: '수동 입력으로 전환 안내'
+      - name: '직접 입력'
+        description: '에디터에서 직접 작성'
+
+  - id: 'SCR-016'
+    name: '작품 목록 관리'
+    route: '/my-bookstore/works'
+    viewport: [phone, desktop]
+    scope: mvp
+    description: '서점에 등록된 작품 목록 관리. 상태 필터, 순서 변경, 수정/삭제.'
+    entry_conditions:
+      - 'SCR-012에서 작품 목록 탭 선택'
+    ui_elements:
+      - '상태 필터 (전체/발행됨/임시저장/비공개)'
+      - '작품 카드 리스트 (썸네일, 제목, 상태, 조회수)'
+      - '작품 순서 변경 (드래그앤드롭)'
+      - '작품 액션 메뉴 (수정/삭제/상태변경)'
+    states:
+      - name: '기본'
+        description: '작품 목록 표시'
+      - name: '필터 적용'
+        description: '선택한 상태의 작품만 표시'
+      - name: '순서 변경 모드'
+        description: '드래그앤드롭으로 순서 변경'
+      - name: '작품 없음'
+        description: '업로드 유도 안내'
+
+  - id: 'SCR-017'
+    name: '서점 페이지 (독자용)'
+    route: '/bookstore/:id'
+    viewport: [phone, desktop]
+    scope: mvp
+    description: '독자가 보는 서점 메인 페이지. 장르 태그 + 최신/인기 섹션 + 단편/시리즈 탭 + 리뷰.'
+    entry_conditions:
+      - '홈/검색/포스트에서 작가 프로필 클릭'
+      - '서점 직접 URL 접근'
+      - '비로그인 상태에서도 열람 가능'
+    ui_elements:
+      - '작가 프로필 (필명, 이미지, 소개글)'
+      - '장르 태그 배지 (작가 사용 태그 기반)'
+      - '팔로우 버튼'
+      - '최신 발행 섹션 (썸네일 그리드)'
+      - '인기 글 섹션 (썸네일 그리드)'
+      - '탐색 메뉴 (단편 전체 / 시리즈 전체)'
+      - '서점 리뷰/응원 글 섹션'
+      - '리뷰 작성 버튼'
+    states:
+      - name: '기본'
+        description: '작가 프로필 + 최신/인기 + 리뷰'
+      - name: '비로그인'
+        description: '팔로우/리뷰 버튼 클릭 시 로그인 유도'
+      - name: '작품 없음'
+        description: '"아직 작품이 없습니다" 안내'
+
+  - id: 'SCR-018'
+    name: '서점 단편 전체'
+    route: '/bookstore/:id/singles'
+    viewport: [phone, desktop]
+    scope: mvp
+    description: '서점 내 단편 작품 전체 목록. 썸네일 그리드.'
+    entry_conditions:
+      - 'SCR-017에서 단편 전체보기 선택'
+    ui_elements:
+      - '단편 작품 그리드 (썸네일, 제목, 가격, 별점)'
+      - '정렬 옵션 (최신순/인기순)'
+    states:
+      - name: '기본'
+        description: '단편 작품 그리드 표시'
+      - name: '작품 없음'
+        description: '"단편 작품이 없습니다" 안내'
+
+  - id: 'SCR-019'
+    name: '서점 시리즈 전체'
+    route: '/bookstore/:id/series'
+    viewport: [phone, desktop]
+    scope: mvp
+    description: '서점 내 시리즈 전체 목록. 썸네일 그리드 + 연재 상태.'
+    entry_conditions:
+      - 'SCR-017에서 시리즈 전체보기 선택'
+    ui_elements:
+      - '시리즈 그리드 (썸네일, 제목, 회차 수, 연재 상태, 별점)'
+      - '정렬 옵션 (최신순/인기순)'
+      - '연재 상태 필터 (연재중/완결)'
+    states:
+      - name: '기본'
+        description: '시리즈 그리드 표시'
+      - name: '작품 없음'
+        description: '"시리즈가 없습니다" 안내'
