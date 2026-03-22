@@ -5,6 +5,12 @@ import { UserEntity } from './user.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
+export enum CashHistoryType {
+  CHARGE = 'CHARGE',
+  PURCHASE = 'PURCHASE',
+  REFUND = 'REFUND',
+}
+
 @Entity('cash_history')
 export class CashHistoryEntity extends BaseEntity {
   @Column({ type: 'uuid', comment: '캐시 ID' })
@@ -18,7 +24,7 @@ export class CashHistoryEntity extends BaseEntity {
     length: 20,
     comment: '변동 유형 (CHARGE/PURCHASE/REFUND)',
   })
-  type: string;
+  type: CashHistoryType;
 
   @Column({ type: 'integer', comment: '변동 금액' })
   amount: number;
@@ -37,22 +43,22 @@ export class CashHistoryEntity extends BaseEntity {
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
-  static create(
-    cashId: string,
-    userId: string,
-    type: string,
-    amount: number,
-    balanceAfter: number,
-    description: string
-  ): CashHistoryEntity {
-    const history = new CashHistoryEntity();
-    history.cashId = cashId;
-    history.userId = userId;
-    history.type = type;
-    history.amount = amount;
-    history.balanceAfter = balanceAfter;
-    history.description = description;
-    return history;
+  static create(input: {
+    cashId: string;
+    userId: string;
+    type: CashHistoryType;
+    amount: number;
+    balanceAfter: number;
+    description: string;
+  }): CashHistoryEntity {
+    const entity = new CashHistoryEntity();
+    entity.cashId = input.cashId;
+    entity.userId = input.userId;
+    entity.type = input.type;
+    entity.amount = input.amount;
+    entity.balanceAfter = input.balanceAfter;
+    entity.description = input.description;
+    return entity;
   }
 }
 

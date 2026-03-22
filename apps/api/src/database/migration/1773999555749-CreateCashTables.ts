@@ -15,8 +15,10 @@ export class CreateCashTables1773999555749 implements MigrationInterface {
         "amount" integer NOT NULL,
         "status" varchar(20) NOT NULL DEFAULT 'PENDING',
         "fail_reason" text NULL,
+        -- paid_at, cancelled_at: 결제/취소 시점은 시간대 정보가 중요하므로 TIMESTAMPTZ 사용
         "paid_at" TIMESTAMPTZ NULL,
         "cancelled_at" TIMESTAMPTZ NULL,
+        -- created_at, updated_at: BaseEntity 기본 TIMESTAMP 패턴 유지
         "created_at" TIMESTAMP NOT NULL DEFAULT now(),
         "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
         CONSTRAINT "PK_payments" PRIMARY KEY ("id")

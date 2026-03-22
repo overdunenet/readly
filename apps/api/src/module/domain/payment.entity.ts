@@ -4,6 +4,13 @@ import { UserEntity } from './user.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+}
+
 @Entity('payments')
 export class PaymentEntity extends BaseEntity {
   @Column({ type: 'uuid', comment: '결제한 사용자 ID' })
@@ -39,10 +46,10 @@ export class PaymentEntity extends BaseEntity {
   @Column({
     type: 'varchar',
     length: 20,
-    default: 'PENDING',
+    default: PaymentStatus.PENDING,
     comment: '결제 상태 (PENDING/PAID/FAILED/CANCELLED)',
   })
-  status: string;
+  status: PaymentStatus;
 
   @Column({ type: 'text', nullable: true, comment: '실패 사유' })
   failReason: string | null;

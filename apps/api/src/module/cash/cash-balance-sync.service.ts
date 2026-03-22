@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DataSources } from '@src/database/datasources';
 import { CashBalanceEntity } from '../domain/cash-balance.entity';
 import { CashEntity } from '../domain/cash.entity';
+import { TransactionService } from '../shared/transaction/transaction.service';
 
 /**
  * 캐시 잔액 정합성 검증 서비스
@@ -13,6 +13,8 @@ import { CashEntity } from '../domain/cash.entity';
 @Injectable()
 export class CashBalanceSyncService {
   private readonly logger = new Logger(CashBalanceSyncService.name);
+
+  constructor(private readonly transactionService: TransactionService) {}
 
   /**
    * 모든 사용자의 캐시 잔액 정합성을 검증하고 불일치 시 재보정합니다.
@@ -27,14 +29,8 @@ export class CashBalanceSyncService {
       cashSum: number;
     }>;
   }> {
-    const queryRunner = DataSources.readly.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      const manager = queryRunner.manager;
-
-      // cash 테이블의 current_amount 합계를 사용자별로 조회
+    return this.transactionService.runInTransaction(async manager => {
+      // groupBy + SUM 집계 → find 불가, queryBuilder 사용 (허용 케이스)
       const cashSums: Array<{ userId: string; totalCurrentAmount: string }> =
         await manager
           .createQueryBuilder()
@@ -62,7 +58,6 @@ export class CashBalanceSyncService {
         });
 
         if (!balance) {
-          // 잔액 레코드가 없으면 생성
           const newBalance = CashBalanceEntity.create(row.userId);
           newBalance.amount = cashSum;
           await manager.getRepository(CashBalanceEntity).save(newBalance);
@@ -94,19 +89,11 @@ export class CashBalanceSyncService {
         }
       }
 
-      await queryRunner.commitTransaction();
-
       this.logger.log(
         `잔액 동기화 완료: checked=${checked}, corrected=${corrected}`
       );
 
       return { checked, corrected, details };
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      this.logger.error('잔액 동기화 실패', error);
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+    });
   }
 }
