@@ -465,7 +465,7 @@ apps/client/src/components/bookstore/
 
 ```
 1. M-1 마이그레이션 (bookstores 테이블)
-2. BookstoreEntity + Repository
+2. BookstoreEntity + getBookstoreRepository() 함수형 확장 (기존 getPostRepository() 패턴 준수)
 3. BookstoreService (open, getMyBookstore, hasBookstore, getById, getByUserId)
 4. BookstoreRouter (open, getMyBookstore, hasBookstore, getById)
 5. BookstoreController (@MessagePattern)

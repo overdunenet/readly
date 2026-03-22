@@ -3,10 +3,10 @@ milestone_id: 'M-001'
 goal: 'MVP 핵심 기능 구현'
 period:
   start: '2026-03-04'
-  end: '2026-03-31'
+  end: '2026-06-30'
 status: 'backlog'
 created_at: '2026-03-04'
-updated_at: '2026-03-04'
+updated_at: '2026-03-22'
 ---
 
 # M-001: MVP 핵심 기능 구현

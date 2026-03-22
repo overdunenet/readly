@@ -16,7 +16,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ### Changed
 
-- Feature_PRD/feature#2_bookstore/PRD.md: draft → approved (Phase A~E 완료)
+- Feature_PRD/feature#2_bookstore/PRD.md: draft → approved → decomposed (Phase A~E 완료 + Issue 분해)
 - US-1~7에 스코프 컬럼 추가 (MVP/Growth 구분)
 - 유저플로우 Flow 1~7에 [MVP]/[Growth] 태그 추가
 - screens.yml에 scope 필드 추가 (mvp/growth)
