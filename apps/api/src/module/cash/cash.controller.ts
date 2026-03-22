@@ -3,11 +3,13 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { Transactional } from '../shared/transaction/transaction.decorator';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { CashService } from './cash.service';
+import { CashBalanceSyncService } from './cash-balance-sync.service';
 
 @Controller()
 export class CashController {
   constructor(
     private readonly cashService: CashService,
+    private readonly cashBalanceSyncService: CashBalanceSyncService,
     private readonly transactionService: TransactionService
   ) {}
 
@@ -49,5 +51,11 @@ export class CashController {
       })),
       nextCursor: result.nextCursor,
     };
+  }
+
+  @MessagePattern('cash.syncBalances')
+  @Transactional
+  async syncBalances() {
+    return this.cashBalanceSyncService.syncBalances();
   }
 }
