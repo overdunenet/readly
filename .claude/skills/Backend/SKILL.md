@@ -272,3 +272,16 @@ export class AddUserStatus1773926438602 implements MigrationInterface {
 | BDD 테스트 | `bdd-testing.md` | NestJS + Jest BDD 스타일 테스트 작성 규칙 |
 
 </reference>
+
+<rules>
+
+### @Transactional 패턴
+
+- mutation query는 Controller에서 `@Transactional` 데코레이터 사용
+- Service에서 `transactionService.runInTransaction()` 직접 호출 금지
+- @Transactional 순서: `@MessagePattern` 아래에 배치
+- Controller에 `transactionService: TransactionService` DI 필수
+- Service는 RepositoryProvider만 사용 — 트랜잭션 컨텍스트 자동 전파
+- Cron 등 배치도 Controller MessagePattern 경유하여 트랜잭션 보장
+
+</rules>

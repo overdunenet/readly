@@ -1,33 +1,30 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Transactional } from '../shared/transaction/transaction.decorator';
+import { TransactionService } from '../shared/transaction/transaction.service';
 import { CashService } from './cash.service';
 
 @Controller()
 export class CashController {
-  constructor(private readonly cashService: CashService) {}
+  constructor(
+    private readonly cashService: CashService,
+    private readonly transactionService: TransactionService
+  ) {}
 
   @MessagePattern('cash.getBalance')
   async getBalance(@Payload() data: { userId: string }) {
-    return this.cashService.getBalance(data.userId);
+    const balance = await this.cashService.getBalance(data.userId);
+    return { amount: balance?.amount ?? 0 };
   }
 
   @MessagePattern('cash.charge')
+  @Transactional
   async charge(@Payload() data: { userId: string; amount: number }) {
-    const result = await this.cashService.charge(data.userId, data.amount);
+    const cash = await this.cashService.charge(data.userId, data.amount);
     return {
-      cashBalance: result.cashBalance.amount,
-      cash: {
-        id: result.cash.id,
-        initialAmount: result.cash.initialAmount,
-        currentAmount: result.cash.currentAmount,
-      },
-      history: {
-        id: result.history.id,
-        type: result.history.type,
-        amount: result.history.amount,
-        balanceAfter: result.history.balanceAfter,
-        description: result.history.description,
-      },
+      id: cash.id,
+      initialAmount: cash.initialAmount,
+      currentAmount: cash.currentAmount,
     };
   }
 
