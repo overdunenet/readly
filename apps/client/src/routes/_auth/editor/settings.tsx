@@ -54,7 +54,9 @@ function SettingsPage() {
         reset({ nickname: result.nickname });
         setIsEditing(false);
       })
-      .catch(() => {});
+      .catch((error) => {
+        console.error('프로필 업데이트 실패:', error);
+      });
   };
 
   // 프로필 이미지: user.profileImage 있으면 img, 없으면 닉네임 첫글자 아바타
