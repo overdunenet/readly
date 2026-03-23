@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { NicepayClientService } from './nicepay/nicepay-client.service';
 import { CashService } from '../cash/cash.service';
@@ -6,6 +6,8 @@ import { PaymentEntity, PaymentStatus } from '../domain/payment.entity';
 
 @Injectable()
 export class PaymentService {
+  private readonly logger = new Logger(PaymentService.name);
+
   constructor(
     private readonly repositoryProvider: RepositoryProvider,
     private readonly nicepayClientService: NicepayClientService,
@@ -58,7 +60,20 @@ export class PaymentService {
     payment.paidAt = new Date();
     payment.method = confirmResult.payMethod;
 
-    const cash = await this.cashService.charge(payment.userId, amount);
+    const cash = await this.cashService
+      .charge(payment.userId, amount)
+      .catch(async (chargeError: unknown) => {
+        this.logger.error(
+          `Cash 충전 실패 (orderId: ${orderId}, tid: ${tid}). NicePay 승인은 완료되었으나 캐시 충전 실패`,
+          chargeError instanceof Error ? chargeError.stack : String(chargeError)
+        );
+        payment.status = PaymentStatus.FAILED;
+        payment.failReason = 'PG 승인 완료, 캐시 충전 실패 — 수동 확인 필요';
+        await this.repositoryProvider.PaymentRepository.save(payment);
+        throw new BadRequestException(
+          '결제는 완료되었으나 캐시 충전 중 오류가 발생했습니다. 고객센터에 문의해주세요.'
+        );
+      });
     payment.cashId = cash.id;
 
     return this.repositoryProvider.PaymentRepository.save(payment);

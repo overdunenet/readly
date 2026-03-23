@@ -8,7 +8,7 @@ import { PaymentHttpController } from './payment.http.controller';
 
 @Module({
   imports: [SharedModule, NicepayClientModule, CashModule],
-  controllers: [PaymentHttpController],
-  providers: [PaymentService, PaymentController],
+  controllers: [PaymentHttpController, PaymentController],
+  providers: [PaymentService],
 })
 export class PaymentModule {}

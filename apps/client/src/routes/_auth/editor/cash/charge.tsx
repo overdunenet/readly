@@ -89,7 +89,7 @@ function CashChargePage() {
           <BalanceAmount>
             {balanceQuery.isLoading
               ? '...'
-              : `${(balanceQuery.data?.balance ?? 0).toLocaleString()}원`}
+              : `${(balanceQuery.data?.amount ?? 0).toLocaleString()}원`}
           </BalanceAmount>
         </BalanceSection>
 

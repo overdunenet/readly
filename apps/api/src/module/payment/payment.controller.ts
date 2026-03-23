@@ -12,6 +12,7 @@ export class PaymentController {
   ) {}
 
   @MessagePattern('payment.initiateCharge')
+  @Transactional
   async initiateCharge(@Payload() data: { userId: string; amount: number }) {
     return this.paymentService.createPendingPayment(data.userId, data.amount);
   }
