@@ -1,7 +1,7 @@
 ---
 name: business-payment
 description: Readly 결제 시스템 - 결제 수단, 유형, 환불 정책
-keywords: [결제, 구독, 환불, 포스트구매, 월간구독, 토스페이, 카카오페이]
+keywords: [결제, 구독, 환불, 포스트구매, 월간구독, 토스페이, 카카오페이, 캐시충전]
 estimated_tokens: ~200
 related_contexts:
   - business-overview
@@ -29,6 +29,13 @@ related_contexts:
 - **방식**: 월간 자동 갱신
 - **접근 권한**: `subscriber` 레벨 Post 대상
 
+### 3. 캐시 충전
+
+- **대상**: 플랫폼 내 가상 화폐(캐시) 잔액
+- **방식**: 1회 충전 (1,000원 ~ 1,000,000원)
+- **용도**: 포스트 구매 시 캐시로 결제
+- **잔액 관리**: CashBalance 테이블에 스냅샷 캐싱, 배치 정합성 검증
+
 ## 환불 정책
 
 ### 포스트 구매 환불
@@ -45,3 +52,4 @@ related_contexts:
 
 - `business/access-control.md`: 접근 권한과 결제 연관성
 - `business/overview.md`: 결제 Flow 다이어그램
+- `codebase/cash-module.md`: Cash 모듈 구현 상세

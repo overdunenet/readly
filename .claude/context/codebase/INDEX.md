@@ -26,6 +26,7 @@ estimated_tokens: ~150
 | [post-editor.md](./post-editor.md)                       | CKEditor 5 포스트 에디터 UI 및 스타일링                               |
 | [post-manage-ui.md](./post-manage-ui.md)                 | 에디터 포스트 목록 관리 UI (필터, 검색, 액션)                         |
 | [otp-phone-verification.md](./otp-phone-verification.md) | OTP 전화번호 인증 모듈 (Entity, SMS 인증 플로우)                      |
+| [cash-module.md](./cash-module.md)                       | Cash 모듈 (캐시 충전, 잔액 관리, 이력, Payment)                      |
 
 ## 빠른 참조
 
@@ -43,6 +44,10 @@ estimated_tokens: ~150
 **PostEntity**: freeContent, paidContent, accessLevel, status, price
 **OtpEntity**: phone(unique), code(6자리), expiresAt, attempts (otp_verifications)
 **FollowEntity**: followerId, followeeId (Unique Constraint)
+**CashEntity**: userId, initialAmount, currentAmount (CHECK >= 0)
+**CashBalanceEntity**: userId(PK+FK), amount (UPSERT 캐싱)
+**CashHistoryEntity**: cashId, type(CHARGE/PURCHASE/REFUND), amount, balanceAfter
+**PaymentEntity**: userId, cashId(nullable), amount, status(PENDING/PAID/FAILED/CANCELLED)
 
 ### 포트
 
@@ -55,3 +60,4 @@ estimated_tokens: ~150
 - `business/overview.md`: 서비스 비전 및 Flow
 - `business/access-control.md`: 접근 권한 정책
 - `business/seo-strategy.md`: SEO 전략 배경
+- `business/payment.md`: 결제 및 캐시 충전 정책

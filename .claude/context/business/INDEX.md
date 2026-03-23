@@ -16,7 +16,7 @@ estimated_tokens: ~150
 | ------------------------------------------------------------------- | ---------------------------------------------------------- |
 | [Product Brief](../../../PM-DOCS/Context%20Output/PRODUCT_BRIEF.md) | 제품 전략 기초 문서 (비전, 타겟 유저, 시장, 비즈니스 모델) |
 | [access-control.md](./access-control.md)                            | 접근 권한 시스템 (무료/유료 구간 구분)                     |
-| [payment.md](./payment.md)                                          | 결제 수단, 유형, 환불 정책                                 |
+| [payment.md](./payment.md)                                          | 결제 수단, 유형, 환불 정책, 캐시 충전                      |
 | [seo-strategy.md](./seo-strategy.md)                                | SEO 전략 목적 및 빌드 타임 프리렌더링 채택 배경            |
 | [developer-experience.md](./developer-experience.md)                | Claude Code 사용 경험 최적화                               |
 | [user-follow.md](./user-follow.md)                                  | 사용자 팔로우 기능 (에디터-팔로워 관계)                    |
@@ -32,7 +32,7 @@ estimated_tokens: ~150
 - **유료 블로그 플랫폼**: 에디터가 Post를 작성하고, 팔로워가 결제하여 열람
 - **무료/유료 구간**: `freeContent`(미리보기) + `paidContent`(본문)
 - **접근 레벨**: public, subscriber, purchaser, private
-- **결제 유형**: 포스트 단건 구매, 월간 구독
+- **결제 유형**: 포스트 단건 구매, 월간 구독, 캐시 충전
 
 ### 관련 Codebase Context
 
@@ -42,3 +42,4 @@ estimated_tokens: ~150
 - `codebase/follow-module.md`: Follow 모듈 구현
 - `codebase/post-manage-ui.md`: 포스트 관리 UI 구현
 - `codebase/social-login.md`: 소셜 로그인 구현
+- `codebase/cash-module.md`: Cash 모듈 (충전, 잔액, 이력)
