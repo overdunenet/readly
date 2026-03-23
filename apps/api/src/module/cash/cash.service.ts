@@ -52,23 +52,17 @@ export class CashService {
    * 특정 사용자의 cash table current_amount 합계로 cashBalance를 동기화
    */
   async syncBalance(userId: string): Promise<number> {
-    const result =
-      await this.repositoryProvider.CashRepository.createQueryBuilder('cash')
-        .select('COALESCE(SUM(cash.current_amount), 0)::int', 'total')
-        .where('cash.user_id = :userId', { userId })
-        .getRawOne();
+    // SUM + UPSERT를 단일 쿼리로 처리
+    const [row] =
+      await this.repositoryProvider.CashBalanceRepository.manager.query(
+        `INSERT INTO "cash_balances" ("user_id", "amount")
+         SELECT $1, COALESCE(SUM("current_amount"), 0)::int FROM "cash" WHERE "user_id" = $1
+         ON CONFLICT ("user_id") DO UPDATE SET "amount" = EXCLUDED."amount", "updated_at" = NOW()
+         RETURNING "amount"`,
+        [userId]
+      );
 
-    const total = parseInt(result?.total ?? '0', 10);
-
-    // UPSERT: 없으면 생성, 있으면 업데이트
-    await this.repositoryProvider.CashBalanceRepository.manager.query(
-      `INSERT INTO "cash_balances" ("user_id", "amount")
-       VALUES ($1, $2)
-       ON CONFLICT ("user_id") DO UPDATE SET "amount" = $2, "updated_at" = NOW()`,
-      [userId, total]
-    );
-
-    return total;
+    return row?.amount ?? 0;
   }
 
   async getHistory(

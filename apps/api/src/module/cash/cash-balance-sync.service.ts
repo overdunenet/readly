@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { RepositoryProvider } from '../shared/transaction/repository.provider';
+import { TransactionService } from '../shared/transaction/transaction.service';
 
 /**
  * 캐시 잔액 정합성 검증 서비스
@@ -12,14 +12,14 @@ import { RepositoryProvider } from '../shared/transaction/repository.provider';
 export class CashBalanceSyncService {
   private readonly logger = new Logger(CashBalanceSyncService.name);
 
-  constructor(private readonly repositoryProvider: RepositoryProvider) {}
+  constructor(private readonly transactionService: TransactionService) {}
 
   /**
    * 모든 사용자의 캐시 잔액 정합성을 검증하고 불일치 시 재보정합니다.
    * 1일 1회 호출을 권장합니다.
    */
   async syncBalances(): Promise<{ synced: number }> {
-    const manager = this.repositoryProvider.CashBalanceRepository.manager;
+    const manager = this.transactionService.getTransaction()!;
 
     // 1. Table lock — sync 중 데이터 변경 방지 (트랜잭션 종료 시 자동 해제)
     //    SHARE MODE: 다른 트랜잭션의 SELECT 허용, INSERT/UPDATE/DELETE 차단
