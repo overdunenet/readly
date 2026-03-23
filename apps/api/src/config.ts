@@ -26,6 +26,12 @@ type KakaoOAuthConfigType = {
   callbackUrl: string;
 };
 
+type NicepayConfigType = {
+  url: string;
+  clientKey: string;
+  secret: string;
+};
+
 type CorsConfigType = {
   origin: boolean | string | string[];
   credentials: boolean;
@@ -53,6 +59,12 @@ export const ConfigProvider = {
     },
     naver: config.get<NaverOAuthConfigType>('auth.naver'),
     kakao: config.get<KakaoOAuthConfigType>('auth.kakao'),
+  },
+  payment: {
+    nicepay: config.get<NicepayConfigType>('payment.nicepay'),
+  },
+  client: {
+    url: config.get<string>('client.url'),
   },
   cors: config.get<CorsConfigType>('cors'),
 } as const;

@@ -40,6 +40,9 @@ module.exports = {
       callbackUrl: 'http://localhost:5173/auth/kakao/callback',
     },
   },
+  client: {
+    url: 'http://localhost:5173',
+  },
   cors: {
     origin: true,
   }

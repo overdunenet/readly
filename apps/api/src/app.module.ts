@@ -5,6 +5,7 @@ import { PostModule } from '@src/module/post/post.module';
 import { FollowModule } from '@src/module/follow/follow.module';
 import { AuthModule } from '@src/module/auth/auth.module';
 import { CashModule } from '@src/module/cash/cash.module';
+import { PaymentModule } from '@src/module/payment/payment.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CashModule } from '@src/module/cash/cash.module';
     FollowModule,
     AuthModule,
     CashModule,
+    PaymentModule,
   ],
   controllers: [],
   providers: [],

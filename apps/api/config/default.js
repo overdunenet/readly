@@ -50,6 +50,16 @@ module.exports = {
       callbackUrl: 'https://post.readly.co.kr/auth/kakao/callback',
     },
   },
+  payment: {
+    nicepay: {
+      url: process.env.NICEPAY_URL,
+      clientKey: process.env.NICEPAY_CLIENT_KEY,
+      secret: process.env.NICEPAY_SECRET,
+    }
+  },
+  client: {
+    url: process.env.CLIENT_URL,
+  },
   cors: {
     origin: [
       /\.readly\.co\.kr$/,
