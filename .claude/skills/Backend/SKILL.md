@@ -1,6 +1,6 @@
 ---
 name: Backend
-description: NestJS/TypeORM 백엔드 개발 시 사용. 레이어 객체 변환, find vs queryBuilder 선택 기준, Migration 생성 규칙(반드시 migration:create 사용), BDD 테스트 작성 규칙 제공.
+description: NestJS 백엔드 개발 시 사용. 레이어 객체 변환 규칙, BDD 테스트 작성 규칙 제공.
 keywords:
   [
     Backend,
@@ -10,11 +10,6 @@ keywords:
     Entity,
     Service,
     Controller,
-    TypeORM,
-    find,
-    queryBuilder,
-    migration,
-    마이그레이션,
     test,
     BDD,
     테스트,
@@ -108,78 +103,6 @@ async findOne(@Param('id') id: number) {
 
 ---
 
-<rules>
-
-## TypeORM 사용 규칙
-
-> **find 메서드를 기본으로 사용하고, QueryBuilder는 필요한 경우에만 사용한다.**
-
-### find 메서드 우선 사용
-
-```typescript
-// ✅ 기본 조회
-const user = await this.userRepository.findOneBy({ id });
-const users = await this.userRepository.find({
-  where: { status: 'active' },
-  relations: ['orders'],
-  order: { createdAt: 'DESC' },
-  take: 10,
-});
-
-// ✅ 조건 조합
-const users = await this.userRepository.find({
-  where: [
-    { status: 'active', role: 'admin' },
-    { status: 'active', role: 'manager' },
-  ],
-});
-```
-
-### QueryBuilder 허용 케이스
-
-**다음 경우에만 QueryBuilder 사용:**
-
-| 케이스                   | 예시             |
-| ------------------------ | ---------------- |
-| **groupBy**              | 집계 쿼리        |
-| **getRawMany/getRawOne** | 원시 데이터 필요 |
-| **복잡한 서브쿼리**      | 중첩 쿼리        |
-| **복잡한 JOIN 조건**     | ON 절 커스텀     |
-
-</rules>
-
-<examples>
-<example type="good">
-```typescript
-// ✅ QueryBuilder 허용: groupBy + getRawMany
-const stats = await this.orderRepository
-  .createQueryBuilder('order')
-  .select('order.status', 'status')
-  .addSelect('COUNT(*)', 'count')
-  .addSelect('SUM(order.amount)', 'total')
-  .groupBy('order.status')
-  .getRawMany();
-```
-</example>
-<example type="bad">
-```typescript
-// ❌ 불필요한 QueryBuilder 사용
-const user = await this.userRepository
-  .createQueryBuilder('user')
-  .where('user.id = :id', { id })
-  .getOne();
-```
-</example>
-<example type="good">
-```typescript
-// ✅ find로 대체
-const user = await this.userRepository.findOneBy({ id });
-```
-</example>
-</examples>
-
----
-
 <checklist>
 
 ## 체크리스트
@@ -188,72 +111,16 @@ const user = await this.userRepository.findOneBy({ id });
 - [ ] Service에서 Entity가 필요한 시점에 변환하는가?
 - [ ] Service의 return은 Entity 또는 일반 객체인가?
 - [ ] Controller에서 Response DTO/Schema로 변환하는가?
-- [ ] TypeORM find 메서드를 우선 사용하는가?
-- [ ] QueryBuilder는 groupBy, getRawMany 등 필요한 경우에만 사용하는가?
 
 </checklist>
-
-<rules>
-
-## Migration 작성 규칙
-
-> **Migration 파일은 반드시 CLI 명령어로 생성한다. 수동으로 타임스탬프를 지정하여 파일을 만들지 않는다.**
-
-### 파일 생성 (필수)
-
-```bash
-# apps/api 디렉토리에서 실행 (yarn 3.x에서 함수 문법 이슈로 npx 직접 사용)
-cd apps/api && npx typeorm migration:create src/database/migration/<MigrationName>
-```
-
-- **절대 수동으로 타임스탬프 파일명을 만들지 않는다** (예: `1774100000000-xxx.ts` 직접 생성 금지)
-- TypeORM CLI가 자동 생성한 타임스탬프 + 클래스명을 그대로 사용한다
-- `migration:create`가 생성한 빈 `up()`/`down()` 메서드에 SQL을 채운다
-- MigrationName은 PascalCase로 작성한다 (예: `AddUserStatus`, `CreatePostsTable`)
-
-### 작성 패턴
-
-```typescript
-import { MigrationInterface, QueryRunner } from 'typeorm';
-
-export class AddUserStatus1773926438602 implements MigrationInterface {
-  name = 'AddUserStatus1773926438602';
-
-  public async up(queryRunner: QueryRunner): Promise<void> {
-    // CREATE TYPE → CREATE TABLE → ALTER TABLE → CREATE INDEX 순서
-    await queryRunner.query(`CREATE TYPE "user_status" AS ENUM (...)`);
-    await queryRunner.query(`ALTER TABLE "users" ADD COLUMN ...`);
-    await queryRunner.query(`CREATE INDEX ...`);
-  }
-
-  public async down(queryRunner: QueryRunner): Promise<void> {
-    // up의 역순: DROP INDEX → ALTER TABLE DROP → DROP TYPE
-    await queryRunner.query(`DROP INDEX ...`);
-    await queryRunner.query(`ALTER TABLE "users" DROP COLUMN ...`);
-    await queryRunner.query(`DROP TYPE ...`);
-  }
-}
-```
-
-### 규칙
-
-- `name` 프로퍼티를 클래스명과 동일하게 설정한다
-- raw SQL로 작성한다 (QueryBuilder 사용하지 않음)
-- `up`에서 CREATE TYPE → CREATE TABLE → ALTER TABLE → CREATE INDEX 순서
-- `down`에서 DROP INDEX → ALTER TABLE → DROP TABLE → DROP TYPE 역순
-- 각 SQL문은 별도 `queryRunner.query()` 호출로 분리한다
-- 기존 데이터 마이그레이션(UPDATE)은 DDL 뒤에 배치한다
-- 실행: `yarn workspace @readly/api migration:run`
-- 롤백: `yarn workspace @readly/api migration:revert`
-
-</rules>
 
 <reference>
 
 ## 관련 문서
 
-| 주제       | 위치             | 설명                                      |
-| ---------- | ---------------- | ----------------------------------------- |
-| BDD 테스트 | `bdd-testing.md` | NestJS + Jest BDD 스타일 테스트 작성 규칙 |
+| 주제              | 위치               | 설명                                      |
+| ----------------- | ------------------ | ----------------------------------------- |
+| TypeORM 사용 규칙 | `TypeORM/SKILL.md` | find vs queryBuilder 선택 기준            |
+| BDD 테스트        | `bdd-testing.md`   | NestJS + Jest BDD 스타일 테스트 작성 규칙 |
 
 </reference>

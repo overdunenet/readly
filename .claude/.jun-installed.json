@@ -1,0 +1,144 @@
+{
+  "version": "0.6.4",
+  "installedAt": "2026-03-23T00:03:42.891Z",
+  "files": {
+    "CLAUDE.md": {
+      "hash": "58c7de4e212e77ce6a2287a9af061a22e070e4fd87312b511f93ffcbd84a7e73"
+    },
+    "hooks/dangerous-command-blocker.sh": {
+      "hash": "d98aa04f0c42cbc74858401640463b7fdd6d4e0fdffe830e49e62c20ce22638c"
+    },
+    "hooks/session-wrap-suggester.sh": {
+      "hash": "3a70420f088e4b270e99c51289ce66495e8e77d6b37529506e680940899948b3"
+    },
+    "hooks/skill-forced.sh": {
+      "hash": "992acecde104535c4239dc1d366fe26277a4fa07788962e0ab6f4063a5c4bc57"
+    },
+    "hooks/workflow-enforced.sh": {
+      "hash": "98fe67cdd9c53bc151ba4547c37f2f12aaa6964b7365fbc3bf7ec38c7cae8e52"
+    },
+    "agents/architect.md": {
+      "hash": "c8eb647baa6f746f64bfb25d3b9160aef5d1ee046d02de29ab4a2344fe2b4deb"
+    },
+    "agents/automation-scout.md": {
+      "hash": "8c19d17a5e09c6040870a8279355412f90045876949d06322ed1746dc13ec974"
+    },
+    "agents/code-reviewer.md": {
+      "hash": "f7d33ae6a9ca89a74c436ce207b2e776726980742b1b20dffe6dab77e77da27a"
+    },
+    "agents/code-writer.md": {
+      "hash": "d5769f586f130f2549018939d4ce63a7c7371a72866a10dfa9d7da5641027fac"
+    },
+    "agents/context-collector.md": {
+      "hash": "bff41d2a4d7e5caf1c647f6bd2b10e2a4fdc1c796f171389f7ee81038bfaa5ae"
+    },
+    "agents/context-manager.md": {
+      "hash": "9f3388e2372532e30534fda4296ae0097cb208fa73522f0fb24050c1892e6942"
+    },
+    "agents/designer.md": {
+      "hash": "3d31d51fc57653528ea90bc7596601ecd4216ec097b436b899c806df89128466"
+    },
+    "agents/director.md": {
+      "hash": "24e78d6ce0e1690e9f4259686c2f997180b726705eab189ddf9cfd2f7bb2ffe0"
+    },
+    "agents/explore.md": {
+      "hash": "b8f4462b4c5b8c40e0ed9463b46b2244df1cf25ba5c9f0b4709e72a39f28e095"
+    },
+    "agents/followup-suggester.md": {
+      "hash": "e36836a914d9c1175da8449c4a5d1dc2848295eb6f8d001a74e15b8f50c26cdf"
+    },
+    "agents/git-manager.md": {
+      "hash": "ff913cb3b41f2a517728594680e4b1eb48d9ef5d91110969219f2440503315fb"
+    },
+    "agents/impact-analyzer.md": {
+      "hash": "20b10d93eda4c5f2e606212f733335146ac7f33fe4eb7ccf27c5fa6d717b6eea"
+    },
+    "agents/learning-extractor.md": {
+      "hash": "729e33ed9e953dfd9a52f62288770375d41db41948eb63913f11fba3719f3c7e"
+    },
+    "agents/plan-verifier.md": {
+      "hash": "961b1cdf0e7b2c3f125dd4cc13a6704096603d64902f297ee36cf98e815fe3b6"
+    },
+    "agents/qa-tester.md": {
+      "hash": "9bbe44e6c064c8f40f339224e9fb32257a7eeac11ef6853f5f143d5e37ddf804"
+    },
+    "agents/simple-code-writer.md": {
+      "hash": "90c450e70cfc74d3f9530cb86b9cc03586226af9bde5cdae11e8ba61edf17699"
+    },
+    "agents/task-enricher.md": {
+      "hash": "1df9109f9e07ad7d97f5e03126b896ff854d605738416aabc85825c125b52d13"
+    },
+    "agents/task-planner.md": {
+      "hash": "293966c5c9b9a0462ced392a44701163e8f45cbb6c146465cdf655f26fd1d814"
+    },
+    "skills/Backend/SKILL.md": {
+      "hash": "6793bfcbce188b0e6b7b274a7bab8989b89560a0d0905152e8dd03cf01d7db1a"
+    },
+    "skills/Backend/bdd-testing.md": {
+      "hash": "90ef513e4a0d16c65e344553544e9df5b77a24037e18c30182bb0cdb9e14d285"
+    },
+    "skills/Coding/SKILL.md": {
+      "hash": "097661a300ad275aac98364684d712b1def4bfc4a3eb3966ef6d72450418f406"
+    },
+    "skills/ContextHandoff/SKILL.md": {
+      "hash": "0673bad145f5ba055e9c6db3dd05d43cdd13fd6d28a59cff6c73dd2ad15da1f0"
+    },
+    "skills/Director/SKILL.md": {
+      "hash": "45408c1b7964a1ab68fbfb59cb8e4037ab808b22d25695d7780066dea128c653"
+    },
+    "skills/Documentation/SKILL.md": {
+      "hash": "9db407965cfb7d218748512c81f13d68b0f03b4440c8b4331f3fa50a2dbd7663"
+    },
+    "skills/Git/SKILL.md": {
+      "hash": "e6142eb24fb5e5a685f83dcf3055870a9e6b27805b1b2086ec9ab76bf2947d1b"
+    },
+    "skills/Git/git.md": {
+      "hash": "916bd107d9c1dfa54ea2bac1e6aab7f698dae07ed104c91a24ef4dafc782efb7"
+    },
+    "skills/Git/pr-apply.md": {
+      "hash": "4bbb692f5d59b0ef803a2bd60d25816d84c0eb49d69a73ce07e1ce899c373756"
+    },
+    "skills/Git/pr-review.md": {
+      "hash": "80b40205a8fb94ccab2644be2cbd75a0560c1ea2723ae258f615a7304c624516"
+    },
+    "skills/Planning/SKILL.md": {
+      "hash": "12361516785d2f3a6c06028557c8637ce038911bdcf37b69d5c210d70d6b6e67"
+    },
+    "skills/PromptStructuring/SKILL.md": {
+      "hash": "1c7553efd1be9543592f4cd0476578883081f4e3fdf2e7f5b649459ab4d59394"
+    },
+    "skills/PromptStructuring/output-optimization.md": {
+      "hash": "71085cb9d07d5a7202ebfcce4d8116afb3a2971c03dc7f03c660c2eb431b23c3"
+    },
+    "skills/PromptStructuring/positive-phrasing.md": {
+      "hash": "2039e7c00ec4094e9c19993663028671deaea83077ade7e1690eac9331ff455e"
+    },
+    "skills/PromptStructuring/skills-frontmatter.md": {
+      "hash": "14dfa1e392257517640a76a8808a725a67adb56c2b4ba386a4018b2560ba6e7b"
+    },
+    "skills/PromptStructuring/xml-tags.md": {
+      "hash": "e470f72bb51102ab5a0ecf510982c6fd99e1073f1857e63f76fedb1516ec373f"
+    },
+    "skills/React/SKILL.md": {
+      "hash": "9d5ac2d88891bf3337dbf33227462a3af67458874e8532baa6d596464f9bb5ac"
+    },
+    "skills/React/react-hook-form.md": {
+      "hash": "a711259e7bf93f8263d15af6a5fb8766e9c0a931fd9c6654f0605677575f9e57"
+    },
+    "skills/React/tailwind-styled.md": {
+      "hash": "d0094b7267770c156f56d5e8b35be285ba6b27a8e86387baf88480f4037f51af"
+    },
+    "skills/React/tanstack-router.md": {
+      "hash": "3bb31b4e6b40b0432ec166e272edf83a6db4a9c9a5f7f69b28103089981098de"
+    },
+    "skills/Reporting/SKILL.md": {
+      "hash": "7b85508ffeeffa6bed50f9624526d8811225af0ad9bbbb344f97ec02c060e2df"
+    },
+    "skills/SessionWrap/SKILL.md": {
+      "hash": "38a344b145dbe129ab70dbc4735431c97f92f34e5d2ec8d382e80e61a6db8178"
+    },
+    "skills/TypeORM/SKILL.md": {
+      "hash": "99c7a656a27db5fcb32d64a14e02a2d7ff9d98a8c05e6d97d8b52e412393bbad"
+    }
+  }
+}
