@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { FindOptionsWhere, MoreThan, Raw } from 'typeorm';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
@@ -37,6 +38,7 @@ export class CashService {
       amount,
       balanceAfter: newBalance,
       description,
+      groupKey: randomUUID(),
     });
     await this.repositoryProvider.CashHistoryRepository.save(history);
 
@@ -63,9 +65,10 @@ export class CashService {
       order: { createdAt: 'ASC' },
     });
 
+    const groupKey = randomUUID();
     let remaining = amount;
-    const firstCashId = cashRows[0].id;
 
+    // cash row 마다 차감 + history 기록
     for (const cash of cashRows) {
       if (remaining <= 0) break;
 
@@ -73,19 +76,26 @@ export class CashService {
       cash.currentAmount -= deduct;
       remaining -= deduct;
       await this.repositoryProvider.CashRepository.save(cash);
+
+      const history = CashHistoryEntity.create({
+        cashId: cash.id,
+        userId,
+        type,
+        amount: -deduct,
+        balanceAfter: 0, // syncBalance 후 일괄 업데이트
+        description,
+        groupKey,
+      });
+      await this.repositoryProvider.CashHistoryRepository.save(history);
     }
 
+    // 잔액 동기화 후 history의 balanceAfter 일괄 업데이트
     const newBalance = await this.syncBalance(userId);
-
-    const history = CashHistoryEntity.create({
-      cashId: firstCashId,
-      userId,
-      type,
-      amount: -amount,
-      balanceAfter: newBalance,
-      description,
-    });
-    await this.repositoryProvider.CashHistoryRepository.save(history);
+    await this.repositoryProvider.CashHistoryRepository.createQueryBuilder()
+      .update()
+      .set({ balanceAfter: newBalance })
+      .where('group_key = :groupKey', { groupKey })
+      .execute();
   }
 
   /**

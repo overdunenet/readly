@@ -35,6 +35,12 @@ export class CashHistoryEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 200, comment: '설명' })
   description: string;
 
+  @Column({
+    type: 'uuid',
+    comment: '동일 작업으로 생성된 history를 묶는 그룹 키',
+  })
+  groupKey: string;
+
   @ManyToOne(() => CashEntity)
   @JoinColumn({ name: 'cash_id' })
   cash: CashEntity;
@@ -50,6 +56,7 @@ export class CashHistoryEntity extends BaseEntity {
     amount: number;
     balanceAfter: number;
     description: string;
+    groupKey: string;
   }): CashHistoryEntity {
     const entity = new CashHistoryEntity();
     entity.cashId = input.cashId;
@@ -58,6 +65,7 @@ export class CashHistoryEntity extends BaseEntity {
     entity.amount = input.amount;
     entity.balanceAfter = input.balanceAfter;
     entity.description = input.description;
+    entity.groupKey = input.groupKey;
     return entity;
   }
 }
