@@ -84,6 +84,13 @@ async create(dto: CreateUserDto) {
 }
 ```
 
+### Enum 패턴
+
+- DB 컬럼: `type: 'varchar'` (DB에 CREATE TYPE enum 사용하지 않음)
+- 코드: TypeScript enum 정의 후 Entity에서 타입으로 사용
+- default 값: enum 멤버로 지정 (e.g., `PaymentStatus.PENDING`)
+- 이유: DB enum은 변경 시 ALTER TYPE 필요하여 유연성 떨어짐
+
 ### Service -> Controller 반환
 
 ```typescript
@@ -113,6 +120,14 @@ async findOne(@Param('id') id: number) {
 ## TypeORM 사용 규칙
 
 > **find 메서드를 기본으로 사용하고, QueryBuilder는 필요한 경우에만 사용한다.**
+
+### TypeORM 쿼리 우선순위
+
+우선순위: find > queryBuilder > raw query
+
+- **find**: 기본 CRUD, 조건 조회, 페이지네이션
+- **queryBuilder**: groupBy, SUM 등 집계, 복잡한 JOIN (find 불가 시에만)
+- **raw query**: queryBuilder로도 불가능한 경우에만 (최후 수단)
 
 ### find 메서드 우선 사용
 
@@ -257,3 +272,16 @@ export class AddUserStatus1773926438602 implements MigrationInterface {
 | BDD 테스트 | `bdd-testing.md` | NestJS + Jest BDD 스타일 테스트 작성 규칙 |
 
 </reference>
+
+<rules>
+
+### @Transactional 패턴
+
+- mutation query는 Controller에서 `@Transactional` 데코레이터 사용
+- Service에서 `transactionService.runInTransaction()` 직접 호출 금지
+- @Transactional 순서: `@MessagePattern` 아래에 배치
+- Controller에 `transactionService: TransactionService` DI 필수
+- Service는 RepositoryProvider만 사용 — 트랜잭션 컨텍스트 자동 전파
+- Cron 등 배치도 Controller MessagePattern 경유하여 트랜잭션 보장
+
+</rules>
