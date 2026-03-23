@@ -19,17 +19,6 @@ export class CashController {
     return { amount: balance?.amount ?? 0 };
   }
 
-  @MessagePattern('cash.charge')
-  @Transactional
-  async charge(@Payload() data: { userId: string; amount: number }) {
-    const cash = await this.cashService.charge(data.userId, data.amount);
-    return {
-      id: cash.id,
-      initialAmount: cash.initialAmount,
-      currentAmount: cash.currentAmount,
-    };
-  }
-
   @MessagePattern('cash.getHistory')
   async getHistory(
     @Payload() data: { userId: string; cursor?: string; limit: number }
