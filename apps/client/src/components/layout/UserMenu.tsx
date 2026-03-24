@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { FileText, LogOut, Settings, SquarePen } from 'lucide-react';
+import { FileText, LogOut, Settings, SquarePen, Wallet } from 'lucide-react';
 import tw from 'tailwind-styled-components';
 
 import type { User } from '../../stores/auth';
@@ -33,6 +33,10 @@ const UserMenu = ({ user, isOpen, onToggle, onClose, onLogout }: Props) => (
           </MenuLinkItem>
           <MenuLinkItem to="/editor/posts" onClick={onClose}>
             <FileText size={16} />내 포스트
+          </MenuLinkItem>
+          <MenuLinkItem to="/editor/cash/charge" onClick={onClose}>
+            <Wallet size={16} />
+            캐시 충전
           </MenuLinkItem>
           <MenuDivider />
           <MenuLinkItem to="/editor/settings" onClick={onClose}>

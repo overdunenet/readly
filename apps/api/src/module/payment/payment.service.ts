@@ -57,7 +57,7 @@ export class PaymentService {
       throw new BadRequestException('결제 승인에 실패했습니다');
     }
 
-    if (confirmResult.amount !== payment.amount) {
+    if (Number(confirmResult.amount) !== payment.amount) {
       payment.status = PaymentStatus.FAILED;
       payment.failReason = `PG 승인 금액 불일치: expected=${payment.amount}, actual=${confirmResult.amount}`;
       await this.repositoryProvider.PaymentRepository.save(payment);
