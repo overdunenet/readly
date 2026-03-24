@@ -40,6 +40,14 @@ module.exports = {
       callbackUrl: 'http://localhost:5173/auth/kakao/callback',
     },
   },
+  payment: {
+    nicepay: {
+      url: 'https://sandbox-api.nicepay.co.kr',
+    },
+  },
+  client: {
+    url: 'http://localhost:5173',
+  },
   cors: {
     origin: true,
   }

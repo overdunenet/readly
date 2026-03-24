@@ -28,4 +28,12 @@ module.exports = {
     },
   },
   cors: { origin: true },
+  payment: {
+    nicepay: {
+      url: 'https://sandbox-api.nicepay.co.kr',
+    },
+  },
+  client: {
+    url: 'http://localhost:5173',
+  },
 };

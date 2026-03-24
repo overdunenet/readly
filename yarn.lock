@@ -3039,6 +3039,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nestjs/axios@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "@nestjs/axios@npm:4.0.1"
+  peerDependencies:
+    "@nestjs/common": ^10.0.0 || ^11.0.0
+    axios: ^1.3.1
+    rxjs: ^7.0.0
+  checksum: a6a3d4a1f0063a95ac74c56eb6947fc28482d7a4bb914e27faa1056ff83f1e9021b62099d14f24b8faedb9ddd217d13abdc99a087a02e6a7e3667d8b1106aa46
+  languageName: node
+  linkType: hard
+
 "@nestjs/cli@npm:^11.0.0":
   version: 11.0.7
   resolution: "@nestjs/cli@npm:11.0.7"
@@ -3417,6 +3428,7 @@ __metadata:
   dependencies:
     "@aws-sdk/client-secrets-manager": ^3.787.0
     "@eslint/js": ^9.19.0
+    "@nestjs/axios": ^4.0.1
     "@nestjs/cli": ^11.0.0
     "@nestjs/common": ^11.1.2
     "@nestjs/core": ^11.1.2
