@@ -3,6 +3,9 @@ import { AppModule } from '@src/app.module';
 import { DataSources } from '@src/database/datasources';
 import { getUserRepository } from '@src/module/domain/user.entity';
 import { getPostRepository } from '@src/module/domain/post.entity';
+import { getCashRepository } from '@src/module/domain/cash.entity';
+import { getCashBalanceRepository } from '@src/module/domain/cash-balance.entity';
+import { getCashHistoryRepository } from '@src/module/domain/cash-history.entity';
 import { RepositoryProvider } from '@src/module/shared/transaction/repository.provider';
 import { TransactionService } from '@src/module/shared/transaction/transaction.service';
 import { EntityManager } from 'typeorm';
@@ -29,6 +32,9 @@ export const mockJestRepository = (entityManager?: EntityManager) => {
   const mockedRepository = {
     UserRepository: getUserRepository(entityManager),
     PostRepository: getPostRepository(entityManager),
+    CashRepository: getCashRepository(entityManager),
+    CashBalanceRepository: getCashBalanceRepository(entityManager),
+    CashHistoryRepository: getCashHistoryRepository(entityManager),
   };
 
   Object.entries(mockedRepository).forEach(([key, repo]) => {
