@@ -34,9 +34,9 @@ const UserMenu = ({ user, isOpen, onToggle, onClose, onLogout }: Props) => (
           <MenuLinkItem to="/editor/posts" onClick={onClose}>
             <FileText size={16} />내 포스트
           </MenuLinkItem>
-          <MenuLinkItem to="/editor/cash/charge" onClick={onClose}>
+          <MenuLinkItem to="/my/cash" onClick={onClose}>
             <Wallet size={16} />
-            캐시 충전
+            캐시 관리
           </MenuLinkItem>
           <MenuDivider />
           <MenuLinkItem to="/editor/settings" onClick={onClose}>

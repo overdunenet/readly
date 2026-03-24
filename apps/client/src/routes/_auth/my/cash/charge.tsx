@@ -18,7 +18,7 @@ const PAY_METHODS = [
 const MIN_AMOUNT = 1_000;
 const MAX_AMOUNT = 1_000_000;
 
-export const Route = createFileRoute('/_auth/editor/cash/charge')({
+export const Route = createFileRoute('/_auth/my/cash/charge')({
   component: CashChargePage,
 });
 

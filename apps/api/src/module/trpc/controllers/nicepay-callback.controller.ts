@@ -33,7 +33,7 @@ export class NicepayCallbackController {
         `NicePay 콜백 실패: ${body.authResultCode} - ${body.authResultMsg}`
       );
       return res.redirect(
-        `${clientUrl}/editor/cash/charge-result?status=failed&message=${encodeURIComponent(body.authResultMsg)}`
+        `${clientUrl}/my/cash/charge-result?status=failed&message=${encodeURIComponent(body.authResultMsg)}`
       );
     }
 
@@ -45,7 +45,7 @@ export class NicepayCallbackController {
       })
       .then(() =>
         res.redirect(
-          `${clientUrl}/editor/cash/charge-result?status=success&orderId=${body.orderId}`
+          `${clientUrl}/my/cash/charge-result?status=success&orderId=${body.orderId}`
         )
       )
       .catch((error: unknown) => {
@@ -57,7 +57,7 @@ export class NicepayCallbackController {
           `NicePay 승인 실패 (orderId: ${body.orderId}): ${message}`
         );
         return res.redirect(
-          `${clientUrl}/editor/cash/charge-result?status=failed&message=${encodeURIComponent(message)}`
+          `${clientUrl}/my/cash/charge-result?status=failed&message=${encodeURIComponent(message)}`
         );
       });
   }
