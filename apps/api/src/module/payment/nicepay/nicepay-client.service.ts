@@ -32,11 +32,7 @@ export class NicepayClientService {
         if (data.resultCode !== '0000') return null;
         return data;
       })
-      .catch(
-        (err: unknown) =>
-          ((err as Record<string, Record<string, unknown>>)?.response
-            ?.data as NicepayConfirmResponse) ?? null
-      );
+      .catch((): null => null);
   }
 
   // 결제 정보 조회 (이미 승인된 건 확인)
@@ -54,10 +50,6 @@ export class NicepayClientService {
         if (data.resultCode !== '0000') return null;
         return data;
       })
-      .catch(
-        (err: unknown) =>
-          ((err as Record<string, Record<string, unknown>>)?.response
-            ?.data as NicepayConfirmResponse) ?? null
-      );
+      .catch((): null => null);
   }
 }

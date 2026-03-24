@@ -42,7 +42,7 @@ module.exports = {
   },
   payment: {
     nicepay: {
-      url: 'https://sandbox-api.nicepay.co.kr',
+      url: 'https://api.nicepay.co.kr',
     },
   },
   client: {
