@@ -15,6 +15,16 @@ export const Route = createFileRoute('/_auth/my-bookstore/works')({
 
 type StatusFilterValue = 'all' | 'draft' | 'published' | 'scheduled';
 
+interface WorkItem {
+  id: string;
+  title: string;
+  excerpt?: string | null;
+  thumbnail?: string | null;
+  status: 'draft' | 'published' | 'scheduled';
+  publishedAt?: Date | string | null;
+  updatedAt: Date | string;
+}
+
 function WorksPage() {
   const navigate = useNavigate();
   const [selectedStatus, setSelectedStatus] =
@@ -87,7 +97,7 @@ function WorksPage() {
           worksQuery.data &&
           worksQuery.data.length > 0 && (
             <WorkList>
-              {worksQuery.data.map((work) => (
+              {worksQuery.data.map((work: WorkItem) => (
                 <WorkListItem key={work.id} work={work} onEdit={handleEdit} />
               ))}
             </WorkList>

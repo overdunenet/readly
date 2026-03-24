@@ -134,7 +134,9 @@ function SettingsPage() {
                   type="number"
                   min={0}
                   value={field.value}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    field.onChange(Number(e.target.value))
+                  }
                   placeholder="0"
                 />
               )}
