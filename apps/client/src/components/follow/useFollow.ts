@@ -2,13 +2,13 @@ import { useCallback, useRef } from 'react';
 
 import { trpc } from '@/shared';
 
-export const useFollow = (followeeId: string) => {
+export const useFollow = (followeeId: string, enabled = true) => {
   const isMutating = useRef(false);
   const utils = trpc.useUtils();
 
   const { data: isFollowing } = trpc.follow.isFollowing.useQuery(
     { followeeId },
-    { enabled: !!followeeId },
+    { enabled: !!followeeId && enabled },
   );
 
   const followMutation = trpc.follow.follow.useMutation({
