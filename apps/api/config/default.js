@@ -52,13 +52,13 @@ module.exports = {
   },
   payment: {
     nicepay: {
-      url: process.env.NICEPAY_URL,
+      url: 'https://api.nicepay.co.kr',
       clientKey: process.env.NICEPAY_CLIENT_KEY,
       secret: process.env.NICEPAY_SECRET,
     }
   },
   client: {
-    url: process.env.CLIENT_URL,
+    url: 'https://post.readly.co.kr',
   },
   cors: {
     origin: [

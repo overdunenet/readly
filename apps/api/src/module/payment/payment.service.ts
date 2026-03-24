@@ -28,12 +28,14 @@ export class PaymentService {
     tid: string,
     amount: number
   ): Promise<PaymentEntity> {
-    const payment =
-      await this.repositoryProvider.PaymentRepository.findOneByOrFail({
-        id: orderId,
-      }).catch(() => {
-        throw new BadRequestException('결제 정보를 찾을 수 없습니다');
-      });
+    const payment = await this.repositoryProvider.PaymentRepository.findOne({
+      where: { id: orderId },
+      lock: { mode: 'pessimistic_write' },
+    });
+
+    if (!payment) {
+      throw new BadRequestException('결제 정보를 찾을 수 없습니다');
+    }
 
     if (payment.status !== PaymentStatus.PENDING) {
       throw new BadRequestException('이미 처리된 결제입니다');
@@ -53,6 +55,13 @@ export class PaymentService {
       payment.failReason = 'PG 결제 승인 실패';
       await this.repositoryProvider.PaymentRepository.save(payment);
       throw new BadRequestException('결제 승인에 실패했습니다');
+    }
+
+    if (confirmResult.amount !== payment.amount) {
+      payment.status = PaymentStatus.FAILED;
+      payment.failReason = `PG 승인 금액 불일치: expected=${payment.amount}, actual=${confirmResult.amount}`;
+      await this.repositoryProvider.PaymentRepository.save(payment);
+      throw new BadRequestException('결제 금액이 일치하지 않습니다');
     }
 
     payment.status = PaymentStatus.PAID;
