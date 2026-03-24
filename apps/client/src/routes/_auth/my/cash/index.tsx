@@ -3,6 +3,7 @@ import tw from 'tailwind-styled-components';
 
 import SubLayout from '../../../../components/layout/SubLayout';
 import { trpc } from '@/shared';
+import { formatAmount, getAmountColor } from './cash-utils';
 
 export const Route = createFileRoute('/_auth/my/cash/')({
   component: CashHubPage,
@@ -66,19 +67,6 @@ function CashHubPage() {
       </PageContainer>
     </SubLayout>
   );
-}
-
-function formatAmount(type: string, amount: number): string {
-  const formatted = amount.toLocaleString();
-  if (type === 'CHARGE' || type === 'REFUND') return `+${formatted}원`;
-  return `-${formatted}원`;
-}
-
-function getAmountColor(type: string): string {
-  if (type === 'CHARGE') return 'text-green-600';
-  if (type === 'PURCHASE') return 'text-red-500';
-  if (type === 'REFUND') return 'text-blue-600';
-  return 'text-gray-900';
 }
 
 // Styled Components
