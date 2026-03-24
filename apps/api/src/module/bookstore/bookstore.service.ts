@@ -6,11 +6,26 @@ import {
 } from '@nestjs/common';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { BookstoreEntity } from '../domain/bookstore.entity';
+import { PostEntity, PostStatus } from '../domain/post.entity';
 
 export interface OpenBookstoreInput {
   penName: string;
   storeName: string;
   termsAgreedAt?: Date;
+}
+
+export interface UpdateProfileInput {
+  penName?: string;
+  storeName?: string;
+  bio?: string;
+  profileImage?: string;
+  coverImage?: string;
+}
+
+export interface GetPostsOptions {
+  type?: 'single' | 'series';
+  page?: number;
+  limit?: number;
 }
 
 @Injectable()
@@ -63,6 +78,87 @@ export class BookstoreService {
       userId,
     }).catch(() => {
       throw new NotFoundException('서점을 찾을 수 없습니다');
+    });
+  }
+
+  async updateProfile(
+    userId: string,
+    input: UpdateProfileInput
+  ): Promise<BookstoreEntity> {
+    const bookstore =
+      await this.repositoryProvider.BookstoreRepository.findOneByOrFail({
+        userId,
+      }).catch(() => {
+        throw new NotFoundException('서점을 찾을 수 없습니다');
+      });
+
+    if (input.penName !== undefined) {
+      bookstore.penName = input.penName;
+    }
+    if (input.storeName !== undefined) {
+      bookstore.storeName = input.storeName;
+    }
+    if (input.bio !== undefined) {
+      bookstore.bio = input.bio || null;
+    }
+    if (input.profileImage !== undefined) {
+      bookstore.profileImage = input.profileImage || null;
+    }
+    if (input.coverImage !== undefined) {
+      bookstore.coverImage = input.coverImage || null;
+    }
+
+    return this.repositoryProvider.BookstoreRepository.save(bookstore);
+  }
+
+  async getById(bookstoreId: string): Promise<BookstoreEntity> {
+    return this.repositoryProvider.BookstoreRepository.findOneByOrFail({
+      id: bookstoreId,
+    }).catch(() => {
+      throw new NotFoundException('서점을 찾을 수 없습니다');
+    });
+  }
+
+  async getPosts(
+    bookstoreId: string,
+    options: GetPostsOptions
+  ): Promise<{ posts: PostEntity[]; total: number }> {
+    const page = options.page ?? 1;
+    const limit = options.limit ?? 20;
+    const skip = (page - 1) * limit;
+
+    const [posts, total] =
+      await this.repositoryProvider.PostRepository.findAndCount({
+        where: {
+          bookstoreId,
+          status: 'published' as PostStatus,
+        },
+        relations: ['author'],
+        order: { publishedAt: 'DESC' },
+        skip,
+        take: limit,
+      });
+
+    return { posts, total };
+  }
+
+  async getMyWorks(userId: string, status?: string): Promise<PostEntity[]> {
+    const bookstore =
+      await this.repositoryProvider.BookstoreRepository.findOneByOrFail({
+        userId,
+      }).catch(() => {
+        throw new NotFoundException('서점을 찾을 수 없습니다');
+      });
+
+    const where: Record<string, unknown> = { bookstoreId: bookstore.id };
+    if (status) {
+      where.status = status as PostStatus;
+    }
+
+    return this.repositoryProvider.PostRepository.find({
+      where,
+      relations: ['author'],
+      order: { updatedAt: 'DESC' },
     });
   }
 }

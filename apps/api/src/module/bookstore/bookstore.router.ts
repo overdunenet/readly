@@ -11,6 +11,8 @@ import { BaseTrpcRouter } from '../trpc/baseTrpcRouter';
 import {
   UserAuthMiddleware,
   UserAuthorizedContext,
+  OptionalUserAuthMiddleware,
+  OptionalUserContext,
 } from '../user/user.auth.middleware';
 
 const openBookstoreInputSchema = z.object({
@@ -42,6 +44,44 @@ const bookstoreResponseSchema = z.object({
   openedAt: z.date().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
+});
+
+const updateProfileInputSchema = z.object({
+  penName: z.string().min(1).max(30).optional(),
+  storeName: z.string().min(1).max(50).optional(),
+  bio: z.string().max(500).optional(),
+  profileImage: z.string().url().optional().or(z.literal('')),
+  coverImage: z.string().url().optional().or(z.literal('')),
+});
+
+const postAccessLevelSchema = z.enum([
+  'public',
+  'subscriber',
+  'purchaser',
+  'private',
+]);
+
+const postResponseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  content: z.string(),
+  excerpt: z.string().nullish(),
+  thumbnail: z.string().nullish(),
+  accessLevel: postAccessLevelSchema,
+  status: z.enum(['draft', 'published', 'scheduled']),
+  price: z.number(),
+  bookstoreId: z.string().uuid().nullable(),
+  publishedAt: z.date().nullish(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+const postFeedItemSchema = postResponseSchema.extend({
+  author: z.object({
+    id: z.string(),
+    nickname: z.string(),
+    profileImage: z.string().nullish(),
+  }),
 });
 
 @Router({ alias: 'bookstore' })
@@ -91,6 +131,90 @@ export class BookstoreRouter extends BaseTrpcRouter {
   async getMyBookstore(@Ctx() ctx: UserAuthorizedContext) {
     return await this.microserviceClient.send('bookstore.getMyBookstore', {
       userId: ctx.user.sub,
+    });
+  }
+
+  /**
+   * 서점 프로필 수정
+   */
+  @UseMiddlewares(UserAuthMiddleware)
+  @Mutation({
+    input: updateProfileInputSchema,
+    output: bookstoreResponseSchema,
+  })
+  async updateProfile(
+    @Ctx() ctx: UserAuthorizedContext,
+    @Input() input: z.infer<typeof updateProfileInputSchema>
+  ) {
+    return await this.microserviceClient.send('bookstore.updateProfile', {
+      userId: ctx.user.sub,
+      input,
+    });
+  }
+
+  /**
+   * 서점 단일 조회 (독자용, 비로그인 허용)
+   */
+  @UseMiddlewares(OptionalUserAuthMiddleware)
+  @Query({
+    input: z.object({
+      bookstoreId: z.string().uuid(),
+    }),
+    output: bookstoreResponseSchema,
+  })
+  async getById(
+    @Ctx() _ctx: OptionalUserContext,
+    @Input('bookstoreId') bookstoreId: string
+  ) {
+    return await this.microserviceClient.send('bookstore.getById', {
+      bookstoreId,
+    });
+  }
+
+  /**
+   * 서점 포스트 목록 조회 (독자용, 비로그인 허용)
+   */
+  @UseMiddlewares(OptionalUserAuthMiddleware)
+  @Query({
+    input: z.object({
+      bookstoreId: z.string().uuid(),
+      page: z.number().int().positive().default(1),
+      limit: z.number().int().positive().max(50).default(20),
+    }),
+    output: z.object({
+      posts: z.array(postFeedItemSchema),
+      total: z.number(),
+    }),
+  })
+  async getPosts(
+    @Ctx() _ctx: OptionalUserContext,
+    @Input('bookstoreId') bookstoreId: string,
+    @Input('page') page: number,
+    @Input('limit') limit: number
+  ) {
+    return await this.microserviceClient.send('bookstore.getPosts', {
+      bookstoreId,
+      options: { page, limit },
+    });
+  }
+
+  /**
+   * 내 작품 목록 조회
+   */
+  @UseMiddlewares(UserAuthMiddleware)
+  @Query({
+    input: z.object({
+      status: z.enum(['draft', 'published', 'scheduled']).optional(),
+    }),
+    output: z.array(postResponseSchema),
+  })
+  async getMyWorks(
+    @Ctx() ctx: UserAuthorizedContext,
+    @Input('status') status?: string
+  ) {
+    return await this.microserviceClient.send('bookstore.getMyWorks', {
+      userId: ctx.user.sub,
+      status,
     });
   }
 }
