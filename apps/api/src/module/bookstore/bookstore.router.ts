@@ -84,6 +84,22 @@ const postFeedItemSchema = postResponseSchema.extend({
   }),
 });
 
+const publishDefaultResponseSchema = z.object({
+  id: z.string().uuid().optional(),
+  bookstoreId: z.string().uuid(),
+  defaultAccessLevel: z.enum(['public', 'subscriber', 'purchaser']),
+  defaultPrice: z.number().int(),
+  defaultAgeRating: z.enum(['all', 'adult']),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+
+const updateSettingsInputSchema = z.object({
+  defaultAccessLevel: z.enum(['public', 'subscriber', 'purchaser']).optional(),
+  defaultPrice: z.number().int().min(0).optional(),
+  defaultAgeRating: z.enum(['all', 'adult']).optional(),
+});
+
 @Router({ alias: 'bookstore' })
 export class BookstoreRouter extends BaseTrpcRouter {
   /**
@@ -215,6 +231,59 @@ export class BookstoreRouter extends BaseTrpcRouter {
     return await this.microserviceClient.send('bookstore.getMyWorks', {
       userId: ctx.user.sub,
       status,
+    });
+  }
+
+  /**
+   * 발행 디폴트 설정 조회
+   */
+  @UseMiddlewares(UserAuthMiddleware)
+  @Query({
+    output: publishDefaultResponseSchema,
+  })
+  async getSettings(@Ctx() ctx: UserAuthorizedContext) {
+    return await this.microserviceClient.send('bookstore.getSettings', {
+      userId: ctx.user.sub,
+    });
+  }
+
+  /**
+   * 발행 디폴트 설정 수정
+   */
+  @UseMiddlewares(UserAuthMiddleware)
+  @Mutation({
+    input: updateSettingsInputSchema,
+    output: publishDefaultResponseSchema,
+  })
+  async updateSettings(
+    @Ctx() ctx: UserAuthorizedContext,
+    @Input() input: z.infer<typeof updateSettingsInputSchema>
+  ) {
+    return await this.microserviceClient.send('bookstore.updateSettings', {
+      userId: ctx.user.sub,
+      input,
+    });
+  }
+
+  /**
+   * 인기 글 목록 조회 (독자용, 비로그인 허용)
+   */
+  @UseMiddlewares(OptionalUserAuthMiddleware)
+  @Query({
+    input: z.object({
+      bookstoreId: z.string().uuid(),
+      limit: z.number().int().positive().max(10).default(5),
+    }),
+    output: z.array(postFeedItemSchema),
+  })
+  async getPopularPosts(
+    @Ctx() _ctx: OptionalUserContext,
+    @Input('bookstoreId') bookstoreId: string,
+    @Input('limit') limit: number
+  ) {
+    return await this.microserviceClient.send('bookstore.getPopularPosts', {
+      bookstoreId,
+      limit,
     });
   }
 }

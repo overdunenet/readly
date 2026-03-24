@@ -7,9 +7,11 @@ import {
   OpenBookstoreInput,
   UpdateProfileInput,
   GetPostsOptions,
+  UpdateSettingsInput,
 } from './bookstore.service';
 import { BookstoreEntity } from '../domain/bookstore.entity';
 import { PostEntity } from '../domain/post.entity';
+import { PublishDefaultEntity } from '../domain/publish-default.entity';
 
 @Controller()
 export class BookstoreController {
@@ -65,5 +67,27 @@ export class BookstoreController {
     @Payload() data: { userId: string; status?: string }
   ): Promise<PostEntity[]> {
     return this.bookstoreService.getMyWorks(data.userId, data.status);
+  }
+
+  @MessagePattern('bookstore.getSettings')
+  async getSettings(
+    @Payload() data: { userId: string }
+  ): Promise<PublishDefaultEntity> {
+    return this.bookstoreService.getSettings(data.userId);
+  }
+
+  @MessagePattern('bookstore.updateSettings')
+  @Transactional
+  async updateSettings(
+    @Payload() data: { userId: string; input: UpdateSettingsInput }
+  ): Promise<PublishDefaultEntity> {
+    return this.bookstoreService.updateSettings(data.userId, data.input);
+  }
+
+  @MessagePattern('bookstore.getPopularPosts')
+  async getPopularPosts(
+    @Payload() data: { bookstoreId: string; limit?: number }
+  ): Promise<PostEntity[]> {
+    return this.bookstoreService.getPopularPosts(data.bookstoreId, data.limit);
   }
 }
