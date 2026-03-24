@@ -7,7 +7,7 @@ import { CheckCircle, XCircle } from 'lucide-react';
 import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
-import SubLayout from '../../../../../components/layout/SubLayout';
+import SubLayout from '../../../../components/layout/SubLayout';
 import { trpc } from '@/shared';
 
 const searchSchema = z.object({

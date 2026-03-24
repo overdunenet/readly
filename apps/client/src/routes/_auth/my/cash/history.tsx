@@ -34,7 +34,7 @@ function CashHistoryPage() {
       cursor ? [...prev, ...historyQuery.data.items] : historyQuery.data.items,
     );
     setHasMore(historyQuery.data.nextCursor !== null);
-  }, [historyQuery.data]);
+  }, [historyQuery.data, cursor]);
 
   const handleLoadMore = () => {
     const lastItem = allItems[allItems.length - 1];
