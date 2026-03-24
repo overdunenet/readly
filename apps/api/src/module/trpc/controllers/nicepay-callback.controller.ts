@@ -20,6 +20,7 @@ export class NicepayCallbackController {
 
   constructor(private readonly microserviceClient: MicroserviceClient) {}
 
+  // 트랜잭션은 AppModule의 PaymentController(@MessagePattern)에서 관리
   @Post('nicepay/confirm')
   async nicepayConfirm(
     @Body() body: NicepayCallbackBody,
