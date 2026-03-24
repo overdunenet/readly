@@ -227,17 +227,17 @@ F2 구현에 착수하기 전 F1에서 반드시 해결해야 할 항목:
 
 ### 새 Entity
 
-| Entity                | 테이블            | 설명                                                                          |
-| --------------------- | ----------------- | ----------------------------------------------------------------------------- |
-| BookstoreEntity       | bookstores        | 서점 정보 (userId, penName, storeName, bio, profileImage, genreTags, country) |
-| BookstoreReviewEntity | bookstore_reviews | 서점 리뷰 (bookstoreId, reviewerId, content)                                  |
-| PublishDefaultEntity  | publish_defaults  | 발행 디폴트 (bookstoreId, defaultAccessLevel, defaultPrice, defaultAgeRating) |
+| Entity                | 테이블            | 설명                                                                                                    |
+| --------------------- | ----------------- | ------------------------------------------------------------------------------------------------------- |
+| BookstoreEntity       | bookstores        | 서점 정보 (userId, penName, storeName, bio, profileImage, genreTags:jsonb, country:enum, termsAgreedAt) |
+| BookstoreReviewEntity | bookstore_reviews | 서점 리뷰 (bookstoreId, reviewerId, content)                                                            |
+| PublishDefaultEntity  | publish_defaults  | 발행 디폴트 (bookstoreId, defaultAccessLevel, defaultPrice, defaultAgeRating)                           |
 
 ### 기존 Entity 변경
 
-| Entity     | 변경 내용                                                  |
-| ---------- | ---------------------------------------------------------- |
-| PostEntity | `bookstoreId` (nullable), `sortOrder` (nullable) 컬럼 추가 |
+| Entity     | 변경 내용                                                                       |
+| ---------- | ------------------------------------------------------------------------------- |
+| PostEntity | `bookstoreId` (NOT NULL, 기존 포스트 삭제 후), `sortOrder` (nullable) 컬럼 추가 |
 
 ### 새 tRPC Router
 

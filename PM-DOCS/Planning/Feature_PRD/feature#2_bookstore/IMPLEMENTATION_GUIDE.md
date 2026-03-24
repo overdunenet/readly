@@ -46,6 +46,29 @@
 
 ## Entity 상세 설계
 
+### 공통 Enum 정의
+
+```typescript
+// apps/api/src/module/domain/enums.ts
+
+export enum CountryEnum {
+  KR = 'KR',
+}
+
+export enum AccessLevelEnum {
+  PUBLIC = 'public',
+  SUBSCRIBER = 'subscriber',
+  PURCHASER = 'purchaser',
+}
+
+export enum AgeRatingEnum {
+  ALL = 'all',
+  ADULT = 'adult',
+}
+```
+
+> DB에는 varchar로 저장, TypeScript 코드에서는 enum으로 타입 안전성 확보.
+
 ### BookstoreEntity
 
 ```typescript
@@ -75,17 +98,17 @@ export class BookstoreEntity extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   coverImage: string | null;
 
-  @Column({ type: 'varchar', array: true, default: '{}' })
+  @Column({ type: 'jsonb', default: '[]' })
   genreTags: string[];
 
-  @Column({ type: 'varchar', default: 'KR' })
-  country: string;
+  @Column({ type: 'varchar', default: CountryEnum.KR })
+  country: CountryEnum;
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @Column({ type: 'boolean', default: false })
-  termsAgreed: boolean;
+  @Column({ type: 'timestamptz', nullable: true })
+  termsAgreedAt: Date | null;
 
   @Column({ type: 'timestamptz', nullable: true })
   openedAt: Date | null;
@@ -106,8 +129,9 @@ export class BookstoreEntity extends BaseEntity {
 
 - UserEntity 확장이 아닌 별도 Entity — 모든 유저가 서점을 가지지 않으므로
 - `userId` Unique Constraint — 1인 1서점 정책 강제
-- `genreTags` 배열 — 작가가 사용한 태그 기반 서점 정체성 표현
-- `country` — MVP에서 한국 유저만 제한, 향후 확장
+- `genreTags` jsonb — varchar[]보다 TypeORM 쿼리 호환성이 좋고 GIN 인덱스 지원
+- `country` enum — DB에는 varchar로 저장, 코드에서는 `CountryEnum`으로 타입 안전성 확보
+- `termsAgreedAt` nullable Date — boolean 대신 약관 동의 일시를 명확히 기록
 
 ### BookstoreReviewEntity
 
@@ -155,14 +179,14 @@ export class PublishDefaultEntity extends BaseEntity {
   @JoinColumn({ name: 'bookstore_id' })
   bookstore: BookstoreEntity;
 
-  @Column({ type: 'varchar', default: 'public' })
-  defaultAccessLevel: string; // public | subscriber | purchaser
+  @Column({ type: 'varchar', default: AccessLevelEnum.PUBLIC })
+  defaultAccessLevel: AccessLevelEnum; // DB: varchar, 코드: enum
 
   @Column({ type: 'int', default: 0 })
   defaultPrice: number;
 
-  @Column({ type: 'varchar', default: 'all' })
-  defaultAgeRating: string; // all | adult
+  @Column({ type: 'varchar', default: AgeRatingEnum.ALL })
+  defaultAgeRating: AgeRatingEnum; // DB: varchar, 코드: enum
 }
 ```
 
@@ -171,10 +195,10 @@ export class PublishDefaultEntity extends BaseEntity {
 ```typescript
 // apps/api/src/module/domain/post.entity.ts (추가 필드)
 
-@Column({ type: 'uuid', nullable: true })
-bookstoreId: string | null;
+@Column({ type: 'uuid' })
+bookstoreId: string;
 
-@ManyToOne(() => BookstoreEntity, { nullable: true })
+@ManyToOne(() => BookstoreEntity)
 @JoinColumn({ name: 'bookstore_id' })
 bookstore: BookstoreEntity;
 
@@ -182,14 +206,13 @@ bookstore: BookstoreEntity;
 sortOrder: number | null;
 ```
 
-**주의:** nullable로 추가하여 기존 포스트와 하위 호환성 유지.
+**주의:** 마이그레이션 시 기존 포스트를 제거하고 `NOT NULL`로 설정. MVP에서는 기존 테스트 데이터만 존재하므로 클린 스타트가 적합.
 
 **PostEntity.create 확장 필요:**
 
-- `PostEntity.create()` factory method에 `bookstoreId?: string` 파라미터 추가
-- `PostService.createPost()`의 input에 `bookstoreId?` 추가
-- 서점 보유 유저가 포스트 생성 시 자동으로 bookstoreId 할당
-- 기존 포스트 백필 전략: 서점 오픈 시 기존 authorId 기반 포스트를 bookstoreId로 일괄 연결 (선택적)
+- `PostEntity.create()` factory method에 `bookstoreId: string` 파라미터 추가 (필수)
+- `PostService.createPost()`의 input에 `bookstoreId` 추가 (필수)
+- 서점 보유 유저만 포스트 생성 가능 (서점 없으면 포스트 생성 차단)
 
 ---
 
@@ -353,10 +376,10 @@ CREATE TABLE bookstores (
   bio TEXT,
   profile_image VARCHAR,
   cover_image VARCHAR,
-  genre_tags VARCHAR[] DEFAULT '{}',
+  genre_tags JSONB DEFAULT '[]',
   country VARCHAR DEFAULT 'KR',
   is_active BOOLEAN DEFAULT TRUE,
-  terms_agreed BOOLEAN DEFAULT FALSE,
+  terms_agreed_at TIMESTAMPTZ,
   opened_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -401,11 +424,15 @@ CREATE INDEX idx_bookstore_reviews_bookstore_created
 ### M-4: posts 테이블 확장
 
 ```sql
-ALTER TABLE posts ADD COLUMN bookstore_id UUID REFERENCES bookstores(id);
+-- 기존 테스트 포스트 제거 후 NOT NULL로 추가
+DELETE FROM posts;
+ALTER TABLE posts ADD COLUMN bookstore_id UUID NOT NULL REFERENCES bookstores(id);
 ALTER TABLE posts ADD COLUMN sort_order INT;
 
 CREATE INDEX idx_posts_bookstore_id ON posts (bookstore_id);
 ```
+
+> **주의:** 기존 posts 데이터를 삭제합니다. MVP 전 테스트 데이터만 존재하는 시점에서 실행해야 합니다.
 
 ---
 
@@ -528,15 +555,15 @@ apps/client/src/components/bookstore/
 
 ## 기존 모듈 영향 분석
 
-| 모듈                 | 영향도   | 상세                                               |
-| -------------------- | -------- | -------------------------------------------------- |
-| PostEntity           | **중간** | bookstoreId, sortOrder 추가 (nullable → 하위 호환) |
-| PostService          | **낮음** | createPost에서 bookstoreId 선택적 설정             |
-| PostRouter           | **없음** | 기존 Procedure 변경 불필요                         |
-| UserEntity           | **없음** | 변경 불필요                                        |
-| FollowEntity         | **없음** | 서점 팔로우 = 유저 팔로우 (재사용)                 |
-| RepositoryProvider   | **중간** | 3개 Repository 추가 등록                           |
-| FE Header/Navigation | **낮음** | "내 서점" 메뉴 항목 추가                           |
+| 모듈                 | 영향도   | 상세                                                          |
+| -------------------- | -------- | ------------------------------------------------------------- |
+| PostEntity           | **높음** | bookstoreId NOT NULL + sortOrder 추가 (기존 포스트 삭제 필요) |
+| PostService          | **중간** | createPost에서 bookstoreId 필수 설정, 서점 미보유 유저 차단   |
+| PostRouter           | **없음** | 기존 Procedure 변경 불필요                                    |
+| UserEntity           | **없음** | 변경 불필요                                                   |
+| FollowEntity         | **없음** | 서점 팔로우 = 유저 팔로우 (재사용)                            |
+| RepositoryProvider   | **중간** | 3개 Repository 추가 등록                                      |
+| FE Header/Navigation | **낮음** | "내 서점" 메뉴 항목 추가                                      |
 
 ---
 
