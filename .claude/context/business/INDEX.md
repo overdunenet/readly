@@ -20,6 +20,7 @@ estimated_tokens: ~150
 | [seo-strategy.md](./seo-strategy.md)                                | SEO 전략 목적 및 빌드 타임 프리렌더링 채택 배경            |
 | [developer-experience.md](./developer-experience.md)                | Claude Code 사용 경험 최적화                               |
 | [user-follow.md](./user-follow.md)                                  | 사용자 팔로우 기능 (에디터-팔로워 관계)                    |
+| [social-authentication.md](./social-authentication.md)              | 소셜 로그인 정책 (네이버/카카오 OAuth, 계정 연결 전략)     |
 
 ## 빠른 참조
 
@@ -40,3 +41,4 @@ estimated_tokens: ~150
 - `codebase/seo-implementation.md`: SEO 구현 상세
 - `codebase/follow-module.md`: Follow 모듈 구현
 - `codebase/post-manage-ui.md`: 포스트 관리 UI 구현
+- `codebase/social-login.md`: 소셜 로그인 구현

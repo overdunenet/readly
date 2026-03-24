@@ -1,11 +1,24 @@
 ---
 name: codebase-user-entity
-description: UserEntity 구조, 비밀번호 관리, JWT 인증 설정, 프론트엔드 User 타입 및 인증 스토어
-keywords: [UserEntity, JWT, bcrypt, 인증, 로그인, AccessToken, RefreshToken, Zustand, useAuthStore, UserMenu]
-estimated_tokens: ~500
+description: UserEntity 구조, JWT 인증 설정, SocialAccount 관계, 프론트엔드 User 타입 및 인증 스토어
+keywords:
+  [
+    UserEntity,
+    JWT,
+    인증,
+    소셜로그인,
+    AccessToken,
+    RefreshToken,
+    Zustand,
+    useAuthStore,
+    UserMenu,
+    SocialAccount,
+  ]
+estimated_tokens: ~400
 related_contexts:
   - business-overview
   - codebase-architecture-overview
+  - codebase-social-login
 ---
 
 # UserEntity 및 인증
@@ -19,9 +32,6 @@ export class UserEntity extends BaseEntity {
   email: string;
 
   @Column({ type: 'varchar' })
-  password: string; // bcrypt 해시
-
-  @Column({ type: 'varchar' })
   nickname: string;
 
   @Column({ nullable: true, type: 'varchar' })
@@ -29,91 +39,31 @@ export class UserEntity extends BaseEntity {
 
   @DeleteDateColumn()
   deletedAt: Date | null; // Soft Delete
+
+  @Column({ nullable: true, type: 'varchar' })
+  phone: string | null; // 전화번호 인증 후 저장
+
+  @OneToMany(() => SocialAccountEntity, socialAccount => socialAccount.user)
+  socialAccounts: SocialAccountEntity[];
 }
 ```
 
-## 비즈니스 로직
+> **Note**: password 컬럼은 소셜 로그인 전환 완료 후 제거됨. 인증은 소셜 로그인(네이버/카카오)으로만 수행.
 
-### 비밀번호 관리
-
-```typescript
-// 비밀번호 설정 (해싱)
-async setPassword(plainPassword: string): Promise<void> {
-  this.password = await bcrypt.hash(plainPassword, 10);
-}
-
-// 비밀번호 검증
-async checkPassword(plainPassword: string): Promise<boolean> {
-  return bcrypt.compare(plainPassword, this.password);
-}
-```
-
-### Factory Method
-
-```typescript
-static async register(input: {
-  email: string;
-  password: string;
-  nickname: string;
-}): Promise<UserEntity> {
-  const user = new UserEntity();
-  user.email = input.email;
-  user.nickname = input.nickname;
-  await user.setPassword(input.password);
-  return user;
-}
-```
-
-## Repository 확장
+## Repository
 
 ```typescript
 export const getUserRepository = (source?) =>
-  getEntityManager(source)
-    .getRepository(UserEntity)
-    .extend({
-      async register(input: RegisterInput): Promise<UserEntity> {
-        const user = await UserEntity.register(input);
-        return this.save(user);
-      },
-    });
+  getEntityManager(source).getRepository(UserEntity);
 ```
 
 ## UserService 주요 메서드
 
-| 메서드                | 설명              |
-| --------------------- | ----------------- |
-| `register(input)`     | 회원가입          |
-| `login(credentials)`  | 로그인 (JWT 발급) |
-| `refreshToken(token)` | 토큰 갱신         |
-| `getMe(userId)`       | 내 정보 조회      |
-
-### 로그인 흐름
-
-```typescript
-async login(credentials: LoginInput): Promise<LoginResponse> {
-  // 1. 이메일로 사용자 찾기
-  const user = await this.repositoryProvider.UserRepository
-    .findOneByOrFail({ email })
-    .catch(() => {
-      throw new UnauthorizedException('Invalid email or password');
-    });
-
-  // 2. 비밀번호 검증
-  const isValid = await user.checkPassword(password);
-  if (!isValid) {
-    throw new UnauthorizedException('Invalid email or password');
-  }
-
-  // 3. JWT 토큰 생성
-  const tokens = await this.generateTokens(user);
-
-  return {
-    accessToken: tokens.accessToken,
-    refreshToken: tokens.refreshToken,
-    user: this.mapUserToInfo(user),
-  };
-}
-```
+| 메서드                 | 설명                                        |
+| ---------------------- | ------------------------------------------- |
+| `refreshToken(token)`  | 토큰 갱신                                   |
+| `getMe(userId)`        | 내 정보 조회                                |
+| `generateTokens(user)` | JWT 토큰 쌍 생성 (AuthService에서도 재사용) |
 
 ## UserRouter (tRPC)
 
@@ -121,8 +71,6 @@ async login(credentials: LoginInput): Promise<LoginResponse> {
 
 | 엔드포인트          | 설명      | 인증   |
 | ------------------- | --------- | ------ |
-| `user.register`     | 회원가입  | 불필요 |
-| `user.login`        | 로그인    | 불필요 |
 | `user.refreshToken` | 토큰 갱신 | 쿠키만 |
 | `user.logout`       | 로그아웃  | 불필요 |
 
@@ -134,21 +82,7 @@ async login(credentials: LoginInput): Promise<LoginResponse> {
 
 ### 쿠키 기반 인증
 
-```typescript
-@Mutation({ input: loginSchema, output: loginResponseSchema })
-async login(@Input('email') email: string, @Ctx() ctx: any) {
-  const result = await this.microserviceClient.send('user.login', { email, password });
-
-  // refreshToken은 쿠키로 설정 (httpOnly, secure)
-  this.cookieService.setRefreshTokenCookie(ctx.res, result.refreshToken);
-
-  // accessToken만 응답으로 반환
-  return {
-    accessToken: result.accessToken,
-    user: result.user,
-  };
-}
-```
+refreshToken은 httpOnly/secure 쿠키로 관리. accessToken만 응답으로 반환.
 
 ## JWT 설정
 
@@ -174,10 +108,9 @@ auth: {
 
 ### 파일 구조
 
-| 파일 | 역할 | 테스트 범위 |
-| ---- | ---- | ----------- |
-| apps/api/src/module/user/user.service.spec.ts | UserService 기본 통합 테스트 | Repository 접근, register, 중복 이메일 검증 |
-| apps/api/src/module/user/user.service.auth.spec.ts | UserService 인증 통합 테스트 | register, login, refreshToken, getMe, 통합 플로우 |
+| 파일                                          | 역할                         | 테스트 범위                                      |
+| --------------------------------------------- | ---------------------------- | ------------------------------------------------ |
+| apps/api/src/module/user/user.service.spec.ts | UserService 기본 통합 테스트 | Repository 접근, DB 연결, 트랜잭션 rollback 검증 |
 
 ### 테스트 패턴
 
@@ -194,10 +127,10 @@ auth: {
 
 ### 파일 구조
 
-| 파일 | 역할 | 핵심 export |
-| ---- | ---- | ----------- |
-| apps/client/src/stores/auth.ts | 인증 상태 관리 (Zustand) | User, useAuthStore |
-| apps/client/src/components/layout/UserMenu.tsx | 사용자 드롭다운 메뉴 | UserMenu |
+| 파일                                           | 역할                     | 핵심 export        |
+| ---------------------------------------------- | ------------------------ | ------------------ |
+| apps/client/src/stores/auth.ts                 | 인증 상태 관리 (Zustand) | User, useAuthStore |
+| apps/client/src/components/layout/UserMenu.tsx | 사용자 드롭다운 메뉴     | UserMenu           |
 
 ### User 타입 정의
 
@@ -206,12 +139,12 @@ auth: {
 
 ### useAuthStore (Zustand)
 
-| 속성/메서드 | 설명 |
-| ----------- | ---- |
-| user | 현재 로그인 사용자 (User \| null) |
-| accessToken | JWT 액세스 토큰 |
-| login(data) | 사용자 정보 + 토큰 설정 |
-| logout() | 상태 초기화 |
+| 속성/메서드 | 설명                              |
+| ----------- | --------------------------------- |
+| user        | 현재 로그인 사용자 (User \| null) |
+| accessToken | JWT 액세스 토큰                   |
+| login(data) | 사용자 정보 + 토큰 설정           |
+| logout()    | 상태 초기화                       |
 
 ### UserMenu 컴포넌트
 
@@ -223,3 +156,5 @@ auth: {
 
 - `codebase/post-entity.md`: PostEntity와 User 관계
 - `codebase/architecture-overview.md`: API 아키텍처
+- `codebase/social-login.md`: 소셜 로그인 모듈 (AuthService, SocialAccountEntity)
+- `codebase/otp-phone-verification.md`: OTP 전화번호 인증 모듈

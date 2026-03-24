@@ -30,14 +30,13 @@ estimated_tokens: ~150
 
 | Milestone | 목표          | 기간                    | Feature 수 |
 | --------- | ------------- | ----------------------- | ---------- |
-| M-001     | MVP 핵심 기능 | 2026-03-04 ~ 2026-06-30 | 17개       |
+| M-001     | MVP 핵심 기능 | 2026-03-04 ~ 2026-06-30 | 16개       |
 
 ### Feature PRD
 
-| Feature                           | PRD                                      | Status     | Milestone |
-| --------------------------------- | ---------------------------------------- | ---------- | --------- |
-| feature#1_auth (인증 & 계정 관리) | `Feature_PRD/feature#1_auth/PRD.md`      | approved   | M-001     |
-| feature#2_bookstore (서점 시스템) | `Feature_PRD/feature#2_bookstore/PRD.md` | decomposed | M-001     |
+| Feature                           | PRD                                 | Status   | Milestone |
+| --------------------------------- | ----------------------------------- | -------- | --------- |
+| feature#1_auth (인증 & 계정 관리) | `Feature_PRD/feature#1_auth/PRD.md` | approved | M-001     |
 
 - `/pm` 커맨드로 기획 워크플로우 실행 가능
 
