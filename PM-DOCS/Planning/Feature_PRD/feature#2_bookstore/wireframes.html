@@ -1,0 +1,2986 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F2 서점 시스템 - 화면 구조도</title>
+  <!-- viewport-config: { default: "both", overrides: {} } -->
+  <style>
+    /* ===== Design Tokens ===== */
+    :root {
+      --color-primary: #2563eb;
+      --color-primary-light: #eff6ff;
+      --color-bg-page: #f9fafb;
+      --color-bg-card: #ffffff;
+      --color-border: #e5e7eb;
+      --color-text-primary: #111827;
+      --color-text-secondary: #374151;
+      --color-text-muted: #6b7280;
+      --color-success: #16a34a;
+      --color-danger: #ef4444;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --header-height: 56px;
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 24px;
+
+      /* Frame Sizes */
+      --phone-width: 260px;
+      --phone-height: 520px;
+      --desktop-width: 480px;
+      --desktop-height: 340px;
+    }
+
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--color-bg-page);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      padding: var(--space-xl);
+    }
+
+    /* ===== Page Header ===== */
+    .page-header {
+      max-width: 1600px;
+      margin: 0 auto var(--space-xl);
+    }
+    .page-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+    }
+    .page-header .meta {
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+    .page-header .meta span + span::before {
+      content: ' · ';
+    }
+
+    /* ===== Screen Grid ===== */
+    .screen-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xl);
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* ===== Screen Group ===== */
+    .screen-group {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      width: 100%;
+    }
+    .screen-group-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+    .screen-group-route {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      font-family: monospace;
+      margin-bottom: var(--space-md);
+    }
+    .screen-group-states {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-lg);
+    }
+
+    /* ===== Screen Card ===== */
+    .screen-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ===== State Label ===== */
+    .state-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-sm);
+      text-align: center;
+    }
+
+    /* ===== Viewport Label ===== */
+    .viewport-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: var(--space-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== Phone Frame ===== */
+    .phone-frame {
+      width: var(--phone-width);
+      height: var(--phone-height);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Phone Status Bar */
+    .phone-status-bar {
+      height: 28px;
+      background: var(--color-bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-md);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      flex-shrink: 0;
+    }
+    .phone-status-bar .notch {
+      width: 80px;
+      height: 20px;
+      background: var(--color-text-primary);
+      border-radius: 10px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 4px;
+    }
+
+    /* Phone Content */
+    .phone-content {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--color-bg-page);
+    }
+
+    /* Phone Home Indicator */
+    .phone-home-indicator {
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .phone-home-indicator::after {
+      content: '';
+      width: 100px;
+      height: 4px;
+      background: var(--color-text-primary);
+      border-radius: 2px;
+      opacity: 0.2;
+    }
+
+    /* ===== Desktop Frame ===== */
+    .desktop-frame {
+      width: var(--desktop-width);
+      min-height: var(--desktop-height);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.06);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Desktop Browser Bar */
+    .desktop-browser-bar {
+      height: 32px;
+      background: #f3f4f6;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-sm);
+      gap: var(--space-sm);
+      flex-shrink: 0;
+    }
+    .desktop-browser-bar .dots {
+      display: flex;
+      gap: 4px;
+    }
+    .desktop-browser-bar .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d1d5db;
+    }
+    .desktop-browser-bar .dot:first-child { background: #fca5a5; }
+    .desktop-browser-bar .dot:nth-child(2) { background: #fcd34d; }
+    .desktop-browser-bar .dot:nth-child(3) { background: #86efac; }
+    .desktop-browser-bar .address-bar {
+      flex: 1;
+      height: 20px;
+      background: var(--color-bg-card);
+      border-radius: 4px;
+      border: 1px solid var(--color-border);
+      font-size: 10px;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+    }
+
+    /* Desktop Content */
+    .desktop-content {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--color-bg-page);
+    }
+
+    /* ===== Screen Meta ===== */
+    .screen-meta {
+      margin-top: var(--space-sm);
+      text-align: center;
+    }
+    .screen-meta .screen-id {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+    .screen-meta .screen-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+
+    /* ===== Common UI Components ===== */
+
+    /* App Header */
+    .app-header {
+      height: var(--header-height);
+      background: var(--color-bg-card);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-md);
+      flex-shrink: 0;
+    }
+    .app-header .back-arrow {
+      font-size: 18px;
+      color: var(--color-text-primary);
+      margin-right: var(--space-sm);
+      cursor: pointer;
+    }
+    .app-header .logo {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--color-text-primary);
+    }
+    .app-header .header-title {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--color-text-primary);
+    }
+    .app-header .header-right {
+      margin-left: auto;
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+
+    /* Desktop App Header */
+    .desktop-app-header {
+      height: 48px;
+      background: var(--color-bg-card);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-lg);
+      flex-shrink: 0;
+      gap: var(--space-lg);
+    }
+    .desktop-app-header .logo {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--color-text-primary);
+    }
+    .desktop-app-header .nav-links {
+      display: flex;
+      gap: var(--space-md);
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+    .desktop-app-header .nav-links .active {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+    .desktop-app-header .nav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+      width: auto;
+    }
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+    }
+    .btn-secondary {
+      background: var(--color-bg-card);
+      color: var(--color-text-secondary);
+      border: 1px solid var(--color-border);
+    }
+    .btn-danger {
+      background: var(--color-danger);
+      color: white;
+    }
+    .btn-disabled {
+      background: #d1d5db;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+    .btn-outline-primary {
+      background: transparent;
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary);
+    }
+
+    /* Input */
+    .input-field {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      background: var(--color-bg-card);
+    }
+    .input-field-error {
+      border-color: var(--color-danger);
+    }
+    .input-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-xs);
+      display: block;
+    }
+
+    /* Textarea */
+    .textarea-field {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      background: var(--color-bg-card);
+      min-height: 60px;
+      resize: none;
+    }
+
+    /* Card */
+    .card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      border: 1px solid var(--color-border);
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .badge-success { background: #dcfce7; color: var(--color-success); }
+    .badge-danger { background: #fef2f2; color: var(--color-danger); }
+    .badge-info { background: var(--color-primary-light); color: var(--color-primary); }
+    .badge-neutral { background: #f3f4f6; color: var(--color-text-muted); }
+    .badge-genre {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 12px;
+    }
+    .badge-warning { background: #fef9c3; color: #a16207; }
+
+    /* Avatar */
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #dbeafe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+    .avatar-lg {
+      width: 72px;
+      height: 72px;
+      font-size: 24px;
+    }
+    .avatar-md {
+      width: 56px;
+      height: 56px;
+      font-size: 20px;
+    }
+
+    /* List Item */
+    .list-item {
+      padding: var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      background: var(--color-bg-card);
+    }
+    .list-item .list-item-content {
+      flex: 1;
+    }
+    .list-item .list-item-arrow {
+      color: var(--color-text-muted);
+      font-size: 14px;
+    }
+
+    /* Error Toast */
+    .error-toast {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: var(--color-danger);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin: var(--space-sm) var(--space-md);
+    }
+
+    /* Error Message (inline) */
+    .error-message {
+      font-size: 12px;
+      color: var(--color-danger);
+      margin-top: var(--space-xs);
+    }
+
+    /* Success Toast */
+    .success-toast {
+      background: #dcfce7;
+      border: 1px solid #bbf7d0;
+      color: var(--color-success);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin: var(--space-sm) var(--space-md);
+    }
+
+    /* Success State */
+    .success-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #dcfce7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--color-success);
+      margin: 0 auto var(--space-md);
+    }
+
+    /* Empty State */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-xl) var(--space-md);
+      color: var(--color-text-muted);
+      text-align: center;
+    }
+    .empty-state .icon-placeholder {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #f3f4f6;
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    /* Scroll Hint */
+    .scroll-hint {
+      height: 40px;
+      background: linear-gradient(transparent, var(--color-bg-page));
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: var(--space-sm);
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+
+    /* ===== Section Divider ===== */
+    .section-divider {
+      max-width: 1600px;
+      margin: var(--space-xl) auto;
+      padding-top: var(--space-xl);
+      border-top: 2px solid var(--color-border);
+    }
+    .section-divider h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+    }
+
+    /* ===== Checkbox ===== */
+    .checkbox-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      padding: 8px 0;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+    .checkbox-box {
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid var(--color-border);
+      border-radius: 3px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .checkbox-box-checked {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      position: relative;
+    }
+    .checkbox-box-checked::after {
+      content: '\2713';
+      color: white;
+      font-size: 10px;
+      position: absolute;
+      top: -1px;
+      left: 2px;
+    }
+
+    /* ===== Toggle ===== */
+    .toggle {
+      width: 36px;
+      height: 20px;
+      border-radius: 10px;
+      background: var(--color-border);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .toggle::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: white;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .toggle-on {
+      background: var(--color-primary);
+    }
+    .toggle-on::after {
+      left: auto;
+      right: 2px;
+    }
+
+    /* ===== Thumbnail ===== */
+    .thumbnail {
+      background: #e5e7eb;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+      font-size: 10px;
+      overflow: hidden;
+    }
+    .thumbnail-sm {
+      width: 48px;
+      height: 64px;
+    }
+    .thumbnail-md {
+      width: 80px;
+      height: 110px;
+    }
+    .thumbnail-lg {
+      width: 100px;
+      height: 140px;
+    }
+    .thumbnail-grid {
+      width: 100%;
+      aspect-ratio: 3/4;
+    }
+
+    /* ===== Tabs ===== */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+    }
+    .tab {
+      flex: 1;
+      padding: var(--space-sm) var(--space-md);
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      border-bottom: 2px solid transparent;
+    }
+    .tab-active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+
+    /* ===== Filter Chips ===== */
+    .filter-chips {
+      display: flex;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      overflow-x: auto;
+    }
+    .chip {
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+      color: var(--color-text-muted);
+    }
+    .chip-active {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+
+    /* ===== Upload Zone ===== */
+    .upload-zone {
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: 13px;
+      background: var(--color-bg-page);
+    }
+    .upload-zone .upload-icon {
+      font-size: 28px;
+      margin-bottom: var(--space-sm);
+    }
+
+    /* ===== Grid Layouts ===== */
+    .thumb-grid {
+      display: grid;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+    }
+    .thumb-grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .thumb-grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .thumb-grid-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* ===== Thumb Card ===== */
+    .thumb-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .thumb-card .thumb-img {
+      background: #e5e7eb;
+      border-radius: var(--radius-sm);
+      aspect-ratio: 3/4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--color-text-muted);
+    }
+    .thumb-card .thumb-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .thumb-card .thumb-meta {
+      font-size: 10px;
+      color: var(--color-text-muted);
+    }
+
+    /* ===== Section Header ===== */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) var(--space-md) var(--space-sm);
+    }
+    .section-header h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .section-header .more-link {
+      font-size: 12px;
+      color: var(--color-primary);
+    }
+
+    /* ===== Review Card ===== */
+    .review-card {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+    }
+    .review-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xs);
+    }
+    .review-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #dbeafe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+    .review-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .review-date {
+      font-size: 10px;
+      color: var(--color-text-muted);
+      margin-left: auto;
+    }
+    .review-text {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+    }
+
+    /* ===== Dropdown Select ===== */
+    .select-field {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      background: var(--color-bg-card);
+      color: var(--color-text-secondary);
+      appearance: none;
+      position: relative;
+    }
+    .select-field::after {
+      content: '\25BC';
+      position: absolute;
+      right: 12px;
+      font-size: 10px;
+      color: var(--color-text-muted);
+    }
+
+    /* ===== Work Card (Management) ===== */
+    .work-card {
+      display: flex;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+      align-items: center;
+    }
+    .work-card-thumb {
+      width: 40px;
+      height: 54px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: var(--color-text-muted);
+    }
+    .work-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .work-card-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .work-card-meta {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .work-card-actions {
+      font-size: 16px;
+      color: var(--color-text-muted);
+      cursor: pointer;
+    }
+
+    /* ===== Desktop Sidebar Layout ===== */
+    .desktop-layout {
+      display: flex;
+      height: 100%;
+    }
+    .desktop-sidebar {
+      width: 180px;
+      background: var(--color-bg-card);
+      border-right: 1px solid var(--color-border);
+      padding: var(--space-md) 0;
+      flex-shrink: 0;
+    }
+    .sidebar-item {
+      padding: var(--space-sm) var(--space-md);
+      font-size: 13px;
+      color: var(--color-text-muted);
+      cursor: pointer;
+    }
+    .sidebar-item-active {
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+      font-weight: 600;
+      border-right: 2px solid var(--color-primary);
+    }
+    .desktop-main {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--color-bg-page);
+    }
+
+    /* ===== Desktop Form Layout ===== */
+    .desktop-form {
+      max-width: 360px;
+      margin: 0 auto;
+      padding: var(--space-lg);
+    }
+
+    /* ===== Info Banner ===== */
+    .info-banner {
+      background: var(--color-primary-light);
+      border: 1px solid #bfdbfe;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      color: var(--color-primary);
+      margin: var(--space-sm) var(--space-md);
+    }
+
+    /* ===== Warning Banner ===== */
+    .warning-banner {
+      background: #fef9c3;
+      border: 1px solid #fde68a;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      color: #a16207;
+      margin: var(--space-sm) var(--space-md);
+    }
+
+    /* ===== Drag Handle ===== */
+    .drag-handle {
+      color: var(--color-text-muted);
+      font-size: 14px;
+      cursor: grab;
+      margin-right: var(--space-xs);
+    }
+
+    /* ===== Sort Dropdown ===== */
+    .sort-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-sm) var(--space-md);
+      font-size: 12px;
+      color: var(--color-text-muted);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+    }
+
+    /* ===== Desktop Grid for Bookstore ===== */
+    .desktop-thumb-grid {
+      display: grid;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+    }
+    .desktop-thumb-grid-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .desktop-thumb-grid-5 {
+      grid-template-columns: repeat(5, 1fr);
+    }
+
+    /* ===== Bookstore Profile (Desktop) ===== */
+    .desktop-profile-banner {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      background: var(--color-bg-card);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    /* ===== Login Prompt Overlay ===== */
+    .login-prompt {
+      background: rgba(0,0,0,0.5);
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-prompt-card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      width: 80%;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== Page Header ===== -->
+  <header class="page-header">
+    <h1>F2. 서점 시스템 - 화면 구조도</h1>
+    <div class="meta">
+      <span>Feature: bookstore</span>
+      <span>Screens: SCR-011 ~ SCR-019</span>
+      <span>Viewport: Mobile(375px) + PC(1280px)</span>
+      <span>Generated: 2026-03-21</span>
+    </div>
+  </header>
+
+
+  <!-- ===================================================================== -->
+  <!--  SECTION: 공통 영역                                                   -->
+  <!-- ===================================================================== -->
+  <div class="section-divider">
+    <h2>공통 영역 (Common Areas)</h2>
+  </div>
+
+  <div class="screen-grid">
+    <!-- Header (Mobile) -->
+    <div class="screen-group" style="max-width: 340px;">
+      <div class="screen-group-title">앱 헤더 (모바일)</div>
+      <div class="screen-group-route">공통 컴포넌트</div>
+      <div class="screen-group-states">
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div style="width:260px; background:var(--color-bg-card); border-radius:var(--radius-sm); border:1px solid var(--color-border); overflow:hidden;">
+            <div class="app-header">
+              <span class="logo">Readly</span>
+              <span class="header-right">&#x1F50D; &nbsp; &#x1F464;</span>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-name">메인 헤더</div>
+          </div>
+        </div>
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div style="width:260px; background:var(--color-bg-card); border-radius:var(--radius-sm); border:1px solid var(--color-border); overflow:hidden;">
+            <div class="app-header">
+              <span class="back-arrow">&larr;</span>
+              <span class="header-title">서점 관리</span>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-name">서브 헤더 (뒤로가기)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header (Desktop) -->
+    <div class="screen-group" style="max-width: 540px;">
+      <div class="screen-group-title">앱 헤더 (데스크톱)</div>
+      <div class="screen-group-route">공통 컴포넌트</div>
+      <div class="screen-group-states">
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div style="width:480px; background:var(--color-bg-card); border-radius:var(--radius-sm); border:1px solid var(--color-border); overflow:hidden;">
+            <div class="desktop-app-header">
+              <span class="logo">Readly</span>
+              <div class="nav-links">
+                <span>홈</span>
+                <span class="active">서점</span>
+                <span>탐색</span>
+              </div>
+              <div class="nav-right">
+                <span style="font-size:13px; color:var(--color-text-muted);">&#x1F50D;</span>
+                <div class="avatar" style="width:28px; height:28px; font-size:11px;">U</div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-name">데스크톱 네비게이션</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===================================================================== -->
+  <!--  SECTION: 작가 화면 (서점 오픈 & 관리)                                -->
+  <!-- ===================================================================== -->
+  <div class="section-divider">
+    <h2>작가 화면 - 서점 오픈 & 관리</h2>
+  </div>
+
+  <div class="screen-grid">
+
+    <!-- ===== SCR-011: 서점 오픈 폼 ===== -->
+    <div class="screen-group">
+      <div class="screen-group-title">SCR-011. 서점 오픈 폼</div>
+      <div class="screen-group-route">/bookstore/open</div>
+      <div class="screen-group-states">
+
+        <!-- 011 - 기본 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">기본</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">서점 오픈</span>
+              </div>
+              <div style="padding: var(--space-lg) var(--space-md);">
+                <div style="text-align:center; margin-bottom:var(--space-lg);">
+                  <div style="font-size:28px; margin-bottom:var(--space-sm);">&#x1F4DA;</div>
+                  <div style="font-size:16px; font-weight:600; margin-bottom:var(--space-xs);">나만의 서점을 열어보세요</div>
+                  <div style="font-size:12px; color:var(--color-text-muted);">작품을 발행하고 독자를 만나세요</div>
+                </div>
+
+                <div style="margin-bottom:var(--space-md);">
+                  <label class="input-label">필명 (편명)</label>
+                  <div class="input-field" style="color:var(--color-text-muted);">필명을 입력하세요</div>
+                </div>
+
+                <div style="margin-bottom:var(--space-lg);">
+                  <label class="input-label">서점명</label>
+                  <div class="input-field" style="color:var(--color-text-muted);">서점명을 입력하세요</div>
+                </div>
+
+                <div class="checkbox-item" style="margin-bottom:var(--space-md);">
+                  <div class="checkbox-box"></div>
+                  <span style="font-size:12px;">이용약관 및 서점 운영 정책에 동의합니다</span>
+                </div>
+
+                <div class="btn btn-disabled">서점 오픈하기</div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-011</div>
+            <div class="screen-name">서점 오픈 폼</div>
+          </div>
+        </div>
+
+        <!-- 011 - 기본 (Desktop) -->
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div class="state-label">기본</div>
+          <div class="desktop-frame">
+            <div class="desktop-browser-bar">
+              <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+              <div class="address-bar">readly.me/bookstore/open</div>
+            </div>
+            <div class="desktop-content">
+              <div class="desktop-app-header">
+                <span class="logo">Readly</span>
+                <div class="nav-links"><span>홈</span><span>탐색</span></div>
+                <div class="nav-right"><div class="avatar" style="width:28px;height:28px;font-size:11px;">U</div></div>
+              </div>
+              <div class="desktop-form" style="padding-top:var(--space-xl);">
+                <div style="text-align:center; margin-bottom:var(--space-lg);">
+                  <div style="font-size:36px; margin-bottom:var(--space-sm);">&#x1F4DA;</div>
+                  <div style="font-size:18px; font-weight:600; margin-bottom:var(--space-xs);">나만의 서점을 열어보세요</div>
+                  <div style="font-size:13px; color:var(--color-text-muted);">작품을 발행하고 독자를 만나세요</div>
+                </div>
+                <div style="margin-bottom:var(--space-md);">
+                  <label class="input-label">필명 (편명)</label>
+                  <div class="input-field" style="color:var(--color-text-muted);">필명을 입력하세요</div>
+                </div>
+                <div style="margin-bottom:var(--space-lg);">
+                  <label class="input-label">서점명</label>
+                  <div class="input-field" style="color:var(--color-text-muted);">서점명을 입력하세요</div>
+                </div>
+                <div class="checkbox-item" style="margin-bottom:var(--space-md);">
+                  <div class="checkbox-box"></div>
+                  <span style="font-size:12px;">이용약관 및 서점 운영 정책에 동의합니다</span>
+                </div>
+                <div class="btn btn-disabled">서점 오픈하기</div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-011</div>
+            <div class="screen-name">서점 오픈 폼 (PC)</div>
+          </div>
+        </div>
+
+        <!-- 011 - 유효성 에러 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">유효성 에러</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">서점 오픈</span>
+              </div>
+              <div style="padding: var(--space-lg) var(--space-md);">
+                <div style="text-align:center; margin-bottom:var(--space-lg);">
+                  <div style="font-size:28px; margin-bottom:var(--space-sm);">&#x1F4DA;</div>
+                  <div style="font-size:16px; font-weight:600; margin-bottom:var(--space-xs);">나만의 서점을 열어보세요</div>
+                  <div style="font-size:12px; color:var(--color-text-muted);">작품을 발행하고 독자를 만나세요</div>
+                </div>
+
+                <div style="margin-bottom:var(--space-md);">
+                  <label class="input-label">필명 (편명)</label>
+                  <div class="input-field input-field-error">이미사용중</div>
+                  <div class="error-message">이미 사용 중인 필명입니다</div>
+                </div>
+
+                <div style="margin-bottom:var(--space-lg);">
+                  <label class="input-label">서점명</label>
+                  <div class="input-field input-field-error">a</div>
+                  <div class="error-message">서점명은 2자 이상이어야 합니다</div>
+                </div>
+
+                <div class="checkbox-item" style="margin-bottom:var(--space-md);">
+                  <div class="checkbox-box checkbox-box-checked"></div>
+                  <span style="font-size:12px;">이용약관 및 서점 운영 정책에 동의합니다</span>
+                </div>
+
+                <div class="btn btn-primary">서점 오픈하기</div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-011</div>
+            <div class="screen-name">유효성 에러</div>
+          </div>
+        </div>
+
+        <!-- 011 - 비한국 유저 차단 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">비한국 유저 차단</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">서점 오픈</span>
+              </div>
+              <div style="padding: var(--space-xl) var(--space-md);">
+                <div class="empty-state">
+                  <div class="icon-placeholder">&#x1F30F;</div>
+                  <div style="font-size:15px; font-weight:600; color:var(--color-text-primary); margin-bottom:var(--space-sm);">현재 한국 유저만 서점 오픈이 가능합니다</div>
+                  <div style="font-size:12px; color:var(--color-text-muted); margin-bottom:var(--space-lg);">글로벌 서점 오픈은 곧 지원될 예정입니다</div>
+                  <div class="btn btn-secondary" style="width:auto; padding:8px 24px;">돌아가기</div>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-011</div>
+            <div class="screen-name">비한국 유저 차단</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SCR-012: 서점 관리 메인 ===== -->
+    <div class="screen-group">
+      <div class="screen-group-title">SCR-012. 서점 관리 메인</div>
+      <div class="screen-group-route">/my-bookstore</div>
+      <div class="screen-group-states">
+
+        <!-- 012 - 기본 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">기본</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">내 서점</span>
+              </div>
+
+              <!-- Profile Summary -->
+              <div style="padding:var(--space-lg) var(--space-md); text-align:center; background:var(--color-bg-card); border-bottom:1px solid var(--color-border);">
+                <div class="avatar avatar-lg" style="margin:0 auto var(--space-sm);">&#x270D;</div>
+                <div style="font-size:16px; font-weight:600;">김작가</div>
+                <div style="font-size:12px; color:var(--color-text-muted);">김작가의 이야기방</div>
+                <div style="margin-top:var(--space-sm);">
+                  <span class="btn btn-sm btn-secondary" style="width:auto; font-size:11px;">프로필 편집</span>
+                  <span class="btn btn-sm btn-secondary" style="width:auto; font-size:11px; margin-left:4px;">서점 미리보기</span>
+                </div>
+              </div>
+
+              <!-- Menu Items -->
+              <div class="list-item">
+                <span style="font-size:18px;">&#x2699;</span>
+                <div class="list-item-content">
+                  <div style="font-size:14px; font-weight:500;">발행 설정</div>
+                  <div style="font-size:11px; color:var(--color-text-muted);">유/무료, 가격, 등급 기본값</div>
+                </div>
+                <span class="list-item-arrow">&rsaquo;</span>
+              </div>
+              <div class="list-item">
+                <span style="font-size:18px;">&#x1F4DD;</span>
+                <div class="list-item-content">
+                  <div style="font-size:14px; font-weight:500;">작품 목록</div>
+                  <div style="font-size:11px; color:var(--color-text-muted);">3개 작품</div>
+                </div>
+                <span class="list-item-arrow">&rsaquo;</span>
+              </div>
+
+              <!-- Upload Button -->
+              <div style="padding:var(--space-lg) var(--space-md);">
+                <div class="btn btn-primary">+ 작품 업로드</div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-012</div>
+            <div class="screen-name">서점 관리 메인</div>
+          </div>
+        </div>
+
+        <!-- 012 - 기본 (Desktop) -->
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div class="state-label">기본</div>
+          <div class="desktop-frame" style="min-height:340px;">
+            <div class="desktop-browser-bar">
+              <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+              <div class="address-bar">readly.me/my-bookstore</div>
+            </div>
+            <div class="desktop-content" style="display:flex; flex-direction:column;">
+              <div class="desktop-app-header">
+                <span class="logo">Readly</span>
+                <div class="nav-links"><span>홈</span><span class="active">내 서점</span><span>탐색</span></div>
+                <div class="nav-right"><div class="avatar" style="width:28px;height:28px;font-size:11px;">K</div></div>
+              </div>
+              <div class="desktop-layout" style="flex:1;">
+                <div class="desktop-sidebar">
+                  <div class="sidebar-item sidebar-item-active">대시보드</div>
+                  <div class="sidebar-item">프로필 편집</div>
+                  <div class="sidebar-item">발행 설정</div>
+                  <div class="sidebar-item">작품 관리</div>
+                  <div class="sidebar-item">작품 업로드</div>
+                  <div style="padding:var(--space-md);"><div class="btn btn-sm btn-secondary" style="font-size:11px;">서점 미리보기</div></div>
+                </div>
+                <div class="desktop-main" style="padding:var(--space-lg);">
+                  <div style="display:flex; align-items:center; gap:var(--space-md); margin-bottom:var(--space-lg);">
+                    <div class="avatar avatar-md">&#x270D;</div>
+                    <div>
+                      <div style="font-size:18px; font-weight:600;">김작가</div>
+                      <div style="font-size:13px; color:var(--color-text-muted);">김작가의 이야기방</div>
+                    </div>
+                    <div class="btn btn-sm btn-outline-primary" style="width:auto; margin-left:auto;">프로필 편집</div>
+                  </div>
+                  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-md);">
+                    <div class="card" style="text-align:center;">
+                      <div style="font-size:11px; color:var(--color-text-muted);">발행 작품</div>
+                      <div style="font-size:24px; font-weight:700; color:var(--color-primary);">3</div>
+                    </div>
+                    <div class="card" style="text-align:center;">
+                      <div style="font-size:11px; color:var(--color-text-muted);">총 조회수</div>
+                      <div style="font-size:24px; font-weight:700; color:var(--color-primary);">1.2K</div>
+                    </div>
+                    <div class="card" style="text-align:center;">
+                      <div style="font-size:11px; color:var(--color-text-muted);">팔로워</div>
+                      <div style="font-size:24px; font-weight:700; color:var(--color-primary);">28</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-012</div>
+            <div class="screen-name">서점 관리 메인 (PC)</div>
+          </div>
+        </div>
+
+        <!-- 012 - 작품 없음 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">작품 없음</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">내 서점</span>
+              </div>
+
+              <div style="padding:var(--space-lg) var(--space-md); text-align:center; background:var(--color-bg-card); border-bottom:1px solid var(--color-border);">
+                <div class="avatar avatar-lg" style="margin:0 auto var(--space-sm);">&#x270D;</div>
+                <div style="font-size:16px; font-weight:600;">김작가</div>
+                <div style="font-size:12px; color:var(--color-text-muted);">김작가의 이야기방</div>
+              </div>
+
+              <div class="empty-state" style="padding:var(--space-xl);">
+                <div class="icon-placeholder">&#x1F4D6;</div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-text-primary); margin-bottom:var(--space-xs);">아직 작품이 없어요</div>
+                <div style="font-size:12px; margin-bottom:var(--space-md);">첫 번째 작품을 업로드해보세요!</div>
+                <div class="btn btn-primary" style="width:auto; padding:10px 24px;">+ 첫 작품 업로드</div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-012</div>
+            <div class="screen-name">작품 없음</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SCR-013: 서점 프로필 편집 ===== -->
+    <div class="screen-group">
+      <div class="screen-group-title">SCR-013. 서점 프로필 편집</div>
+      <div class="screen-group-route">/my-bookstore/profile</div>
+      <div class="screen-group-states">
+
+        <!-- 013 - 기본 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">기본</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">프로필 편집</span>
+              </div>
+              <div style="padding:var(--space-lg) var(--space-md);">
+                <!-- Profile Image -->
+                <div style="text-align:center; margin-bottom:var(--space-lg);">
+                  <div class="avatar avatar-lg" style="margin:0 auto var(--space-sm);">&#x270D;</div>
+                  <div class="btn btn-sm btn-secondary" style="width:auto; font-size:11px;">사진 변경</div>
+                </div>
+
+                <div style="margin-bottom:var(--space-md);">
+                  <label class="input-label">필명</label>
+                  <div class="input-field">김작가</div>
+                </div>
+
+                <div style="margin-bottom:var(--space-lg);">
+                  <label class="input-label">소개글</label>
+                  <div class="textarea-field" style="min-height:80px; color:var(--color-text-secondary);">판타지와 SF를 즐겨 쓰는 작가입니다. 새로운 세계를 만들어갑니다.</div>
+                </div>
+
+                <div class="btn btn-primary">저장</div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-013</div>
+            <div class="screen-name">프로필 편집</div>
+          </div>
+        </div>
+
+        <!-- 013 - 기본 (Desktop) -->
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div class="state-label">기본</div>
+          <div class="desktop-frame">
+            <div class="desktop-browser-bar">
+              <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+              <div class="address-bar">readly.me/my-bookstore/profile</div>
+            </div>
+            <div class="desktop-content" style="display:flex; flex-direction:column;">
+              <div class="desktop-app-header">
+                <span class="logo">Readly</span>
+                <div class="nav-links"><span>홈</span><span class="active">내 서점</span></div>
+                <div class="nav-right"><div class="avatar" style="width:28px;height:28px;font-size:11px;">K</div></div>
+              </div>
+              <div class="desktop-layout" style="flex:1;">
+                <div class="desktop-sidebar">
+                  <div class="sidebar-item">대시보드</div>
+                  <div class="sidebar-item sidebar-item-active">프로필 편집</div>
+                  <div class="sidebar-item">발행 설정</div>
+                  <div class="sidebar-item">작품 관리</div>
+                </div>
+                <div class="desktop-main">
+                  <div class="desktop-form">
+                    <div style="font-size:16px; font-weight:600; margin-bottom:var(--space-lg);">프로필 편집</div>
+                    <div style="text-align:center; margin-bottom:var(--space-lg);">
+                      <div class="avatar avatar-lg" style="margin:0 auto var(--space-sm);">&#x270D;</div>
+                      <div class="btn btn-sm btn-secondary" style="width:auto; font-size:11px;">사진 변경</div>
+                    </div>
+                    <div style="margin-bottom:var(--space-md);">
+                      <label class="input-label">필명</label>
+                      <div class="input-field">김작가</div>
+                    </div>
+                    <div style="margin-bottom:var(--space-lg);">
+                      <label class="input-label">소개글</label>
+                      <div class="textarea-field" style="min-height:60px; color:var(--color-text-secondary);">판타지와 SF를 즐겨 쓰는 작가입니다.</div>
+                    </div>
+                    <div class="btn btn-primary">저장</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-013</div>
+            <div class="screen-name">프로필 편집 (PC)</div>
+          </div>
+        </div>
+
+        <!-- 013 - 저장 완료 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">저장 완료</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">프로필 편집</span>
+              </div>
+              <div class="success-toast">프로필이 저장되었습니다</div>
+              <div style="padding:var(--space-lg) var(--space-md);">
+                <div style="text-align:center; margin-bottom:var(--space-lg);">
+                  <div class="avatar avatar-lg" style="margin:0 auto var(--space-sm);">&#x270D;</div>
+                  <div class="btn btn-sm btn-secondary" style="width:auto; font-size:11px;">사진 변경</div>
+                </div>
+                <div style="margin-bottom:var(--space-md);">
+                  <label class="input-label">필명</label>
+                  <div class="input-field">김작가</div>
+                </div>
+                <div style="margin-bottom:var(--space-lg);">
+                  <label class="input-label">소개글</label>
+                  <div class="textarea-field" style="min-height:80px; color:var(--color-text-secondary);">판타지와 SF를 즐겨 쓰는 작가입니다.</div>
+                </div>
+                <div class="btn btn-primary">저장</div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-013</div>
+            <div class="screen-name">저장 완료</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SCR-014: 서점 발행 설정 ===== -->
+    <div class="screen-group">
+      <div class="screen-group-title">SCR-014. 서점 발행 설정</div>
+      <div class="screen-group-route">/my-bookstore/settings</div>
+      <div class="screen-group-states">
+
+        <!-- 014 - 기본 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">기본</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">발행 설정</span>
+              </div>
+              <div style="padding:var(--space-md);">
+                <div class="info-banner" style="margin:0 0 var(--space-md);">새 작품 발행 시 기본 적용되는 설정입니다. 개별 작품에서 수정할 수 있습니다.</div>
+
+                <div class="card" style="margin-bottom:var(--space-md);">
+                  <div style="font-size:14px; font-weight:600; margin-bottom:var(--space-md);">단편 기본값</div>
+
+                  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-md);">
+                    <div>
+                      <div style="font-size:13px; font-weight:500;">유료 발행</div>
+                      <div style="font-size:11px; color:var(--color-text-muted);">작품을 유료로 판매합니다</div>
+                    </div>
+                    <div class="toggle toggle-on"></div>
+                  </div>
+
+                  <div style="margin-bottom:var(--space-md);">
+                    <label class="input-label">구매 가격</label>
+                    <div style="display:flex; align-items:center; gap:var(--space-sm);">
+                      <div class="input-field" style="width:100px;">500</div>
+                      <span style="font-size:13px; color:var(--color-text-muted);">원</span>
+                    </div>
+                  </div>
+
+                  <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div>
+                      <div style="font-size:13px; font-weight:500;">이용 등급</div>
+                    </div>
+                    <div style="display:flex; gap:var(--space-sm);">
+                      <span class="chip chip-active">전체</span>
+                      <span class="chip">성인</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="btn btn-primary">저장</div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-014</div>
+            <div class="screen-name">발행 설정</div>
+          </div>
+        </div>
+
+        <!-- 014 - 기본 (Desktop) -->
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div class="state-label">기본</div>
+          <div class="desktop-frame" style="min-height:340px;">
+            <div class="desktop-browser-bar">
+              <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+              <div class="address-bar">readly.me/my-bookstore/settings</div>
+            </div>
+            <div class="desktop-content" style="display:flex; flex-direction:column;">
+              <div class="desktop-app-header">
+                <span class="logo">Readly</span>
+                <div class="nav-links"><span>홈</span><span class="active">내 서점</span></div>
+                <div class="nav-right"><div class="avatar" style="width:28px;height:28px;font-size:11px;">K</div></div>
+              </div>
+              <div class="desktop-layout" style="flex:1;">
+                <div class="desktop-sidebar">
+                  <div class="sidebar-item">대시보드</div>
+                  <div class="sidebar-item">프로필 편집</div>
+                  <div class="sidebar-item sidebar-item-active">발행 설정</div>
+                  <div class="sidebar-item">작품 관리</div>
+                </div>
+                <div class="desktop-main">
+                  <div class="desktop-form">
+                    <div style="font-size:16px; font-weight:600; margin-bottom:var(--space-sm);">발행 설정</div>
+                    <div style="font-size:12px; color:var(--color-text-muted); margin-bottom:var(--space-lg);">새 작품 발행 시 기본 적용됩니다</div>
+
+                    <div class="card" style="margin-bottom:var(--space-md);">
+                      <div style="font-size:14px; font-weight:600; margin-bottom:var(--space-md);">단편 기본값</div>
+                      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-md);">
+                        <span style="font-size:13px;">유료 발행</span>
+                        <div class="toggle toggle-on"></div>
+                      </div>
+                      <div style="margin-bottom:var(--space-md);">
+                        <label class="input-label">구매 가격</label>
+                        <div style="display:flex; align-items:center; gap:var(--space-sm);">
+                          <div class="input-field" style="width:120px;">500</div>
+                          <span style="font-size:13px; color:var(--color-text-muted);">원</span>
+                        </div>
+                      </div>
+                      <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <span style="font-size:13px;">이용 등급</span>
+                        <div style="display:flex; gap:var(--space-sm);">
+                          <span class="chip chip-active">전체</span>
+                          <span class="chip">성인</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="btn btn-primary">저장</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-014</div>
+            <div class="screen-name">발행 설정 (PC)</div>
+          </div>
+        </div>
+
+        <!-- 014 - 저장 완료 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">저장 완료</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">발행 설정</span>
+              </div>
+              <div class="success-toast">설정이 저장되었습니다</div>
+              <div style="padding:var(--space-md);">
+                <div class="card">
+                  <div style="font-size:14px; font-weight:600; margin-bottom:var(--space-md);">단편 기본값</div>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:var(--space-sm); font-size:13px;">
+                    <span style="color:var(--color-text-muted);">유료 발행</span>
+                    <div class="toggle toggle-on"></div>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:var(--space-sm); font-size:13px;">
+                    <span style="color:var(--color-text-muted);">가격</span>
+                    <span>500원</span>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; font-size:13px;">
+                    <span style="color:var(--color-text-muted);">등급</span>
+                    <span class="badge badge-info">전체 이용가</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-014</div>
+            <div class="screen-name">저장 완료</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SCR-015: 작품 업로드 ===== -->
+    <div class="screen-group">
+      <div class="screen-group-title">SCR-015. 작품 업로드</div>
+      <div class="screen-group-route">/my-bookstore/upload</div>
+      <div class="screen-group-states">
+
+        <!-- 015 - 방식 선택 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">방식 선택</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">작품 업로드</span>
+              </div>
+              <div style="padding:var(--space-lg) var(--space-md);">
+                <div style="font-size:15px; font-weight:600; margin-bottom:var(--space-sm);">어떻게 작품을 등록할까요?</div>
+                <div style="font-size:12px; color:var(--color-text-muted); margin-bottom:var(--space-lg);">방법을 선택하세요</div>
+
+                <div class="card" style="margin-bottom:var(--space-md); cursor:pointer; text-align:center; padding:var(--space-lg);">
+                  <div style="font-size:28px; margin-bottom:var(--space-sm);">&#x1F4C4;</div>
+                  <div style="font-size:14px; font-weight:600; margin-bottom:var(--space-xs);">파일 업로드</div>
+                  <div style="font-size:12px; color:var(--color-text-muted);">Word(.docx) 또는 HWP 파일</div>
+                </div>
+
+                <div class="card" style="cursor:pointer; text-align:center; padding:var(--space-lg);">
+                  <div style="font-size:28px; margin-bottom:var(--space-sm);">&#x270F;</div>
+                  <div style="font-size:14px; font-weight:600; margin-bottom:var(--space-xs);">직접 입력</div>
+                  <div style="font-size:12px; color:var(--color-text-muted);">에디터에서 직접 작성</div>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-015</div>
+            <div class="screen-name">방식 선택</div>
+          </div>
+        </div>
+
+        <!-- 015 - 방식 선택 (Desktop) -->
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div class="state-label">방식 선택</div>
+          <div class="desktop-frame" style="min-height:340px;">
+            <div class="desktop-browser-bar">
+              <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+              <div class="address-bar">readly.me/my-bookstore/upload</div>
+            </div>
+            <div class="desktop-content" style="display:flex; flex-direction:column;">
+              <div class="desktop-app-header">
+                <span class="logo">Readly</span>
+                <div class="nav-links"><span>홈</span><span class="active">내 서점</span></div>
+                <div class="nav-right"><div class="avatar" style="width:28px;height:28px;font-size:11px;">K</div></div>
+              </div>
+              <div class="desktop-layout" style="flex:1;">
+                <div class="desktop-sidebar">
+                  <div class="sidebar-item">대시보드</div>
+                  <div class="sidebar-item">프로필 편집</div>
+                  <div class="sidebar-item">발행 설정</div>
+                  <div class="sidebar-item">작품 관리</div>
+                  <div class="sidebar-item sidebar-item-active">작품 업로드</div>
+                </div>
+                <div class="desktop-main" style="display:flex; align-items:center; justify-content:center; padding:var(--space-lg);">
+                  <div style="display:flex; gap:var(--space-lg);">
+                    <div class="card" style="width:140px; text-align:center; padding:var(--space-lg); cursor:pointer;">
+                      <div style="font-size:32px; margin-bottom:var(--space-sm);">&#x1F4C4;</div>
+                      <div style="font-size:13px; font-weight:600;">파일 업로드</div>
+                      <div style="font-size:11px; color:var(--color-text-muted);">Word / HWP</div>
+                    </div>
+                    <div class="card" style="width:140px; text-align:center; padding:var(--space-lg); cursor:pointer;">
+                      <div style="font-size:32px; margin-bottom:var(--space-sm);">&#x270F;</div>
+                      <div style="font-size:13px; font-weight:600;">직접 입력</div>
+                      <div style="font-size:11px; color:var(--color-text-muted);">에디터 작성</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-015</div>
+            <div class="screen-name">방식 선택 (PC)</div>
+          </div>
+        </div>
+
+        <!-- 015 - 파일 업로드 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">파일 업로드</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">파일 업로드</span>
+              </div>
+              <div style="padding:var(--space-md);">
+                <div class="upload-zone" style="margin-bottom:var(--space-md);">
+                  <div class="upload-icon">&#x2B06;</div>
+                  <div style="font-size:13px; font-weight:500; margin-bottom:var(--space-xs);">파일을 선택하세요</div>
+                  <div style="font-size:11px; color:var(--color-text-muted);">.docx, .hwp (최대 10MB)</div>
+                </div>
+
+                <div class="btn btn-secondary">파일 선택</div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-015</div>
+            <div class="screen-name">파일 업로드</div>
+          </div>
+        </div>
+
+        <!-- 015 - 파싱 결과 확인 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">파싱 결과 확인</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">작품 등록</span>
+              </div>
+              <div style="padding:var(--space-md);">
+                <div class="success-toast" style="margin:0 0 var(--space-md);">파일에서 내용을 추출했습니다</div>
+
+                <div style="margin-bottom:var(--space-md);">
+                  <label class="input-label">제목</label>
+                  <div class="input-field">추출된 제목이 여기에 표시됩니다</div>
+                </div>
+
+                <div style="margin-bottom:var(--space-md);">
+                  <label class="input-label">본문 미리보기</label>
+                  <div class="textarea-field" style="min-height:60px; font-size:12px; color:var(--color-text-muted);">파일에서 추출된 본문의 앞부분이 여기에 미리보기로 표시됩니다...</div>
+                </div>
+
+                <div style="margin-bottom:var(--space-md);">
+                  <label class="input-label">분류</label>
+                  <div style="display:flex; gap:var(--space-sm);">
+                    <span class="chip chip-active">단편</span>
+                    <span class="chip">시리즈</span>
+                  </div>
+                </div>
+
+                <div style="margin-bottom:var(--space-md);">
+                  <label class="input-label">썸네일</label>
+                  <div class="upload-zone" style="padding:var(--space-md);">
+                    <div style="font-size:20px;">&#x1F5BC;</div>
+                    <div style="font-size:11px;">이미지 선택</div>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:var(--space-sm);">
+                  <div class="btn btn-secondary" style="flex:1;">임시저장</div>
+                  <div class="btn btn-primary" style="flex:1;">발행</div>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-015</div>
+            <div class="screen-name">파싱 결과 확인</div>
+          </div>
+        </div>
+
+        <!-- 015 - 파싱 실패 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">파싱 실패</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">파일 업로드</span>
+              </div>
+              <div style="padding:var(--space-md);">
+                <div class="error-toast" style="margin:0 0 var(--space-md);">파일을 읽을 수 없습니다. 직접 입력으로 전환합니다.</div>
+
+                <div class="empty-state">
+                  <div class="icon-placeholder" style="background:#fef2f2; color:var(--color-danger);">&#x26A0;</div>
+                  <div style="font-size:14px; font-weight:600; color:var(--color-text-primary); margin-bottom:var(--space-xs);">파일 읽기 실패</div>
+                  <div style="font-size:12px; margin-bottom:var(--space-lg);">지원하지 않는 형식이거나 파일이 손상되었습니다</div>
+                  <div class="btn btn-primary" style="width:auto; padding:10px 24px;">직접 입력하기</div>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-015</div>
+            <div class="screen-name">파싱 실패</div>
+          </div>
+        </div>
+
+        <!-- 015 - 직접 입력 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">직접 입력</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">직접 입력</span>
+              </div>
+              <div style="padding:var(--space-md);">
+                <div style="margin-bottom:var(--space-md);">
+                  <label class="input-label">제목</label>
+                  <div class="input-field" style="color:var(--color-text-muted);">작품 제목을 입력하세요</div>
+                </div>
+
+                <div style="margin-bottom:var(--space-md);">
+                  <label class="input-label">본문</label>
+                  <div class="textarea-field" style="min-height:120px; color:var(--color-text-muted); font-size:13px;">여기에 작품 내용을 작성하세요...</div>
+                </div>
+
+                <div style="margin-bottom:var(--space-md);">
+                  <label class="input-label">분류</label>
+                  <div style="display:flex; gap:var(--space-sm);">
+                    <span class="chip chip-active">단편</span>
+                    <span class="chip">시리즈</span>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:var(--space-sm);">
+                  <div class="btn btn-secondary" style="flex:1;">임시저장</div>
+                  <div class="btn btn-primary" style="flex:1;">발행</div>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-015</div>
+            <div class="screen-name">직접 입력</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SCR-016: 작품 목록 관리 ===== -->
+    <div class="screen-group">
+      <div class="screen-group-title">SCR-016. 작품 목록 관리</div>
+      <div class="screen-group-route">/my-bookstore/works</div>
+      <div class="screen-group-states">
+
+        <!-- 016 - 기본 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">기본</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">작품 관리</span>
+              </div>
+              <div class="filter-chips">
+                <span class="chip chip-active">전체</span>
+                <span class="chip">발행됨</span>
+                <span class="chip">임시저장</span>
+                <span class="chip">비공개</span>
+              </div>
+
+              <div class="work-card">
+                <div class="work-card-thumb">IMG</div>
+                <div class="work-card-info">
+                  <div class="work-card-title">밤하늘의 별을 세다</div>
+                  <div class="work-card-meta">
+                    <span class="badge badge-success" style="font-size:10px; padding:1px 6px;">발행됨</span>
+                    <span>&#183; 조회 342</span>
+                  </div>
+                </div>
+                <div class="work-card-actions">&#x22EE;</div>
+              </div>
+
+              <div class="work-card">
+                <div class="work-card-thumb">IMG</div>
+                <div class="work-card-info">
+                  <div class="work-card-title">잃어버린 계절의 문</div>
+                  <div class="work-card-meta">
+                    <span class="badge badge-success" style="font-size:10px; padding:1px 6px;">발행됨</span>
+                    <span>&#183; 조회 128</span>
+                  </div>
+                </div>
+                <div class="work-card-actions">&#x22EE;</div>
+              </div>
+
+              <div class="work-card">
+                <div class="work-card-thumb">IMG</div>
+                <div class="work-card-info">
+                  <div class="work-card-title">새벽의 방문자 (초안)</div>
+                  <div class="work-card-meta">
+                    <span class="badge badge-warning" style="font-size:10px; padding:1px 6px;">임시저장</span>
+                  </div>
+                </div>
+                <div class="work-card-actions">&#x22EE;</div>
+              </div>
+
+              <div class="scroll-hint">&#x25BC; 스크롤</div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-016</div>
+            <div class="screen-name">작품 목록 관리</div>
+          </div>
+        </div>
+
+        <!-- 016 - 기본 (Desktop) -->
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div class="state-label">기본</div>
+          <div class="desktop-frame" style="min-height:360px;">
+            <div class="desktop-browser-bar">
+              <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+              <div class="address-bar">readly.me/my-bookstore/works</div>
+            </div>
+            <div class="desktop-content" style="display:flex; flex-direction:column;">
+              <div class="desktop-app-header">
+                <span class="logo">Readly</span>
+                <div class="nav-links"><span>홈</span><span class="active">내 서점</span></div>
+                <div class="nav-right"><div class="avatar" style="width:28px;height:28px;font-size:11px;">K</div></div>
+              </div>
+              <div class="desktop-layout" style="flex:1;">
+                <div class="desktop-sidebar">
+                  <div class="sidebar-item">대시보드</div>
+                  <div class="sidebar-item">프로필 편집</div>
+                  <div class="sidebar-item">발행 설정</div>
+                  <div class="sidebar-item sidebar-item-active">작품 관리</div>
+                  <div class="sidebar-item">작품 업로드</div>
+                </div>
+                <div class="desktop-main">
+                  <div style="padding:var(--space-md) var(--space-lg); display:flex; align-items:center; justify-content:space-between;">
+                    <div style="font-size:15px; font-weight:600;">작품 관리</div>
+                    <div class="btn btn-sm btn-primary" style="width:auto;">+ 업로드</div>
+                  </div>
+                  <div class="filter-chips" style="padding-top:0;">
+                    <span class="chip chip-active">전체 (3)</span>
+                    <span class="chip">발행됨 (2)</span>
+                    <span class="chip">임시저장 (1)</span>
+                    <span class="chip">비공개</span>
+                  </div>
+                  <!-- Table-like list -->
+                  <div style="padding:0 var(--space-lg);">
+                    <div style="display:flex; gap:var(--space-md); padding:var(--space-sm) 0; border-bottom:1px solid var(--color-border); align-items:center;">
+                      <div class="work-card-thumb" style="width:36px; height:48px;">IMG</div>
+                      <div style="flex:1; font-size:13px; font-weight:500;">밤하늘의 별을 세다</div>
+                      <span class="badge badge-success" style="font-size:10px;">발행됨</span>
+                      <span style="font-size:11px; color:var(--color-text-muted); width:60px;">342 조회</span>
+                      <span style="font-size:14px; color:var(--color-text-muted); cursor:pointer;">&#x22EE;</span>
+                    </div>
+                    <div style="display:flex; gap:var(--space-md); padding:var(--space-sm) 0; border-bottom:1px solid var(--color-border); align-items:center;">
+                      <div class="work-card-thumb" style="width:36px; height:48px;">IMG</div>
+                      <div style="flex:1; font-size:13px; font-weight:500;">잃어버린 계절의 문</div>
+                      <span class="badge badge-success" style="font-size:10px;">발행됨</span>
+                      <span style="font-size:11px; color:var(--color-text-muted); width:60px;">128 조회</span>
+                      <span style="font-size:14px; color:var(--color-text-muted); cursor:pointer;">&#x22EE;</span>
+                    </div>
+                    <div style="display:flex; gap:var(--space-md); padding:var(--space-sm) 0; border-bottom:1px solid var(--color-border); align-items:center;">
+                      <div class="work-card-thumb" style="width:36px; height:48px;">IMG</div>
+                      <div style="flex:1; font-size:13px; font-weight:500;">새벽의 방문자 (초안)</div>
+                      <span class="badge badge-warning" style="font-size:10px;">임시저장</span>
+                      <span style="font-size:11px; color:var(--color-text-muted); width:60px;">-</span>
+                      <span style="font-size:14px; color:var(--color-text-muted); cursor:pointer;">&#x22EE;</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-016</div>
+            <div class="screen-name">작품 목록 관리 (PC)</div>
+          </div>
+        </div>
+
+        <!-- 016 - 순서 변경 모드 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">순서 변경 모드</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">순서 변경</span>
+                <span class="header-right" style="color:var(--color-primary); font-weight:600;">완료</span>
+              </div>
+              <div class="info-banner">드래그하여 작품 순서를 변경하세요</div>
+
+              <div class="work-card" style="background:var(--color-primary-light);">
+                <span class="drag-handle">&#x2630;</span>
+                <div class="work-card-thumb">IMG</div>
+                <div class="work-card-info">
+                  <div class="work-card-title">밤하늘의 별을 세다</div>
+                </div>
+              </div>
+
+              <div class="work-card">
+                <span class="drag-handle">&#x2630;</span>
+                <div class="work-card-thumb">IMG</div>
+                <div class="work-card-info">
+                  <div class="work-card-title">잃어버린 계절의 문</div>
+                </div>
+              </div>
+
+              <div class="work-card">
+                <span class="drag-handle">&#x2630;</span>
+                <div class="work-card-thumb">IMG</div>
+                <div class="work-card-info">
+                  <div class="work-card-title">새벽의 방문자</div>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-016</div>
+            <div class="screen-name">순서 변경 모드</div>
+          </div>
+        </div>
+
+        <!-- 016 - 작품 없음 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">작품 없음</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">작품 관리</span>
+              </div>
+              <div class="empty-state" style="padding:var(--space-xl) var(--space-lg);">
+                <div class="icon-placeholder">&#x1F4D6;</div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-text-primary); margin-bottom:var(--space-xs);">등록된 작품이 없습니다</div>
+                <div style="font-size:12px; margin-bottom:var(--space-lg);">첫 작품을 업로드해보세요</div>
+                <div class="btn btn-primary" style="width:auto; padding:10px 24px;">+ 작품 업로드</div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-016</div>
+            <div class="screen-name">작품 없음</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ===================================================================== -->
+  <!--  SECTION: 독자 화면 (서점 페이지)                                      -->
+  <!-- ===================================================================== -->
+  <div class="section-divider">
+    <h2>독자 화면 - 서점 페이지 (도서관 경험)</h2>
+  </div>
+
+  <div class="screen-grid">
+
+    <!-- ===== SCR-017: 서점 페이지 (독자용) ===== -->
+    <div class="screen-group">
+      <div class="screen-group-title">SCR-017. 서점 페이지 (독자용)</div>
+      <div class="screen-group-route">/bookstore/:id</div>
+      <div class="screen-group-states">
+
+        <!-- 017 - 기본 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">기본</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <!-- Author Profile -->
+              <div style="padding:var(--space-lg) var(--space-md); text-align:center; background:var(--color-bg-card); border-bottom:1px solid var(--color-border);">
+                <div class="avatar avatar-lg" style="margin:0 auto var(--space-sm);">&#x270D;</div>
+                <div style="font-size:16px; font-weight:700; margin-bottom:2px;">김작가</div>
+                <div style="font-size:12px; color:var(--color-text-muted); margin-bottom:var(--space-sm);">판타지와 SF를 즐겨 쓰는 작가</div>
+                <!-- Genre Tags -->
+                <div style="display:flex; flex-wrap:wrap; gap:var(--space-xs); justify-content:center; margin-bottom:var(--space-sm);">
+                  <span class="badge-genre">판타지</span>
+                  <span class="badge-genre">SF</span>
+                  <span class="badge-genre">단편소설</span>
+                </div>
+                <div class="btn btn-sm btn-primary" style="width:auto; padding:6px 20px;">+ 팔로우</div>
+              </div>
+
+              <!-- Tabs -->
+              <div class="tabs">
+                <div class="tab tab-active">최신</div>
+                <div class="tab">인기</div>
+                <div class="tab">단편</div>
+                <div class="tab">시리즈</div>
+              </div>
+
+              <!-- Latest Section - Thumbnail Grid (Wattpad-like) -->
+              <div class="section-header">
+                <h3>최신 발행</h3>
+              </div>
+              <div class="thumb-grid thumb-grid-2">
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">밤하늘의 별을 세다</div>
+                  <div class="thumb-meta">&#x2B50; 4.5 &#183; 무료</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">잃어버린 계절의 문</div>
+                  <div class="thumb-meta">&#x2B50; 4.2 &#183; 500원</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">시간의 정원사</div>
+                  <div class="thumb-meta">&#x2B50; 4.8 &#183; 무료</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">달의 뒷면</div>
+                  <div class="thumb-meta">&#x2B50; 4.0 &#183; 300원</div>
+                </div>
+              </div>
+
+              <!-- Reviews Preview -->
+              <div class="section-header" style="border-top:1px solid var(--color-border); margin-top:var(--space-sm);">
+                <h3>리뷰 &amp; 응원</h3>
+                <span class="more-link">더보기</span>
+              </div>
+              <div class="review-card">
+                <div class="review-header">
+                  <div class="review-avatar">R</div>
+                  <span class="review-name">독자A</span>
+                  <span class="review-date">2일 전</span>
+                </div>
+                <div class="review-text">정말 재미있게 읽었습니다. 다음 작품도 기대해요!</div>
+              </div>
+
+              <div style="padding:var(--space-md); text-align:center;">
+                <div class="btn btn-sm btn-outline-primary" style="width:auto;">리뷰 쓰기</div>
+              </div>
+
+              <div class="scroll-hint">&#x25BC; 스크롤</div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-017</div>
+            <div class="screen-name">서점 페이지</div>
+          </div>
+        </div>
+
+        <!-- 017 - 기본 (Desktop) -->
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div class="state-label">기본</div>
+          <div class="desktop-frame" style="min-height:420px;">
+            <div class="desktop-browser-bar">
+              <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+              <div class="address-bar">readly.me/bookstore/kim-writer</div>
+            </div>
+            <div class="desktop-content">
+              <div class="desktop-app-header">
+                <span class="logo">Readly</span>
+                <div class="nav-links"><span>홈</span><span class="active">서점</span><span>탐색</span></div>
+                <div class="nav-right">
+                  <span style="font-size:13px; color:var(--color-text-muted);">&#x1F50D;</span>
+                  <div class="avatar" style="width:28px;height:28px;font-size:11px;">U</div>
+                </div>
+              </div>
+
+              <!-- Desktop Profile Banner -->
+              <div class="desktop-profile-banner">
+                <div class="avatar avatar-lg">&#x270D;</div>
+                <div style="flex:1;">
+                  <div style="font-size:18px; font-weight:700; margin-bottom:2px;">김작가</div>
+                  <div style="font-size:13px; color:var(--color-text-muted); margin-bottom:var(--space-sm);">판타지와 SF를 즐겨 쓰는 작가입니다. 새로운 세계를 만들어갑니다.</div>
+                  <div style="display:flex; gap:var(--space-xs); flex-wrap:wrap;">
+                    <span class="badge-genre">판타지</span>
+                    <span class="badge-genre">SF</span>
+                    <span class="badge-genre">단편소설</span>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:var(--space-sm);">
+                  <div class="btn btn-sm btn-primary" style="width:auto; padding:6px 20px;">+ 팔로우</div>
+                  <div style="font-size:11px; color:var(--color-text-muted);">팔로워 28</div>
+                </div>
+              </div>
+
+              <!-- Tabs -->
+              <div class="tabs" style="padding:0 var(--space-lg);">
+                <div class="tab tab-active">최신</div>
+                <div class="tab">인기</div>
+                <div class="tab">단편</div>
+                <div class="tab">시리즈</div>
+              </div>
+
+              <!-- Latest Grid - Desktop (Wattpad-like) -->
+              <div class="section-header" style="padding-left:var(--space-lg); padding-right:var(--space-lg);">
+                <h3>최신 발행</h3>
+              </div>
+              <div class="desktop-thumb-grid desktop-thumb-grid-4" style="padding-bottom:var(--space-sm);">
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">밤하늘의 별을 세다</div>
+                  <div class="thumb-meta">&#x2B50; 4.5 &#183; 무료</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">잃어버린 계절의 문</div>
+                  <div class="thumb-meta">&#x2B50; 4.2 &#183; 500원</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">시간의 정원사</div>
+                  <div class="thumb-meta">&#x2B50; 4.8 &#183; 무료</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">달의 뒷면</div>
+                  <div class="thumb-meta">&#x2B50; 4.0 &#183; 300원</div>
+                </div>
+              </div>
+
+              <!-- Popular Grid -->
+              <div class="section-header" style="padding-left:var(--space-lg); padding-right:var(--space-lg); border-top:1px solid var(--color-border);">
+                <h3>인기 글</h3>
+              </div>
+              <div class="desktop-thumb-grid desktop-thumb-grid-4">
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">시간의 정원사</div>
+                  <div class="thumb-meta">&#x2B50; 4.8 &#183; 조회 1.2K</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">밤하늘의 별을 세다</div>
+                  <div class="thumb-meta">&#x2B50; 4.5 &#183; 조회 892</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">잃어버린 계절의 문</div>
+                  <div class="thumb-meta">&#x2B50; 4.2 &#183; 조회 456</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">달의 뒷면</div>
+                  <div class="thumb-meta">&#x2B50; 4.0 &#183; 조회 321</div>
+                </div>
+              </div>
+
+              <!-- Reviews section -->
+              <div class="section-header" style="padding-left:var(--space-lg); padding-right:var(--space-lg); border-top:1px solid var(--color-border);">
+                <h3>리뷰 &amp; 응원</h3>
+                <span class="more-link">리뷰 쓰기</span>
+              </div>
+              <div style="padding:0 var(--space-lg);">
+                <div class="review-card" style="border-radius:var(--radius-sm);">
+                  <div class="review-header">
+                    <div class="review-avatar">R</div>
+                    <span class="review-name">독자A</span>
+                    <span class="review-date">2일 전</span>
+                  </div>
+                  <div class="review-text">정말 재미있게 읽었습니다. 다음 작품도 기대해요!</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-017</div>
+            <div class="screen-name">서점 페이지 (PC)</div>
+          </div>
+        </div>
+
+        <!-- 017 - 비로그인 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">비로그인</div>
+          <div class="phone-frame" style="position:relative;">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content" style="position:relative;">
+              <div style="padding:var(--space-lg) var(--space-md); text-align:center; background:var(--color-bg-card); border-bottom:1px solid var(--color-border);">
+                <div class="avatar avatar-lg" style="margin:0 auto var(--space-sm);">&#x270D;</div>
+                <div style="font-size:16px; font-weight:700; margin-bottom:2px;">김작가</div>
+                <div style="font-size:12px; color:var(--color-text-muted); margin-bottom:var(--space-sm);">판타지와 SF를 즐겨 쓰는 작가</div>
+                <div style="display:flex; flex-wrap:wrap; gap:var(--space-xs); justify-content:center; margin-bottom:var(--space-sm);">
+                  <span class="badge-genre">판타지</span>
+                  <span class="badge-genre">SF</span>
+                </div>
+                <div class="btn btn-sm btn-primary" style="width:auto; padding:6px 20px;">+ 팔로우</div>
+              </div>
+
+              <!-- Login prompt overlay -->
+              <div style="position:absolute; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; z-index:10;">
+                <div style="background:var(--color-bg-card); border-radius:var(--radius-md); padding:var(--space-lg); width:85%; text-align:center;">
+                  <div style="font-size:15px; font-weight:600; margin-bottom:var(--space-sm);">로그인이 필요합니다</div>
+                  <div style="font-size:12px; color:var(--color-text-muted); margin-bottom:var(--space-md);">팔로우하려면 먼저 로그인하세요</div>
+                  <div class="btn btn-primary" style="margin-bottom:var(--space-sm);">로그인</div>
+                  <div class="btn btn-secondary">회원가입</div>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-017</div>
+            <div class="screen-name">비로그인 상태</div>
+          </div>
+        </div>
+
+        <!-- 017 - 작품 없음 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">작품 없음</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div style="padding:var(--space-lg) var(--space-md); text-align:center; background:var(--color-bg-card); border-bottom:1px solid var(--color-border);">
+                <div class="avatar avatar-lg" style="margin:0 auto var(--space-sm);">&#x270D;</div>
+                <div style="font-size:16px; font-weight:700; margin-bottom:2px;">새로운작가</div>
+                <div style="font-size:12px; color:var(--color-text-muted); margin-bottom:var(--space-sm);">아직 소개글이 없습니다</div>
+                <div class="btn btn-sm btn-primary" style="width:auto; padding:6px 20px;">+ 팔로우</div>
+              </div>
+
+              <div class="tabs">
+                <div class="tab tab-active">최신</div>
+                <div class="tab">인기</div>
+                <div class="tab">단편</div>
+                <div class="tab">시리즈</div>
+              </div>
+
+              <div class="empty-state" style="padding:var(--space-xl);">
+                <div class="icon-placeholder">&#x1F4DA;</div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-text-primary); margin-bottom:var(--space-xs);">아직 작품이 없습니다</div>
+                <div style="font-size:12px;">작가의 첫 작품을 기다려주세요</div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-017</div>
+            <div class="screen-name">작품 없음</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SCR-018: 서점 단편 전체 ===== -->
+    <div class="screen-group">
+      <div class="screen-group-title">SCR-018. 서점 단편 전체</div>
+      <div class="screen-group-route">/bookstore/:id/singles</div>
+      <div class="screen-group-states">
+
+        <!-- 018 - 기본 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">기본</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">김작가 &#183; 단편</span>
+              </div>
+
+              <div class="sort-bar">
+                <span>단편 8개</span>
+                <span>최신순 &#x25BC;</span>
+              </div>
+
+              <div class="thumb-grid thumb-grid-2">
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">밤하늘의 별을 세다</div>
+                  <div class="thumb-meta">&#x2B50; 4.5 &#183; 무료</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">잃어버린 계절의 문</div>
+                  <div class="thumb-meta">&#x2B50; 4.2 &#183; 500원</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">시간의 정원사</div>
+                  <div class="thumb-meta">&#x2B50; 4.8 &#183; 무료</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">달의 뒷면</div>
+                  <div class="thumb-meta">&#x2B50; 4.0 &#183; 300원</div>
+                </div>
+              </div>
+
+              <div class="scroll-hint">&#x25BC; 스크롤</div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-018</div>
+            <div class="screen-name">단편 전체</div>
+          </div>
+        </div>
+
+        <!-- 018 - 기본 (Desktop) -->
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div class="state-label">기본</div>
+          <div class="desktop-frame" style="min-height:360px;">
+            <div class="desktop-browser-bar">
+              <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+              <div class="address-bar">readly.me/bookstore/kim-writer/singles</div>
+            </div>
+            <div class="desktop-content">
+              <div class="desktop-app-header">
+                <span class="logo">Readly</span>
+                <div class="nav-links"><span>홈</span><span class="active">서점</span><span>탐색</span></div>
+                <div class="nav-right"><div class="avatar" style="width:28px;height:28px;font-size:11px;">U</div></div>
+              </div>
+
+              <!-- Breadcrumb -->
+              <div style="padding:var(--space-sm) var(--space-lg); font-size:12px; color:var(--color-text-muted); border-bottom:1px solid var(--color-border); background:var(--color-bg-card);">
+                <span style="color:var(--color-primary); cursor:pointer;">김작가의 서점</span> &rsaquo; <span>단편</span>
+              </div>
+
+              <div style="padding:var(--space-md) var(--space-lg); display:flex; align-items:center; justify-content:space-between;">
+                <div style="font-size:16px; font-weight:600;">단편 <span style="color:var(--color-text-muted); font-weight:400;">(8)</span></div>
+                <div style="font-size:12px; color:var(--color-text-muted);">최신순 &#x25BC;</div>
+              </div>
+
+              <div class="desktop-thumb-grid desktop-thumb-grid-5">
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">밤하늘의 별을 세다</div>
+                  <div class="thumb-meta">&#x2B50; 4.5 &#183; 무료</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">잃어버린 계절의 문</div>
+                  <div class="thumb-meta">&#x2B50; 4.2 &#183; 500원</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">시간의 정원사</div>
+                  <div class="thumb-meta">&#x2B50; 4.8 &#183; 무료</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">달의 뒷면</div>
+                  <div class="thumb-meta">&#x2B50; 4.0 &#183; 300원</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img">COVER</div>
+                  <div class="thumb-title">우주의 끝에서</div>
+                  <div class="thumb-meta">&#x2B50; 3.9 &#183; 무료</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-018</div>
+            <div class="screen-name">단편 전체 (PC)</div>
+          </div>
+        </div>
+
+        <!-- 018 - 작품 없음 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">작품 없음</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">김작가 &#183; 단편</span>
+              </div>
+              <div class="empty-state" style="padding:var(--space-xl);">
+                <div class="icon-placeholder">&#x1F4D6;</div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-text-primary); margin-bottom:var(--space-xs);">단편 작품이 없습니다</div>
+                <div style="font-size:12px;">작가의 다른 작품을 확인해보세요</div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-018</div>
+            <div class="screen-name">작품 없음</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SCR-019: 서점 시리즈 전체 ===== -->
+    <div class="screen-group">
+      <div class="screen-group-title">SCR-019. 서점 시리즈 전체</div>
+      <div class="screen-group-route">/bookstore/:id/series</div>
+      <div class="screen-group-states">
+
+        <!-- 019 - 기본 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">기본</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">김작가 &#183; 시리즈</span>
+              </div>
+
+              <div class="sort-bar">
+                <div style="display:flex; gap:var(--space-sm);">
+                  <span class="chip chip-active" style="font-size:11px; padding:2px 8px;">전체</span>
+                  <span class="chip" style="font-size:11px; padding:2px 8px;">연재중</span>
+                  <span class="chip" style="font-size:11px; padding:2px 8px;">완결</span>
+                </div>
+                <span>최신순 &#x25BC;</span>
+              </div>
+
+              <div class="thumb-grid thumb-grid-2">
+                <div class="thumb-card">
+                  <div class="thumb-img" style="position:relative;">
+                    COVER
+                    <span class="badge badge-info" style="position:absolute; top:4px; left:4px; font-size:9px;">연재중</span>
+                  </div>
+                  <div class="thumb-title">은하수 연대기</div>
+                  <div class="thumb-meta">12회 &#183; &#x2B50; 4.6</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img" style="position:relative;">
+                    COVER
+                    <span class="badge badge-neutral" style="position:absolute; top:4px; left:4px; font-size:9px;">완결</span>
+                  </div>
+                  <div class="thumb-title">시간여행자의 일기</div>
+                  <div class="thumb-meta">8회 &#183; &#x2B50; 4.3</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img" style="position:relative;">
+                    COVER
+                    <span class="badge badge-info" style="position:absolute; top:4px; left:4px; font-size:9px;">연재중</span>
+                  </div>
+                  <div class="thumb-title">마법사의 제자</div>
+                  <div class="thumb-meta">5회 &#183; &#x2B50; 4.1</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img" style="position:relative;">
+                    COVER
+                    <span class="badge badge-neutral" style="position:absolute; top:4px; left:4px; font-size:9px;">완결</span>
+                  </div>
+                  <div class="thumb-title">용의 노래</div>
+                  <div class="thumb-meta">15회 &#183; &#x2B50; 4.7</div>
+                </div>
+              </div>
+
+              <div class="scroll-hint">&#x25BC; 스크롤</div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-019</div>
+            <div class="screen-name">시리즈 전체</div>
+          </div>
+        </div>
+
+        <!-- 019 - 기본 (Desktop) -->
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div class="state-label">기본</div>
+          <div class="desktop-frame" style="min-height:360px;">
+            <div class="desktop-browser-bar">
+              <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+              <div class="address-bar">readly.me/bookstore/kim-writer/series</div>
+            </div>
+            <div class="desktop-content">
+              <div class="desktop-app-header">
+                <span class="logo">Readly</span>
+                <div class="nav-links"><span>홈</span><span class="active">서점</span><span>탐색</span></div>
+                <div class="nav-right"><div class="avatar" style="width:28px;height:28px;font-size:11px;">U</div></div>
+              </div>
+
+              <!-- Breadcrumb -->
+              <div style="padding:var(--space-sm) var(--space-lg); font-size:12px; color:var(--color-text-muted); border-bottom:1px solid var(--color-border); background:var(--color-bg-card);">
+                <span style="color:var(--color-primary); cursor:pointer;">김작가의 서점</span> &rsaquo; <span>시리즈</span>
+              </div>
+
+              <div style="padding:var(--space-md) var(--space-lg); display:flex; align-items:center; justify-content:space-between;">
+                <div style="font-size:16px; font-weight:600;">시리즈 <span style="color:var(--color-text-muted); font-weight:400;">(4)</span></div>
+                <div style="display:flex; align-items:center; gap:var(--space-md);">
+                  <div style="display:flex; gap:var(--space-sm);">
+                    <span class="chip chip-active" style="font-size:11px; padding:2px 8px;">전체</span>
+                    <span class="chip" style="font-size:11px; padding:2px 8px;">연재중</span>
+                    <span class="chip" style="font-size:11px; padding:2px 8px;">완결</span>
+                  </div>
+                  <span style="font-size:12px; color:var(--color-text-muted);">최신순 &#x25BC;</span>
+                </div>
+              </div>
+
+              <div class="desktop-thumb-grid desktop-thumb-grid-4">
+                <div class="thumb-card">
+                  <div class="thumb-img" style="position:relative;">
+                    COVER
+                    <span class="badge badge-info" style="position:absolute; top:4px; left:4px; font-size:9px;">연재중</span>
+                  </div>
+                  <div class="thumb-title">은하수 연대기</div>
+                  <div class="thumb-meta">12회 &#183; &#x2B50; 4.6</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img" style="position:relative;">
+                    COVER
+                    <span class="badge badge-neutral" style="position:absolute; top:4px; left:4px; font-size:9px;">완결</span>
+                  </div>
+                  <div class="thumb-title">시간여행자의 일기</div>
+                  <div class="thumb-meta">8회 &#183; &#x2B50; 4.3</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img" style="position:relative;">
+                    COVER
+                    <span class="badge badge-info" style="position:absolute; top:4px; left:4px; font-size:9px;">연재중</span>
+                  </div>
+                  <div class="thumb-title">마법사의 제자</div>
+                  <div class="thumb-meta">5회 &#183; &#x2B50; 4.1</div>
+                </div>
+                <div class="thumb-card">
+                  <div class="thumb-img" style="position:relative;">
+                    COVER
+                    <span class="badge badge-neutral" style="position:absolute; top:4px; left:4px; font-size:9px;">완결</span>
+                  </div>
+                  <div class="thumb-title">용의 노래</div>
+                  <div class="thumb-meta">15회 &#183; &#x2B50; 4.7</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-019</div>
+            <div class="screen-name">시리즈 전체 (PC)</div>
+          </div>
+        </div>
+
+        <!-- 019 - 작품 없음 (Mobile) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">작품 없음</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>&#x1F50B;</span>
+            </div>
+            <div class="phone-content">
+              <div class="app-header">
+                <span class="back-arrow">&larr;</span>
+                <span class="header-title">김작가 &#183; 시리즈</span>
+              </div>
+              <div class="empty-state" style="padding:var(--space-xl);">
+                <div class="icon-placeholder">&#x1F4DA;</div>
+                <div style="font-size:14px; font-weight:600; color:var(--color-text-primary); margin-bottom:var(--space-xs);">시리즈가 없습니다</div>
+                <div style="font-size:12px;">작가의 단편 작품을 확인해보세요</div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-019</div>
+            <div class="screen-name">작품 없음</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ===================================================================== -->
+  <!--  SECTION: 공통 패턴                                                    -->
+  <!-- ===================================================================== -->
+  <div class="section-divider">
+    <h2>공통 패턴 (Common Patterns)</h2>
+  </div>
+
+  <div class="screen-grid">
+
+    <!-- Error Toast -->
+    <div class="screen-group" style="max-width:340px;">
+      <div class="screen-group-title">에러 토스트</div>
+      <div class="screen-group-route">공통 패턴</div>
+      <div class="screen-group-states">
+        <div class="screen-card">
+          <div style="width:260px;">
+            <div class="error-toast" style="margin:0;">필명이 이미 사용 중입니다</div>
+            <div style="height:8px;"></div>
+            <div class="error-toast" style="margin:0;">파일을 읽을 수 없습니다</div>
+            <div style="height:8px;"></div>
+            <div class="error-toast" style="margin:0;">서점 생성에 실패했습니다. 다시 시도해주세요.</div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-name">에러 메시지</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="screen-group" style="max-width:340px;">
+      <div class="screen-group-title">성공 토스트</div>
+      <div class="screen-group-route">공통 패턴</div>
+      <div class="screen-group-states">
+        <div class="screen-card">
+          <div style="width:260px;">
+            <div class="success-toast" style="margin:0;">서점이 성공적으로 오픈되었습니다!</div>
+            <div style="height:8px;"></div>
+            <div class="success-toast" style="margin:0;">프로필이 저장되었습니다</div>
+            <div style="height:8px;"></div>
+            <div class="success-toast" style="margin:0;">작품이 발행되었습니다</div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-name">성공 메시지</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty States -->
+    <div class="screen-group" style="max-width:340px;">
+      <div class="screen-group-title">빈 상태 (Empty State)</div>
+      <div class="screen-group-route">공통 패턴</div>
+      <div class="screen-group-states">
+        <div class="screen-card">
+          <div style="width:260px; background:var(--color-bg-card); border-radius:var(--radius-md); border:1px solid var(--color-border);">
+            <div class="empty-state">
+              <div class="icon-placeholder">&#x1F4DA;</div>
+              <div style="font-size:14px; font-weight:600; color:var(--color-text-primary); margin-bottom:var(--space-xs);">컨텐츠 없음 제목</div>
+              <div style="font-size:12px;">안내 메시지가 여기에 표시됩니다</div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-name">빈 상태 기본형</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll Hint -->
+    <div class="screen-group" style="max-width:340px;">
+      <div class="screen-group-title">스크롤 힌트</div>
+      <div class="screen-group-route">공통 패턴</div>
+      <div class="screen-group-states">
+        <div class="screen-card">
+          <div style="width:260px; background:var(--color-bg-page); border-radius:var(--radius-md); border:1px solid var(--color-border); overflow:hidden;">
+            <div style="padding:var(--space-md); font-size:12px; color:var(--color-text-muted);">
+              ... 리스트 아이템들 ...<br>
+              ... 리스트 아이템들 ...
+            </div>
+            <div class="scroll-hint">&#x25BC; 스크롤</div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-name">리스트 스크롤 힌트</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="max-width:1600px; margin:var(--space-xl) auto 0; padding-top:var(--space-xl); border-top:1px solid var(--color-border); text-align:center; color:var(--color-text-muted); font-size:12px;">
+    F2 서점 시스템 화면 구조도 &#183; Readly &#183; 2026-03-21
+  </div>
+
+</body>
+</html>
