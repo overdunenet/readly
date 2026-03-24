@@ -7,7 +7,7 @@ import { CheckCircle, XCircle } from 'lucide-react';
 import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
-import SubLayout from '../../../../components/layout/SubLayout';
+import SubLayout from '../../../../../components/layout/SubLayout';
 import { trpc } from '@/shared';
 
 const searchSchema = z.object({
@@ -16,14 +16,14 @@ const searchSchema = z.object({
   message: z.string().optional(),
 });
 
-export const Route = createFileRoute('/_auth/editor/cash/charge-result')({
+export const Route = createFileRoute('/_auth/my/cash/charge-result')({
   validateSearch: searchSchema,
   component: ChargeResultPage,
 });
 
 function ChargeResultPage() {
   const { status, message } = useSearch({
-    from: '/_auth/editor/cash/charge-result',
+    from: '/_auth/my/cash/charge-result',
   });
   const navigate = useNavigate();
   const balanceQuery = trpc.cash.getBalance.useQuery(undefined, {
@@ -33,7 +33,7 @@ function ChargeResultPage() {
   const isSuccess = status === 'success';
 
   const handleConfirm = () => {
-    const target = isSuccess ? '/editor' : '/editor/cash/charge';
+    const target = isSuccess ? '/my/cash' : '/my/cash/charge';
     navigate({ to: target });
   };
 

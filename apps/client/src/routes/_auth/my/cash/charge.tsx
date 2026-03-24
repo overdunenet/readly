@@ -3,7 +3,7 @@ import { useState } from 'react';
 import SnappyModal from 'react-snappy-modal';
 import tw from 'tailwind-styled-components';
 
-import SubLayout from '../../../../components/layout/SubLayout';
+import SubLayout from '../../../../../components/layout/SubLayout';
 import { trpc } from '@/shared';
 import { AlertModal } from '@/shared/modal/AlertModal';
 
@@ -18,7 +18,7 @@ const PAY_METHODS = [
 const MIN_AMOUNT = 1_000;
 const MAX_AMOUNT = 1_000_000;
 
-export const Route = createFileRoute('/_auth/editor/cash/charge')({
+export const Route = createFileRoute('/_auth/my/cash/charge')({
   component: CashChargePage,
 });
 
