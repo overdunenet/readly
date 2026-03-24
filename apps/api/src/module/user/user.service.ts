@@ -50,6 +50,7 @@ export class UserService {
           nickname: user.nickname,
           profileImage: user.profileImage,
           status: user.status,
+          country: user.country,
         },
       }));
     });

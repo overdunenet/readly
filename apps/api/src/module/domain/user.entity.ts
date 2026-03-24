@@ -43,6 +43,9 @@ export class UserEntity extends BaseEntity {
   })
   status: UserStatus;
 
+  @Column({ type: 'varchar', length: 10, default: 'KR' })
+  country: string;
+
   @DeleteDateColumn()
   deletedAt: Date;
 

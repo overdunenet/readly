@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { UserEntity } from './user.entity';
+import { BookstoreEntity } from './bookstore.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
@@ -66,6 +67,20 @@ export class PostEntity extends BaseEntity {
   @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'author_id' })
   author: UserEntity;
+
+  @Column({ type: 'uuid', nullable: true, comment: '서점 ID' })
+  bookstoreId: string | null;
+
+  @ManyToOne(() => BookstoreEntity, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'bookstore_id' })
+  bookstore: BookstoreEntity;
+
+  @Column({
+    type: 'integer',
+    nullable: true,
+    comment: '서점 내 정렬 순서',
+  })
+  sortOrder: number | null;
 
   @DeleteDateColumn()
   deletedAt: Date;

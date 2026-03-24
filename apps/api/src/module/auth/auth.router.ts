@@ -21,6 +21,7 @@ const socialLoginOutputSchema = z.object({
     nickname: z.string(),
     profileImage: z.string().nullable(),
     status: z.nativeEnum(UserStatus),
+    country: z.string(),
   }),
 });
 
@@ -72,6 +73,7 @@ export class AuthRouter extends BaseTrpcRouter {
         nickname: z.string(),
         profileImage: z.string().nullable(),
         status: z.nativeEnum(UserStatus),
+        country: z.string(),
       }),
     }),
   })
