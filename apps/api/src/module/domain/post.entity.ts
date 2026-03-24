@@ -94,12 +94,14 @@ export class PostEntity extends BaseEntity {
     accessLevel?: PostAccessLevel;
     price?: number;
     authorId: string;
+    bookstoreId?: string;
   }): PostEntity {
-    const { authorId, ...postEditInput } = input;
+    const { authorId, bookstoreId, ...postEditInput } = input;
 
     const post = new PostEntity();
     post.status = 'draft';
     post.authorId = authorId;
+    post.bookstoreId = bookstoreId ?? null;
 
     // edit 메서드를 활용하여 나머지 필드 설정
     post.edit(postEditInput);
@@ -201,6 +203,7 @@ export const getPostRepository = (
         accessLevel?: PostAccessLevel;
         price?: number;
         authorId: string;
+        bookstoreId?: string;
       }): Promise<PostEntity> {
         const post = PostEntity.create(input);
         return this.save(post);
