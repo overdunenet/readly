@@ -28,4 +28,7 @@ module.exports = {
     },
   },
   cors: { origin: true },
+  client: {
+    url: 'http://localhost:5173',
+  },
 };

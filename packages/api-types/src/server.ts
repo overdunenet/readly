@@ -239,6 +239,32 @@ const appRouter = t.router({
       }),
     }))).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
   }),
+  cash: t.router({
+    getBalance: publicProcedure.output(z.object({
+      amount: z.number(),
+    })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    getHistory: publicProcedure.input(z.object({
+      cursor: z.string().uuid().optional(),
+      limit: z.number().min(1).max(100).default(20),
+    })).output(z.object({
+      items: z.array(z.object({
+        id: z.string(),
+        cashId: z.string(),
+        type: z.enum(['CHARGE', 'PURCHASE', 'REFUND']),
+        amount: z.number(),
+        balanceAfter: z.number(),
+        description: z.string(),
+        createdAt: z.date(),
+      })),
+      nextCursor: z.string().nullable(),
+    })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    initiateCharge: publicProcedure.input(z.object({
+      amount: z.number().min(1000).max(1000000),
+    })).output(z.object({
+      orderId: z.string(),
+      amount: z.number(),
+    })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+  }),
   user: t.router({
     refreshToken: publicProcedure.input(z.object({})).output(z.object({
       accessToken: z.string(),
