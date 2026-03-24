@@ -2,3 +2,7 @@ export { default as CountryRestrictionNotice } from './CountryRestrictionNotice'
 export { default as BookstoreOpenForm } from './BookstoreOpenForm';
 export { default as BookstoreHeader } from './BookstoreHeader';
 export { default as BookstoreNavMenu } from './BookstoreNavMenu';
+export { default as BookstoreProfile } from './BookstoreProfile';
+export { default as LatestPostsSection } from './LatestPostsSection';
+export { default as StatusFilter } from './StatusFilter';
+export { default as WorkListItem } from './WorkListItem';
