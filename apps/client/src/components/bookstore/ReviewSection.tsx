@@ -1,3 +1,4 @@
+import { Link, useLocation } from '@tanstack/react-router';
 import { MessageSquare } from 'lucide-react';
 import { useState } from 'react';
 import SnappyModal from 'react-snappy-modal';
@@ -17,6 +18,7 @@ interface ReviewSectionProps {
 
 const ReviewSection = ({ bookstoreId }: ReviewSectionProps) => {
   const user = useAuthStore((s) => s.user);
+  const location = useLocation();
   const utils = trpc.useUtils();
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
 
@@ -116,6 +118,20 @@ const ReviewSection = ({ bookstoreId }: ReviewSectionProps) => {
             isSubmitting={createMutation.isPending}
           />
         </FormSection>
+      )}
+
+      {/* 비로그인 안내 */}
+      {!user && (
+        <div className="text-center py-4 text-gray-500 text-sm">
+          <Link
+            to="/login"
+            search={{ redirect: location.pathname }}
+            className="text-blue-600 underline"
+          >
+            로그인
+          </Link>
+          하면 응원 글을 남길 수 있습니다.
+        </div>
       )}
 
       {/* 리뷰 목록 */}

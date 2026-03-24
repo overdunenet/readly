@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
+import { stripHtml } from '../shared/utils/sanitize';
 import { BookstoreReviewEntity } from '../domain/bookstore-review.entity';
 
 @Injectable()
@@ -42,7 +43,7 @@ export class BookstoreReviewService {
     const review = BookstoreReviewEntity.create({
       bookstoreId,
       reviewerId,
-      content,
+      content: stripHtml(content),
     });
 
     return this.repositoryProvider.BookstoreReviewRepository.save(review);
@@ -64,7 +65,7 @@ export class BookstoreReviewService {
       throw new ForbiddenException('본인의 리뷰만 수정할 수 있습니다');
     }
 
-    review.content = content;
+    review.content = stripHtml(content);
 
     return this.repositoryProvider.BookstoreReviewRepository.save(review);
   }

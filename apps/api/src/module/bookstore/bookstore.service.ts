@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
+import { stripHtml } from '../shared/utils/sanitize';
 import { BookstoreEntity } from '../domain/bookstore.entity';
 import { PostEntity, PostStatus } from '../domain/post.entity';
 import { PublishDefaultEntity } from '../domain/publish-default.entity';
@@ -107,7 +108,7 @@ export class BookstoreService {
       bookstore.storeName = input.storeName;
     }
     if (input.bio !== undefined) {
-      bookstore.bio = input.bio || null;
+      bookstore.bio = input.bio ? stripHtml(input.bio) : null;
     }
     if (input.profileImage !== undefined) {
       bookstore.profileImage = input.profileImage || null;

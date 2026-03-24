@@ -4,6 +4,7 @@ import tw from 'tailwind-styled-components';
 import Layout from '../../components/layout/Layout';
 
 import BookstoreProfile from '@/components/bookstore/BookstoreProfile';
+import FollowButton from '@/components/follow/FollowButton';
 import LatestPostsSection from '@/components/bookstore/LatestPostsSection';
 import PopularPostsSection from '@/components/bookstore/PopularPostsSection';
 import ReviewSection from '@/components/bookstore/ReviewSection';
@@ -47,6 +48,7 @@ function BookstoreDetailPage() {
     <Layout>
       <PageContainer>
         <BookstoreProfile bookstore={bookstoreQuery.data} />
+        <FollowButton followeeId={bookstoreQuery.data.userId} />
         <PopularPostsSection bookstoreId={bookstoreId} />
         <LatestPostsSection
           posts={postsQuery.data?.posts ?? []}
