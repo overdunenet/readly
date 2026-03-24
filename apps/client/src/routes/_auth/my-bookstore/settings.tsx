@@ -133,10 +133,17 @@ function SettingsPage() {
                 <Input
                   type="number"
                   min={0}
-                  value={field.value}
+                  value={field.value === 0 ? '' : field.value}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    field.onChange(Number(e.target.value))
+                    field.onChange(
+                      e.target.value === ''
+                        ? 0
+                        : parseInt(e.target.value, 10) || 0,
+                    )
                   }
+                  onBlur={() => {
+                    if (field.value === 0) field.onChange(0);
+                  }}
                   placeholder="0"
                 />
               )}
