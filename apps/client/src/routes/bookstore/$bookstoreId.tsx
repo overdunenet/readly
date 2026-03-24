@@ -7,7 +7,6 @@ import BookstoreProfile from '@/components/bookstore/BookstoreProfile';
 import FollowButton from '@/components/follow/FollowButton';
 import LatestPostsSection from '@/components/bookstore/LatestPostsSection';
 import PopularPostsSection from '@/components/bookstore/PopularPostsSection';
-import ReviewSection from '@/components/bookstore/ReviewSection';
 import { trpc } from '@/shared';
 
 export const Route = createFileRoute('/bookstore/$bookstoreId')({
@@ -55,7 +54,6 @@ function BookstoreDetailPage() {
           total={postsQuery.data?.total ?? 0}
           isLoading={postsQuery.isLoading}
         />
-        <ReviewSection bookstoreId={bookstoreId} />
       </PageContainer>
     </Layout>
   );

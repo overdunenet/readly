@@ -6,7 +6,4 @@ export { default as BookstoreProfile } from './BookstoreProfile';
 export { default as LatestPostsSection } from './LatestPostsSection';
 export { default as StatusFilter } from './StatusFilter';
 export { default as WorkListItem } from './WorkListItem';
-export { default as ReviewSection } from './ReviewSection';
-export { default as ReviewForm } from './ReviewForm';
-export { default as ReviewItem } from './ReviewItem';
 export { default as PopularPostsSection } from './PopularPostsSection';
