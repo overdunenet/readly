@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { UserEntity } from './user.entity';
+import { PublishDefaultEntity } from './publish-default.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
@@ -70,6 +71,9 @@ export class BookstoreEntity extends BaseEntity {
     comment: '서점 오픈 일시',
   })
   openedAt: Date | null;
+
+  @Column(() => PublishDefaultEntity, { prefix: 'publish_default' })
+  publishDefault: PublishDefaultEntity;
 
   @DeleteDateColumn()
   deletedAt: Date;

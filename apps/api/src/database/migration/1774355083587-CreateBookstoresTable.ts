@@ -18,9 +18,9 @@ export class CreateBookstoresTable1774355083587 implements MigrationInterface {
         "is_active" BOOLEAN NOT NULL DEFAULT true,
         "terms_agreed_at" TIMESTAMPTZ,
         "opened_at" TIMESTAMPTZ,
-        "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-        "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
-        "deleted_at" TIMESTAMP
+        "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
+        "updated_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
+        "deleted_at" TIMESTAMPTZ
       )
     `);
   }

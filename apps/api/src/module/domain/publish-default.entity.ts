@@ -1,19 +1,7 @@
-import { Column, Entity, OneToOne, JoinColumn, EntityManager } from 'typeorm';
-import { BaseEntity } from '@src/module/shared/entity/base.entity';
-import { BookstoreEntity } from './bookstore.entity';
+import { Column } from 'typeorm';
 import { PublishAccessLevel, AgeRating } from './enums';
-import { TransactionService } from '../shared/transaction/transaction.service';
-import { getEntityManager } from '@src/database/datasources';
 
-@Entity('publish_defaults')
-export class PublishDefaultEntity extends BaseEntity {
-  @Column({ type: 'uuid', unique: true, comment: '서점 ID' })
-  bookstoreId: string;
-
-  @OneToOne(() => BookstoreEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'bookstore_id' })
-  bookstore: BookstoreEntity;
-
+export class PublishDefaultEntity {
   @Column({
     type: 'varchar',
     default: PublishAccessLevel.PUBLIC,
@@ -35,23 +23,11 @@ export class PublishDefaultEntity extends BaseEntity {
   })
   defaultAgeRating: AgeRating;
 
-  // DDD 패턴 - Static Factory Method
-  static create(input: {
-    bookstoreId: string;
-    defaultAccessLevel?: PublishAccessLevel;
-    defaultPrice?: number;
-    defaultAgeRating?: AgeRating;
-  }): PublishDefaultEntity {
+  static createDefault(): PublishDefaultEntity {
     const entity = new PublishDefaultEntity();
-    entity.bookstoreId = input.bookstoreId;
-    entity.defaultAccessLevel =
-      input.defaultAccessLevel ?? PublishAccessLevel.PUBLIC;
-    entity.defaultPrice = input.defaultPrice ?? 0;
-    entity.defaultAgeRating = input.defaultAgeRating ?? AgeRating.ALL;
+    entity.defaultAccessLevel = PublishAccessLevel.PUBLIC;
+    entity.defaultPrice = 0;
+    entity.defaultAgeRating = AgeRating.ALL;
     return entity;
   }
 }
-
-export const getPublishDefaultRepository = (
-  source?: TransactionService | EntityManager
-) => getEntityManager(source).getRepository(PublishDefaultEntity);

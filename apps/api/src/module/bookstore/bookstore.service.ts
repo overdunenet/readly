@@ -4,10 +4,11 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
+import { FindOptionsWhere } from 'typeorm';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { stripHtml } from '../shared/utils/sanitize';
 import { BookstoreEntity } from '../domain/bookstore.entity';
-import { PostEntity, PostStatus } from '../domain/post.entity';
+import { PostEntity, PostStatus, POST_STATUS } from '../domain/post.entity';
 import { PublishDefaultEntity } from '../domain/publish-default.entity';
 import { PublishAccessLevel, AgeRating } from '../domain/enums';
 
@@ -40,6 +41,14 @@ export interface UpdateSettingsInput {
 @Injectable()
 export class BookstoreService {
   constructor(private readonly repositoryProvider: RepositoryProvider) {}
+
+  private getBookstoreByUserId(userId: string): Promise<BookstoreEntity> {
+    return this.repositoryProvider.BookstoreRepository.findOneByOrFail({
+      userId,
+    }).catch(() => {
+      throw new NotFoundException('서점을 찾을 수 없습니다');
+    });
+  }
 
   async open(
     userId: string,
@@ -77,29 +86,21 @@ export class BookstoreService {
   }
 
   async hasBookstore(userId: string): Promise<boolean> {
-    const bookstore =
-      await this.repositoryProvider.BookstoreRepository.findOneBy({ userId });
-    return !!bookstore;
+    const count = await this.repositoryProvider.BookstoreRepository.countBy({
+      userId,
+    });
+    return count > 0;
   }
 
   async getMyBookstore(userId: string): Promise<BookstoreEntity> {
-    return this.repositoryProvider.BookstoreRepository.findOneByOrFail({
-      userId,
-    }).catch(() => {
-      throw new NotFoundException('서점을 찾을 수 없습니다');
-    });
+    return this.getBookstoreByUserId(userId);
   }
 
   async updateProfile(
     userId: string,
     input: UpdateProfileInput
   ): Promise<BookstoreEntity> {
-    const bookstore =
-      await this.repositoryProvider.BookstoreRepository.findOneByOrFail({
-        userId,
-      }).catch(() => {
-        throw new NotFoundException('서점을 찾을 수 없습니다');
-      });
+    const bookstore = await this.getBookstoreByUserId(userId);
 
     if (input.penName !== undefined) {
       bookstore.penName = input.penName;
@@ -140,7 +141,7 @@ export class BookstoreService {
       await this.repositoryProvider.PostRepository.findAndCount({
         where: {
           bookstoreId,
-          status: 'published' as PostStatus,
+          status: POST_STATUS.PUBLISHED,
         },
         relations: ['author'],
         order: { publishedAt: 'DESC' },
@@ -151,17 +152,12 @@ export class BookstoreService {
     return { posts, total };
   }
 
-  async getMyWorks(userId: string, status?: string): Promise<PostEntity[]> {
-    const bookstore =
-      await this.repositoryProvider.BookstoreRepository.findOneByOrFail({
-        userId,
-      }).catch(() => {
-        throw new NotFoundException('서점을 찾을 수 없습니다');
-      });
+  async getMyWorks(userId: string, status?: PostStatus): Promise<PostEntity[]> {
+    const bookstore = await this.getBookstoreByUserId(userId);
 
-    const where: Record<string, unknown> = { bookstoreId: bookstore.id };
+    const where: FindOptionsWhere<PostEntity> = { bookstoreId: bookstore.id };
     if (status) {
-      where.status = status as PostStatus;
+      where.status = status;
     }
 
     return this.repositoryProvider.PostRepository.find({
@@ -172,64 +168,34 @@ export class BookstoreService {
   }
 
   async getSettings(userId: string): Promise<PublishDefaultEntity> {
-    const bookstore =
-      await this.repositoryProvider.BookstoreRepository.findOneByOrFail({
-        userId,
-      }).catch(() => {
-        throw new NotFoundException('서점을 찾을 수 없습니다');
-      });
+    const bookstore = await this.getBookstoreByUserId(userId);
 
-    const existing =
-      await this.repositoryProvider.PublishDefaultRepository.findOneBy({
-        bookstoreId: bookstore.id,
-      });
-
-    if (existing) {
-      return existing;
-    }
-
-    // 기본값 반환 (아직 DB에 없는 경우)
-    return PublishDefaultEntity.create({ bookstoreId: bookstore.id });
+    return bookstore.publishDefault ?? PublishDefaultEntity.createDefault();
   }
 
   async updateSettings(
     userId: string,
     input: UpdateSettingsInput
   ): Promise<PublishDefaultEntity> {
-    const bookstore =
-      await this.repositoryProvider.BookstoreRepository.findOneByOrFail({
-        userId,
-      }).catch(() => {
-        throw new NotFoundException('서점을 찾을 수 없습니다');
-      });
+    const bookstore = await this.getBookstoreByUserId(userId);
 
-    const existing =
-      await this.repositoryProvider.PublishDefaultRepository.findOneBy({
-        bookstoreId: bookstore.id,
-      });
-
-    if (existing) {
-      if (input.defaultAccessLevel !== undefined) {
-        existing.defaultAccessLevel = input.defaultAccessLevel;
-      }
-      if (input.defaultPrice !== undefined) {
-        existing.defaultPrice = input.defaultPrice;
-      }
-      if (input.defaultAgeRating !== undefined) {
-        existing.defaultAgeRating = input.defaultAgeRating;
-      }
-      return this.repositoryProvider.PublishDefaultRepository.save(existing);
+    if (!bookstore.publishDefault) {
+      bookstore.publishDefault = PublishDefaultEntity.createDefault();
     }
 
-    // 새로 생성 (upsert)
-    const entity = PublishDefaultEntity.create({
-      bookstoreId: bookstore.id,
-      defaultAccessLevel: input.defaultAccessLevel,
-      defaultPrice: input.defaultPrice,
-      defaultAgeRating: input.defaultAgeRating,
-    });
+    if (input.defaultAccessLevel !== undefined) {
+      bookstore.publishDefault.defaultAccessLevel = input.defaultAccessLevel;
+    }
+    if (input.defaultPrice !== undefined) {
+      bookstore.publishDefault.defaultPrice = input.defaultPrice;
+    }
+    if (input.defaultAgeRating !== undefined) {
+      bookstore.publishDefault.defaultAgeRating = input.defaultAgeRating;
+    }
 
-    return this.repositoryProvider.PublishDefaultRepository.save(entity);
+    const saved =
+      await this.repositoryProvider.BookstoreRepository.save(bookstore);
+    return saved.publishDefault;
   }
 
   async getPopularPosts(
@@ -240,7 +206,7 @@ export class BookstoreService {
     return this.repositoryProvider.PostRepository.find({
       where: {
         bookstoreId,
-        status: 'published' as PostStatus,
+        status: POST_STATUS.PUBLISHED,
       },
       relations: ['author'],
       order: { createdAt: 'DESC' },

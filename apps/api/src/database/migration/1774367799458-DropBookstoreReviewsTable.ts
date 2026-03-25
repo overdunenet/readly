@@ -16,9 +16,9 @@ export class DropBookstoreReviewsTable1774367799458
         "bookstore_id" UUID NOT NULL REFERENCES "bookstores"("id") ON DELETE CASCADE,
         "reviewer_id" UUID NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
         "content" TEXT NOT NULL,
-        "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-        "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
-        "deleted_at" TIMESTAMP,
+        "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
+        "updated_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
+        "deleted_at" TIMESTAMPTZ,
         CONSTRAINT "uq_bookstore_reviews_bookstore_reviewer" UNIQUE ("bookstore_id", "reviewer_id")
       )
     `);

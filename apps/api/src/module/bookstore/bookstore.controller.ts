@@ -10,7 +10,7 @@ import {
   UpdateSettingsInput,
 } from './bookstore.service';
 import { BookstoreEntity } from '../domain/bookstore.entity';
-import { PostEntity } from '../domain/post.entity';
+import { PostEntity, PostStatus } from '../domain/post.entity';
 import { PublishDefaultEntity } from '../domain/publish-default.entity';
 
 @Controller()
@@ -64,7 +64,7 @@ export class BookstoreController {
 
   @MessagePattern('bookstore.getMyWorks')
   async getMyWorks(
-    @Payload() data: { userId: string; status?: string }
+    @Payload() data: { userId: string; status?: PostStatus }
   ): Promise<PostEntity[]> {
     return this.bookstoreService.getMyWorks(data.userId, data.status);
   }
