@@ -1,6 +1,8 @@
 import { FileText } from 'lucide-react';
 import tw from 'tailwind-styled-components';
 
+import { formatDate } from '@/utils/date';
+
 interface PostItem {
   id: string;
   title: string;
@@ -12,33 +14,16 @@ interface PostItem {
 interface LatestPostsSectionProps {
   posts: PostItem[];
   total: number;
-  isLoading: boolean;
 }
 
-function formatDate(date: Date | string | null | undefined): string {
-  if (!date) return '';
-  const d = new Date(date);
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-}
-
-const LatestPostsSection = ({
-  posts,
-  total,
-  isLoading,
-}: LatestPostsSectionProps) => (
+const LatestPostsSection = ({ posts, total }: LatestPostsSectionProps) => (
   <Container>
     <Header>
       <Title>작품 목록</Title>
       <Count>{total}편</Count>
     </Header>
 
-    {isLoading && (
-      <LoadingContainer>
-        <LoadingText>로딩 중...</LoadingText>
-      </LoadingContainer>
-    )}
-
-    {!isLoading && posts.length === 0 && (
+    {posts.length === 0 && (
       <EmptyContainer>
         <EmptyIcon>
           <FileText size={40} />
@@ -47,7 +32,7 @@ const LatestPostsSection = ({
       </EmptyContainer>
     )}
 
-    {!isLoading && posts.length > 0 && (
+    {posts.length > 0 && (
       <PostList>
         {posts.map((post) => (
           <PostCard key={post.id}>
@@ -61,7 +46,9 @@ const LatestPostsSection = ({
             <PostInfo>
               <PostTitle>{post.title}</PostTitle>
               {post.excerpt && <PostExcerpt>{post.excerpt}</PostExcerpt>}
-              <PostDate>{formatDate(post.publishedAt)}</PostDate>
+              {post.publishedAt && (
+                <PostDate>{formatDate(post.publishedAt)}</PostDate>
+              )}
             </PostInfo>
           </PostCard>
         ))}
@@ -156,18 +143,6 @@ const PostDate = tw.time`
   text-gray-400
   mt-1
   block
-`;
-
-const LoadingContainer = tw.div`
-  flex
-  items-center
-  justify-center
-  py-12
-`;
-
-const LoadingText = tw.p`
-  text-sm
-  text-gray-500
 `;
 
 const EmptyContainer = tw.div`

@@ -1,6 +1,14 @@
 import tw from 'tailwind-styled-components';
 
-type StatusFilterValue = 'all' | 'draft' | 'published' | 'scheduled';
+export const STATUS_FILTER_VALUES = {
+  ALL: 'all',
+  DRAFT: 'draft',
+  PUBLISHED: 'published',
+  SCHEDULED: 'scheduled',
+} as const;
+
+export type StatusFilterValue =
+  (typeof STATUS_FILTER_VALUES)[keyof typeof STATUS_FILTER_VALUES];
 
 interface StatusFilterProps {
   selectedStatus: StatusFilterValue;
@@ -8,10 +16,10 @@ interface StatusFilterProps {
 }
 
 const FILTER_OPTIONS: { value: StatusFilterValue; label: string }[] = [
-  { value: 'all', label: '전체' },
-  { value: 'draft', label: '임시저장' },
-  { value: 'published', label: '발행됨' },
-  { value: 'scheduled', label: '예약' },
+  { value: STATUS_FILTER_VALUES.ALL, label: '전체' },
+  { value: STATUS_FILTER_VALUES.DRAFT, label: '임시저장' },
+  { value: STATUS_FILTER_VALUES.PUBLISHED, label: '발행됨' },
+  { value: STATUS_FILTER_VALUES.SCHEDULED, label: '예약' },
 ];
 
 const StatusFilter = ({

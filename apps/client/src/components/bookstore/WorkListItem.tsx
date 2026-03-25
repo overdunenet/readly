@@ -1,7 +1,9 @@
 import { FileText, Edit2 } from 'lucide-react';
 import tw from 'tailwind-styled-components';
 
-interface WorkItem {
+import { formatRelativeTime } from '@/utils/date';
+
+export interface WorkItem {
   id: string;
   title: string;
   excerpt?: string | null;
@@ -21,23 +23,6 @@ const STATUS_LABELS: Record<string, { label: string; style: string }> = {
   published: { label: '발행됨', style: 'bg-green-100 text-green-700' },
   scheduled: { label: '예약', style: 'bg-blue-100 text-blue-700' },
 };
-
-function formatRelativeTime(date: string | Date | null | undefined): string {
-  if (!date) return '';
-  const now = new Date();
-  const target = new Date(date);
-  const diffMs = now.getTime() - target.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return '방금 전';
-  if (diffMin < 60) return `${diffMin}분 전`;
-  const diffHour = Math.floor(diffMin / 60);
-  if (diffHour < 24) return `${diffHour}시간 전`;
-  const diffDay = Math.floor(diffHour / 24);
-  if (diffDay < 30) return `${diffDay}일 전`;
-  const diffMonth = Math.floor(diffDay / 30);
-  if (diffMonth < 12) return `${diffMonth}개월 전`;
-  return `${Math.floor(diffMonth / 12)}년 전`;
-}
 
 const WorkListItem = ({ work, onEdit }: WorkListItemProps) => {
   const statusInfo = STATUS_LABELS[work.status] ?? STATUS_LABELS.draft;

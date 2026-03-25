@@ -1,12 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { Suspense } from 'react';
 import tw from 'tailwind-styled-components';
 
 import Layout from '../../components/layout/Layout';
 
 import BookstoreProfile from '@/components/bookstore/BookstoreProfile';
-import FollowButton from '@/components/follow/FollowButton';
 import LatestPostsSection from '@/components/bookstore/LatestPostsSection';
 import PopularPostsSection from '@/components/bookstore/PopularPostsSection';
+import FollowButton from '@/components/follow/FollowButton';
 import { trpc } from '@/shared';
 
 export const Route = createFileRoute('/bookstore/$bookstoreId')({
@@ -16,48 +17,35 @@ export const Route = createFileRoute('/bookstore/$bookstoreId')({
 function BookstoreDetailPage() {
   const { bookstoreId } = Route.useParams();
 
-  const bookstoreQuery = trpc.bookstore.getById.useQuery({ bookstoreId });
-  const postsQuery = trpc.bookstore.getPosts.useQuery({
+  const [bookstore] = trpc.bookstore.getById.useSuspenseQuery({ bookstoreId });
+  const [postsData] = trpc.bookstore.getPosts.useSuspenseQuery({
     bookstoreId,
     page: 1,
     limit: 20,
   });
 
-  if (bookstoreQuery.isLoading) {
-    return (
-      <Layout>
-        <LoadingContainer>
-          <LoadingText>로딩 중...</LoadingText>
-        </LoadingContainer>
-      </Layout>
-    );
-  }
-
-  if (bookstoreQuery.error || !bookstoreQuery.data) {
-    return (
-      <Layout>
-        <ErrorContainer>
-          <ErrorText>서점을 찾을 수 없습니다.</ErrorText>
-        </ErrorContainer>
-      </Layout>
-    );
-  }
-
   return (
     <Layout>
       <PageContainer>
-        <BookstoreProfile bookstore={bookstoreQuery.data} />
-        <FollowButton followeeId={bookstoreQuery.data.userId} />
-        <PopularPostsSection bookstoreId={bookstoreId} />
+        <BookstoreProfile bookstore={bookstore} />
+        <FollowButton followeeId={bookstore.userId} />
+        <Suspense fallback={<SectionLoading />}>
+          <PopularPostsSection bookstoreId={bookstoreId} />
+        </Suspense>
         <LatestPostsSection
-          posts={postsQuery.data?.posts ?? []}
-          total={postsQuery.data?.total ?? 0}
-          isLoading={postsQuery.isLoading}
+          posts={postsData.posts ?? []}
+          total={postsData.total ?? 0}
         />
       </PageContainer>
     </Layout>
   );
 }
+
+const SectionLoading = () => (
+  <LoadingContainer>
+    <LoadingText>로딩 중...</LoadingText>
+  </LoadingContainer>
+);
 
 // Styled Components
 const PageContainer = tw.div`
@@ -70,22 +58,10 @@ const LoadingContainer = tw.div`
   flex
   items-center
   justify-center
-  py-20
+  py-8
 `;
 
 const LoadingText = tw.p`
-  text-sm
-  text-gray-500
-`;
-
-const ErrorContainer = tw.div`
-  flex
-  items-center
-  justify-center
-  py-20
-`;
-
-const ErrorText = tw.p`
   text-sm
   text-gray-500
 `;

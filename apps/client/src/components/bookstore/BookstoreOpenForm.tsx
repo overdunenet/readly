@@ -10,11 +10,11 @@ const bookstoreOpenSchema = z.object({
   penName: z
     .string()
     .min(1, '필명을 입력해주세요')
-    .max(20, '필명은 20자 이내여야 합니다'),
+    .max(30, '필명은 30자 이내여야 합니다'),
   storeName: z
     .string()
     .min(1, '서점 이름을 입력해주세요')
-    .max(30, '서점 이름은 30자 이내여야 합니다'),
+    .max(50, '서점 이름은 50자 이내여야 합니다'),
   agreedToTerms: z.boolean().refine((v) => v === true, '약관에 동의해주세요'),
 });
 
@@ -68,7 +68,7 @@ const BookstoreOpenForm = ({ onSuccess }: BookstoreOpenFormProps) => {
         <Input
           {...register('penName')}
           placeholder="서점에서 사용할 필명을 입력해주세요"
-          maxLength={20}
+          maxLength={30}
         />
         {errors.penName && (
           <ErrorMessage>{errors.penName.message}</ErrorMessage>
@@ -80,7 +80,7 @@ const BookstoreOpenForm = ({ onSuccess }: BookstoreOpenFormProps) => {
         <Input
           {...register('storeName')}
           placeholder="서점 이름을 입력해주세요"
-          maxLength={30}
+          maxLength={50}
         />
         {errors.storeName && (
           <ErrorMessage>{errors.storeName.message}</ErrorMessage>

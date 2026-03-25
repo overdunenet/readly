@@ -14,10 +14,7 @@ const FollowButton = ({ followeeId }: FollowButtonProps) => {
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
-  const { isFollowing, isLoading, toggleFollow } = useFollow(
-    followeeId,
-    !!user,
-  );
+  const { isFollowing, isLoading, toggleFollow } = useFollow(followeeId);
 
   // 자기 자신에게는 팔로우 버튼 미표시
   if (user?.id === followeeId) {

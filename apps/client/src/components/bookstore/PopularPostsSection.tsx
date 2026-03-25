@@ -2,24 +2,17 @@ import { TrendingUp, FileText } from 'lucide-react';
 import tw from 'tailwind-styled-components';
 
 import { trpc } from '@/shared';
+import { formatDate } from '@/utils/date';
 
 interface PopularPostsSectionProps {
   bookstoreId: string;
 }
 
-function formatDate(date: Date | string | null | undefined): string {
-  if (!date) return '';
-  const d = new Date(date);
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-}
-
 const PopularPostsSection = ({ bookstoreId }: PopularPostsSectionProps) => {
-  const popularQuery = trpc.bookstore.getPopularPosts.useQuery({
+  const [posts] = trpc.bookstore.getPopularPosts.useSuspenseQuery({
     bookstoreId,
     limit: 5,
   });
-
-  const posts = popularQuery.data ?? [];
 
   return (
     <Container>
@@ -30,13 +23,7 @@ const PopularPostsSection = ({ bookstoreId }: PopularPostsSectionProps) => {
         </HeaderLeft>
       </Header>
 
-      {popularQuery.isLoading && (
-        <LoadingContainer>
-          <LoadingText>로딩 중...</LoadingText>
-        </LoadingContainer>
-      )}
-
-      {!popularQuery.isLoading && posts.length === 0 && (
+      {posts.length === 0 && (
         <EmptyContainer>
           <EmptyIcon>
             <FileText size={32} />
@@ -45,14 +32,16 @@ const PopularPostsSection = ({ bookstoreId }: PopularPostsSectionProps) => {
         </EmptyContainer>
       )}
 
-      {!popularQuery.isLoading && posts.length > 0 && (
+      {posts.length > 0 && (
         <PostList>
           {posts.map((post, index) => (
             <PostItem key={post.id}>
               <Rank>{index + 1}</Rank>
               <PostInfo>
                 <PostTitle>{post.title}</PostTitle>
-                <PostDate>{formatDate(post.publishedAt)}</PostDate>
+                {post.publishedAt && (
+                  <PostDate>{formatDate(post.publishedAt)}</PostDate>
+                )}
               </PostInfo>
             </PostItem>
           ))}
@@ -135,18 +124,6 @@ const PostDate = tw.time`
   text-gray-400
   mt-0.5
   block
-`;
-
-const LoadingContainer = tw.div`
-  flex
-  items-center
-  justify-center
-  py-8
-`;
-
-const LoadingText = tw.p`
-  text-sm
-  text-gray-500
 `;
 
 const EmptyContainer = tw.div`
