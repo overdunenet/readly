@@ -5,15 +5,15 @@ feature: 'bookstore'
 screens:
   - id: 'SCR-011'
     name: '서점 오픈 폼'
-    route: '/bookstore/open'
+    route: null # 별도 라우트 없음
     viewport: [phone, desktop]
     scope: mvp
-    description: '필명 + 서점명 입력 → 약관 동의 → 서점 생성. 한국 유저만 접근 가능.'
+    description: '/editor/my-bookstore 페이지 내 컴포넌트 분기로 표시. 서점 미보유 시 서점 오픈 폼(필명 + 서점명 입력 → 약관 동의 → 서점 생성)을 렌더링. 한국 유저만 접근 가능.'
     entry_conditions:
       - '로그인 상태'
       - '한국 유저 (국가: KR)'
       - '아직 서점을 오픈하지 않은 유저'
-      - '마이페이지에서 "서점 오픈하기" 버튼 클릭'
+      - '에디터 메뉴에서 "서점 오픈하기" 버튼 클릭'
     ui_elements:
       - '필명(편명) 입력 필드'
       - '서점명 입력 필드'
@@ -31,7 +31,7 @@ screens:
 
   - id: 'SCR-012'
     name: '서점 관리 메인'
-    route: '/my-bookstore'
+    route: '/editor/my-bookstore'
     viewport: [phone, desktop]
     scope: mvp
     description: '서점 관리 대시보드. 프로필, 발행 설정, 작품 관리, 업로드로의 진입점.'
@@ -53,7 +53,7 @@ screens:
 
   - id: 'SCR-013'
     name: '서점 프로필 편집'
-    route: '/my-bookstore/profile'
+    route: '/editor/my-bookstore/profile'
     viewport: [phone, desktop]
     scope: mvp
     description: '필명, 소개글, 프로필 이미지 수정.'
@@ -72,7 +72,7 @@ screens:
 
   - id: 'SCR-014'
     name: '서점 발행 설정'
-    route: '/my-bookstore/settings'
+    route: '/editor/my-bookstore/settings'
     viewport: [phone, desktop]
     scope: growth
     description: '단편/시리즈별 발행 디폴트 설정 (유/무료, 가격, 성인/전체 이용가).'
@@ -92,7 +92,7 @@ screens:
 
   - id: 'SCR-015'
     name: '작품 업로드'
-    route: '/my-bookstore/upload'
+    route: '/editor/my-bookstore/upload'
     viewport: [phone, desktop]
     scope: growth
     description: 'Word/HWP 파일 업로드 또는 직접 입력으로 작품 등록.'
@@ -122,7 +122,7 @@ screens:
 
   - id: 'SCR-016'
     name: '작품 목록 관리'
-    route: '/my-bookstore/works'
+    route: '/editor/my-bookstore/works'
     viewport: [phone, desktop]
     scope: mvp
     description: '서점에 등록된 작품 목록 관리. 상태 필터, 순서 변경, 수정/삭제.'
