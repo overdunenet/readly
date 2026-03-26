@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class RenameCountryAndDropGenreTags1774500000000
+export class RenameCountryAndDropGenreTags1774513290302
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {

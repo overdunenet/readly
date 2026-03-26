@@ -27,18 +27,18 @@ import {
 @Router({ alias: 'bookstore' })
 export class BookstoreRouter extends BaseTrpcRouter {
   /**
-   * 서점 오픈
+   * 서점 생성
    */
   @UseMiddlewares(UserAuthMiddleware)
   @Mutation({
     input: openBookstoreInputSchema,
     output: bookstoreResponseSchema,
   })
-  async open(
+  async createBookstore(
     @Ctx() ctx: UserAuthorizedContext,
     @Input() input: z.infer<typeof openBookstoreInputSchema>
   ) {
-    return await this.microserviceClient.send('bookstore.open', {
+    return await this.microserviceClient.send('bookstore.createBookstore', {
       userId: ctx.user.sub,
       input: {
         penName: input.penName,
@@ -148,11 +148,11 @@ export class BookstoreRouter extends BaseTrpcRouter {
     }),
     output: z.array(postResponseSchema),
   })
-  async getMyWorks(
+  async getMyPosts(
     @Ctx() ctx: UserAuthorizedContext,
     @Input('status') status?: string
   ) {
-    return await this.microserviceClient.send('bookstore.getMyWorks', {
+    return await this.microserviceClient.send('bookstore.getMyPosts', {
       userId: ctx.user.sub,
       status,
     });

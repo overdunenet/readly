@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Language } from '../domain/enums';
 
 const nameRegex = /^[가-힣a-zA-Z0-9_\s]+$/;
 
@@ -26,10 +27,9 @@ export const bookstoreResponseSchema = z.object({
   bio: z.string().nullable(),
   profileImage: z.string().nullable(),
   coverImage: z.string().nullable(),
-  language: z.string(),
+  language: z.nativeEnum(Language),
   isActive: z.boolean(),
   termsAgreedAt: z.date().nullable(),
-  openedAt: z.date().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

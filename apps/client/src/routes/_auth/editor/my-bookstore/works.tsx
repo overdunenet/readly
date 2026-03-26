@@ -22,7 +22,7 @@ function WorksPage() {
   trpc.bookstore.getMyBookstore.useSuspenseQuery();
 
   const statusParam = selectedStatus === 'all' ? undefined : selectedStatus;
-  const [works] = trpc.bookstore.getMyWorks.useSuspenseQuery({
+  const [works] = trpc.bookstore.getMyPosts.useSuspenseQuery({
     status: statusParam,
   });
 

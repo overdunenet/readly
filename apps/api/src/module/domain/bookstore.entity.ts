@@ -9,6 +9,7 @@ import {
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { UserEntity } from './user.entity';
 import { PublishDefaultEntity } from './publish-default.entity';
+import { Language } from './enums';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
@@ -39,10 +40,10 @@ export class BookstoreEntity extends BaseEntity {
   @Column({
     type: 'varchar',
     length: 10,
-    default: 'ko',
+    default: Language.KO,
     comment: '서점 언어 코드',
   })
-  language: string;
+  language: Language;
 
   @Column({
     type: 'boolean',
@@ -58,13 +59,6 @@ export class BookstoreEntity extends BaseEntity {
   })
   termsAgreedAt: Date | null;
 
-  @Column({
-    type: 'timestamptz',
-    nullable: true,
-    comment: '서점 오픈 일시',
-  })
-  openedAt: Date | null;
-
   @Column(() => PublishDefaultEntity, { prefix: 'publish_default' })
   publishDefault: PublishDefaultEntity;
 
@@ -76,7 +70,7 @@ export class BookstoreEntity extends BaseEntity {
     userId: string;
     penName: string;
     storeName: string;
-    language: string;
+    language: Language;
     termsAgreedAt?: Date;
   }): BookstoreEntity {
     const bookstore = new BookstoreEntity();

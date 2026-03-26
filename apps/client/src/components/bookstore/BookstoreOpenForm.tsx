@@ -27,7 +27,7 @@ interface BookstoreOpenFormProps {
 const BookstoreOpenForm = ({ onSuccess }: BookstoreOpenFormProps) => {
   const [error, setError] = useState<string | null>(null);
 
-  const openMutation = trpc.bookstore.open.useMutation();
+  const openMutation = trpc.bookstore.createBookstore.useMutation();
 
   const {
     register,

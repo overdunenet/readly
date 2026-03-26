@@ -70,7 +70,7 @@ export default BookstoreForm;
 
 const CreateForm = ({ onSuccess }: { onSuccess: () => void }) => {
   const [error, setError] = useState<string | null>(null);
-  const openMutation = trpc.bookstore.open.useMutation();
+  const openMutation = trpc.bookstore.createBookstore.useMutation();
 
   const {
     register,

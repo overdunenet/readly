@@ -1,6 +1,7 @@
-// 서점 국가 제한 (MVP: KR만)
-export enum CountryEnum {
-  KR = 'KR',
+// 서점 언어 코드
+export enum Language {
+  KO = 'ko',
+  EN = 'en',
 }
 
 // 발행 디폴트용 접근 레벨 (private 제외)

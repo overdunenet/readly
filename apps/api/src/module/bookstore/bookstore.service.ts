@@ -10,9 +10,9 @@ import { stripHtml } from '../shared/utils/sanitize';
 import { BookstoreEntity } from '../domain/bookstore.entity';
 import { PostEntity, PostStatus, POST_STATUS } from '../domain/post.entity';
 import { PublishDefaultEntity } from '../domain/publish-default.entity';
-import { PublishAccessLevel, AgeRating } from '../domain/enums';
+import { PublishAccessLevel, AgeRating, Language } from '../domain/enums';
 
-export interface OpenBookstoreInput {
+export interface CreateBookstoreInput {
   penName: string;
   storeName: string;
   termsAgreedAt?: Date;
@@ -50,9 +50,9 @@ export class BookstoreService {
     });
   }
 
-  async open(
+  async createBookstore(
     userId: string,
-    input: OpenBookstoreInput
+    input: CreateBookstoreInput
   ): Promise<BookstoreEntity> {
     const existing =
       await this.repositoryProvider.BookstoreRepository.findOneBy({ userId });
@@ -67,7 +67,7 @@ export class BookstoreService {
       throw new NotFoundException('사용자를 찾을 수 없습니다');
     });
 
-    if (user.language !== 'ko') {
+    if (user.language !== Language.KO) {
       throw new ForbiddenException(
         '현재 한국 유저만 서점을 오픈할 수 있습니다'
       );
@@ -80,7 +80,6 @@ export class BookstoreService {
       language: user.language,
       termsAgreedAt: input.termsAgreedAt,
     });
-    bookstore.openedAt = new Date();
 
     return this.repositoryProvider.BookstoreRepository.save(bookstore);
   }
@@ -152,7 +151,7 @@ export class BookstoreService {
     return { posts, total };
   }
 
-  async getMyWorks(userId: string, status?: PostStatus): Promise<PostEntity[]> {
+  async getMyPosts(userId: string, status?: PostStatus): Promise<PostEntity[]> {
     const bookstore = await this.getBookstoreByUserId(userId);
 
     const where: FindOptionsWhere<PostEntity> = { bookstoreId: bookstore.id };

@@ -49,7 +49,7 @@ const appRouter = t.router({
     }),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any) }),
 bookstore: t.router({
-  open: publicProcedure.input(z.object({
+  createBookstore: publicProcedure.input(z.object({
     penName: z
       .string()
       .min(1)
@@ -74,7 +74,6 @@ bookstore: t.router({
     language: z.string(),
     isActive: z.boolean(),
     termsAgreedAt: z.date().nullable(),
-    openedAt: z.date().nullable(),
     createdAt: z.date(),
     updatedAt: z.date(),
   })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
@@ -90,7 +89,6 @@ bookstore: t.router({
     language: z.string(),
     isActive: z.boolean(),
     termsAgreedAt: z.date().nullable(),
-    openedAt: z.date().nullable(),
     createdAt: z.date(),
     updatedAt: z.date(),
   })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
@@ -123,7 +121,6 @@ bookstore: t.router({
     language: z.string(),
     isActive: z.boolean(),
     termsAgreedAt: z.date().nullable(),
-    openedAt: z.date().nullable(),
     createdAt: z.date(),
     updatedAt: z.date(),
   })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
@@ -140,7 +137,6 @@ bookstore: t.router({
     language: z.string(),
     isActive: z.boolean(),
     termsAgreedAt: z.date().nullable(),
-    openedAt: z.date().nullable(),
     createdAt: z.date(),
     updatedAt: z.date(),
   })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
@@ -176,7 +172,7 @@ bookstore: t.router({
     })),
     total: z.number(),
   })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
-  getMyWorks: publicProcedure.input(z.object({
+  getMyPosts: publicProcedure.input(z.object({
     status: z.enum(['draft', 'published', 'scheduled']).optional(),
   })).output(z.array(z.object({
     id: z.string(),

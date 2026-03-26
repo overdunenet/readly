@@ -10,6 +10,7 @@ import { EntityManager } from 'typeorm';
 import { UserEntity } from '../domain/user.entity';
 import { PostAccessLevel } from '../domain/post.entity';
 import { BookstoreEntity } from '../domain/bookstore.entity';
+import { Language } from '../domain/enums';
 
 describe('PostService - getAccessiblePosts', () => {
   let app: TestingModule;
@@ -33,7 +34,7 @@ describe('PostService - getAccessiblePosts', () => {
       userId,
       penName: '테스트필명',
       storeName: '테스트서점',
-      language: 'ko',
+      language: Language.KO,
     });
     return testingRepositoryProvider.BookstoreRepository.save(bookstore);
   };

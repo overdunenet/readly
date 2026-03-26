@@ -4,7 +4,7 @@ import { Transactional } from '../shared/transaction/transaction.decorator';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import {
   BookstoreService,
-  OpenBookstoreInput,
+  CreateBookstoreInput,
   UpdateProfileInput,
   GetPostsOptions,
   UpdateSettingsInput,
@@ -20,12 +20,12 @@ export class BookstoreController {
     private readonly transactionService: TransactionService
   ) {}
 
-  @MessagePattern('bookstore.open')
+  @MessagePattern('bookstore.createBookstore')
   @Transactional
-  async open(
-    @Payload() data: { userId: string; input: OpenBookstoreInput }
+  async createBookstore(
+    @Payload() data: { userId: string; input: CreateBookstoreInput }
   ): Promise<BookstoreEntity> {
-    return this.bookstoreService.open(data.userId, data.input);
+    return this.bookstoreService.createBookstore(data.userId, data.input);
   }
 
   @MessagePattern('bookstore.hasBookstore')
@@ -62,11 +62,11 @@ export class BookstoreController {
     return this.bookstoreService.getPosts(data.bookstoreId, data.options);
   }
 
-  @MessagePattern('bookstore.getMyWorks')
-  async getMyWorks(
+  @MessagePattern('bookstore.getMyPosts')
+  async getMyPosts(
     @Payload() data: { userId: string; status?: PostStatus }
   ): Promise<PostEntity[]> {
-    return this.bookstoreService.getMyWorks(data.userId, data.status);
+    return this.bookstoreService.getMyPosts(data.userId, data.status);
   }
 
   @MessagePattern('bookstore.getSettings')
