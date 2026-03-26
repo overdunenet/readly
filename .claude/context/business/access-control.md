@@ -45,20 +45,6 @@ Post는 **freeContent**(무료 공개 구간)와 **paidContent**(유료 구간) 
 > `freeContent`는 `private`를 제외한 모든 접근 권한에서 공개됩니다.
 > `paidContent`는 접근 권한에 따라 결제/구독 여부를 확인한 후 노출됩니다.
 
-## 서점 필수화 정책
-
-포스트 작성(발행)은 **서점을 보유한 에디터만** 가능합니다.
-
-| 역할                 | 서점 보유          | 포스트 작성 | 포스트 열람               |
-| -------------------- | ------------------ | ----------- | ------------------------- |
-| 에디터               | O (서점 오픈 완료) | 가능        | 가능                      |
-| 독자 (로그인 사용자) | X                  | 불가        | 권한에 따라 가능          |
-| 비로그인 사용자      | X                  | 불가        | public freeContent만 가능 |
-
-- 서점 오픈 시 `BookstoreEntity` 생성, `PostEntity.bookstoreId`로 연결
-- 서점 미보유 사용자가 글 작성 시도 시 서점 오픈 유도
-- 현재 한국 유저(`country === 'KR'`)만 서점 오픈 가능
-
 ## 설계 배경
 
 ### 필드 분리 방식 선택 이유
@@ -71,4 +57,3 @@ Post는 **freeContent**(무료 공개 구간)와 **paidContent**(유료 구간) 
 
 - `business/payment.md`: 결제 시스템 상세
 - `codebase/post-entity.md`: PostEntity 권한 검증 로직
-- `codebase/bookstore-module.md`: Bookstore 모듈 (서점 필수화 구현)
