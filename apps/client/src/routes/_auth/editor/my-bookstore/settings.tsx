@@ -7,6 +7,7 @@ import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
 import { trpc } from '@/shared';
+import { PUBLISH_ACCESS_LEVEL_OPTIONS } from '@/shared/constants/access-level';
 import { AlertModal } from '@/shared/modal/AlertModal';
 
 export const Route = createFileRoute('/_auth/editor/my-bookstore/settings')({
@@ -20,12 +21,6 @@ const settingsFormSchema = z.object({
 });
 
 type SettingsFormType = z.infer<typeof settingsFormSchema>;
-
-const ACCESS_LEVEL_OPTIONS = [
-  { value: 'public', label: '전체공개' },
-  { value: 'subscriber', label: '구독자 전용' },
-  { value: 'purchaser', label: '구매자 전용' },
-] as const;
 
 const AGE_RATING_OPTIONS = [
   { value: 'all', label: '전체이용가' },
@@ -97,7 +92,7 @@ function SettingsPage() {
             control={control}
             render={({ field }) => (
               <Select value={field.value} onChange={field.onChange}>
-                {ACCESS_LEVEL_OPTIONS.map((option) => (
+                {PUBLISH_ACCESS_LEVEL_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
