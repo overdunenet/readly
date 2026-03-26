@@ -42,3 +42,4 @@ estimated_tokens: ~150
 - `codebase/follow-module.md`: Follow 모듈 구현
 - `codebase/post-manage-ui.md`: 포스트 관리 UI 구현
 - `codebase/social-login.md`: 소셜 로그인 구현
+- `codebase/bookstore-module.md`: Bookstore 모듈 구현
