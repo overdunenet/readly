@@ -88,7 +88,7 @@ events:
         pii: false
       - name: 'save_type'
         type: 'string'
-        description: '저장 트리거 (interval: 30초 주기, beforeunload: 이탈 감지, session_backup: 세션 백업, edit_snapshot: 수정 시작 시 원본 스냅샷)'
+        description: '저장 트리거 (interval: 30초 주기, beforeunload: 이탈 감지, session_backup: 세션 백업)'
         required: true
         pii: false
       - name: 'success'
@@ -124,7 +124,7 @@ events:
     properties:
       - name: 'draft_type'
         type: 'string'
-        description: '불러온 임시저장 유형 (auto / manual)'
+        description: '불러온 임시저장 유형 (auto / manual / edit_snapshot)'
         required: true
         pii: false
       - name: 'draft_age_seconds'
@@ -142,7 +142,7 @@ events:
     properties:
       - name: 'draft_type'
         type: 'string'
-        description: '삭제한 임시저장 유형 (auto / manual)'
+        description: '삭제한 임시저장 유형 (auto / manual / edit_snapshot)'
         required: true
         pii: false
     kpi: '임시저장 삭제 빈도'

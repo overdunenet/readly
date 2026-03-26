@@ -434,13 +434,13 @@ export class SeriesEntity extends BaseEntity {
 
 ### B.7. 마이그레이션 계획
 
-| 순서 | 마이그레이션               | 선행 조건         | 설명                                                                                                                                                                           |
-| ---- | -------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 0    | (F2) CreateBookstoresTable | F1 완료           | bookstores 테이블 생성                                                                                                                                                         |
-| 0    | (F2) AddBookstoreIdToPosts | bookstores 존재   | posts에 bookstore_id FK 추가                                                                                                                                                   |
-| 1    | CreateSeriesTable          | bookstores 존재   | series 테이블 생성, FK: bookstore_id -> bookstores                                                                                                                             |
-| 2    | ExtendPostsForWriting      | series 존재       | posts의 content→free_content/paid_content 분리, content_type enum 추가, access_level을 enum으로 변경, paywall_position, tags, series_id(FK), episode_number, viewer_badge 추가 |
-| 3    | CreateDraftsTable          | users, posts 존재 | drafts 테이블 생성, FK: user_id -> users, post_id -> posts                                                                                                                     |
+| 순서 | 마이그레이션               | 선행 조건         | 설명                                                                                                                                                             |
+| ---- | -------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | (F2) CreateBookstoresTable | F1 완료           | bookstores 테이블 생성                                                                                                                                           |
+| 0    | (F2) AddBookstoreIdToPosts | bookstores 존재   | posts에 bookstore_id FK 추가                                                                                                                                     |
+| 1    | CreateSeriesTable          | bookstores 존재   | series 테이블 생성, FK: bookstore_id -> bookstores                                                                                                               |
+| 2    | ExtendPostsForWriting      | series 존재       | posts에 신규 컬럼 추가: paywall_position, tags, series_id(FK), episode_number, viewer_badge (freeContent/paidContent는 이미 존재하므로 분리 마이그레이션 불필요) |
+| 3    | CreateDraftsTable          | users, posts 존재 | drafts 테이블 생성, FK: user_id -> users, post_id -> posts                                                                                                       |
 
 > 마이그레이션 0번은 F2 범위. F3 마이그레이션은 1~3번만 담당.
 > 생성 명령: `npx typeorm migration:create src/database/migration/<MigrationName>` (apps/api/ 디렉토리)
@@ -466,7 +466,7 @@ const editPostInputSchema = z.object({
   accessLevel: z
     .enum(['public', 'subscriber', 'purchaser', 'private'])
     .optional(),
-  price: z.number().int().min(100).max(100000).multipleOf(100).optional(), // 100~100,000원, 100원 단위
+  price: z.number().int().min(100).max(100000).multipleOf(100).optional(), // 무료 글은 price를 전송하지 않음 (.optional()). 유료 시에만 100~100,000원, 100원 단위 검증 적용
   // --- 추가 ---
   paywallPosition: z.number().int().min(0).nullable().optional(),
   tags: z.array(z.string()).nullable().optional(),
@@ -487,7 +487,7 @@ const publishInputSchema = z.object({
   accessLevel: z
     .enum(['public', 'subscriber', 'purchaser', 'private'])
     .optional(),
-  price: z.number().int().min(100).max(100000).multipleOf(100).optional(), // 100~100,000원, 100원 단위
+  price: z.number().int().min(100).max(100000).multipleOf(100).optional(), // 무료 글은 price를 전송하지 않음 (.optional()). 유료 시에만 100~100,000원, 100원 단위 검증 적용
   excerpt: z.string().max(500).optional(),
   thumbnail: z.string().url().optional(),
 });
