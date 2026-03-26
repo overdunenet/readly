@@ -1,14 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import SnappyModal from 'react-snappy-modal';
+import { toast } from 'sonner';
 import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
 import { trpc } from '@/shared';
 import { PUBLISH_ACCESS_LEVEL_OPTIONS } from '@/shared/constants/access-level';
-import { AlertModal } from '@/shared/modal/AlertModal';
 
 export const Route = createFileRoute('/_auth/editor/my-bookstore/settings')({
   component: SettingsPage,
@@ -29,19 +28,16 @@ const AGE_RATING_OPTIONS = [
 
 function SettingsPage() {
   const utils = trpc.useUtils();
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const [settings] = trpc.bookstore.getSettings.useSuspenseQuery();
 
   const updateSettingsMutation = trpc.bookstore.updateSettings.useMutation({
     onSuccess: () => {
       utils.bookstore.getSettings.invalidate();
-      setToastMessage('발행 설정이 저장되었습니다.');
+      toast.success('발행 설정이 저장되었습니다.');
     },
     onError: (error) => {
-      SnappyModal.show(
-        <AlertModal title="저장 실패" message={error.message} />,
-      );
+      toast.error(error.message);
     },
   });
 
@@ -67,13 +63,6 @@ function SettingsPage() {
       defaultAgeRating: settings.defaultAgeRating,
     });
   }, [settings, reset]);
-
-  // toast 자동 사라짐
-  useEffect(() => {
-    if (!toastMessage) return;
-    const timer = setTimeout(() => setToastMessage(null), 3000);
-    return () => clearTimeout(timer);
-  }, [toastMessage]);
 
   const onSubmit = (data: SettingsFormType) => {
     updateSettingsMutation.mutate(data);
@@ -153,8 +142,6 @@ function SettingsPage() {
           {updateSettingsMutation.isPending ? '저장 중...' : '저장'}
         </SubmitButton>
       </Form>
-
-      {toastMessage && <Toast>{toastMessage}</Toast>}
     </PageContainer>
   );
 }
@@ -242,20 +229,4 @@ const SubmitButton = tw.button`
   transition-colors
   disabled:bg-gray-300
   disabled:cursor-not-allowed
-`;
-
-const Toast = tw.div`
-  fixed
-  bottom-6
-  left-1/2
-  -translate-x-1/2
-  px-4
-  py-2.5
-  bg-gray-900
-  text-white
-  text-sm
-  rounded-lg
-  shadow-lg
-  animate-fade-in
-  z-50
 `;
