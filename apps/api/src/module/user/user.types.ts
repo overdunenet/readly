@@ -6,5 +6,5 @@ export interface UserResponse {
   nickname: string;
   profileImage: string | null;
   status: UserStatus;
-  country: string;
+  language: string;
 }

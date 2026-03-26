@@ -37,18 +37,6 @@ const BookstoreProfile = ({ bookstore }: BookstoreProfileProps) => (
         <StoreName>{bookstore.storeName}</StoreName>
       </Info>
     </ProfileSection>
-    {bookstore.genreTags?.length > 0 && (
-      <div className="flex flex-wrap gap-1.5 px-6 pt-2">
-        {bookstore.genreTags.map((tag: string) => (
-          <span
-            key={tag}
-            className="text-xs bg-gray-100 text-gray-600 rounded-full px-2.5 py-0.5"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-    )}
     {bookstore.bio && <Bio>{bookstore.bio}</Bio>}
   </Container>
 );

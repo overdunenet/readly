@@ -23,7 +23,7 @@ const loginResponseSchema = z.object({
     nickname: z.string(),
     profileImage: z.string().nullable(),
     status: z.nativeEnum(UserStatus),
-    country: z.string(),
+    language: z.string(),
   }),
 });
 
@@ -33,7 +33,7 @@ const userSchema = z.object({
   nickname: z.string(),
   profileImage: z.string().nullable(),
   status: z.nativeEnum(UserStatus),
-  country: z.string(),
+  language: z.string(),
 });
 
 @Router({ alias: 'user' })

@@ -46,7 +46,7 @@ export class AuthService {
         nickname: user.nickname,
         profileImage: user.profileImage,
         status: user.status,
-        country: user.country,
+        language: user.language,
       },
     };
   }
@@ -218,7 +218,7 @@ export class AuthService {
           nickname: existingUserWithPhone.nickname,
           profileImage: existingUserWithPhone.profileImage,
           status: existingUserWithPhone.status,
-          country: existingUserWithPhone.country,
+          language: existingUserWithPhone.language,
         },
       };
     }
@@ -242,7 +242,7 @@ export class AuthService {
         nickname: user.nickname,
         profileImage: user.profileImage,
         status: user.status,
-        country: user.country,
+        language: user.language,
       },
     };
   }

@@ -3,7 +3,7 @@ import tw from 'tailwind-styled-components';
 
 import {
   BookstoreForm,
-  BookstoreHeader,
+  BookstoreProfile,
   BookstoreNavMenu,
   CountryRestrictionNotice,
 } from '@/components/bookstore';
@@ -23,7 +23,7 @@ function MyBookstorePage() {
   });
 
   // 비한국 유저 안내
-  if (user?.country !== 'KR' && myBookstoreQuery.error) {
+  if (user?.language !== 'ko' && myBookstoreQuery.error) {
     return <CountryRestrictionNotice />;
   }
 
@@ -40,7 +40,7 @@ function MyBookstorePage() {
   // 서점이 없으면 오픈 폼 표시 (별도 페이지 이동 아님)
   if (myBookstoreQuery.error || !myBookstoreQuery.data) {
     // 비한국 유저 안내
-    if (user?.country !== 'KR') {
+    if (user?.language !== 'ko') {
       return <CountryRestrictionNotice />;
     }
 
@@ -63,7 +63,7 @@ function MyBookstorePage() {
 
   return (
     <PageContainer>
-      <BookstoreHeader bookstore={myBookstoreQuery.data} />
+      <BookstoreProfile bookstore={myBookstoreQuery.data} />
       <MenuSection>
         <BookstoreNavMenu bookstoreId={myBookstoreQuery.data.id} />
       </MenuSection>

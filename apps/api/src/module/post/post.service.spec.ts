@@ -33,7 +33,7 @@ describe('PostService - getAccessiblePosts', () => {
       userId,
       penName: '테스트필명',
       storeName: '테스트서점',
-      country: 'KR',
+      language: 'ko',
     });
     return testingRepositoryProvider.BookstoreRepository.save(bookstore);
   };

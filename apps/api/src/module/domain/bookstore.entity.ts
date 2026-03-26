@@ -37,19 +37,12 @@ export class BookstoreEntity extends BaseEntity {
   coverImage: string | null;
 
   @Column({
-    type: 'jsonb',
-    default: '[]',
-    comment: '장르 태그 목록',
-  })
-  genreTags: string[];
-
-  @Column({
     type: 'varchar',
     length: 10,
-    default: 'KR',
-    comment: '서점 국가 코드',
+    default: 'ko',
+    comment: '서점 언어 코드',
   })
-  country: string;
+  language: string;
 
   @Column({
     type: 'boolean',
@@ -83,14 +76,14 @@ export class BookstoreEntity extends BaseEntity {
     userId: string;
     penName: string;
     storeName: string;
-    country: string;
+    language: string;
     termsAgreedAt?: Date;
   }): BookstoreEntity {
     const bookstore = new BookstoreEntity();
     bookstore.userId = input.userId;
     bookstore.penName = input.penName;
     bookstore.storeName = input.storeName;
-    bookstore.country = input.country;
+    bookstore.language = input.language;
     bookstore.termsAgreedAt = input.termsAgreedAt ?? null;
     return bookstore;
   }

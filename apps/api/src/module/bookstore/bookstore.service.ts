@@ -67,7 +67,7 @@ export class BookstoreService {
       throw new NotFoundException('사용자를 찾을 수 없습니다');
     });
 
-    if (user.country !== 'KR') {
+    if (user.language !== 'ko') {
       throw new ForbiddenException(
         '현재 한국 유저만 서점을 오픈할 수 있습니다'
       );
@@ -77,7 +77,7 @@ export class BookstoreService {
       userId,
       penName: input.penName,
       storeName: input.storeName,
-      country: user.country,
+      language: user.language,
       termsAgreedAt: input.termsAgreedAt,
     });
     bookstore.openedAt = new Date();
