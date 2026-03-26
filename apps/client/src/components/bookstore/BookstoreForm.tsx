@@ -91,10 +91,22 @@ interface CommonFieldsProps {
   ) => infer R
     ? R
     : never;
-  errors: { penName?: { message?: string }; storeName?: { message?: string } };
+  errors: {
+    penName?: { message?: string };
+    storeName?: { message?: string };
+    bio?: { message?: string };
+    profileImage?: { message?: string };
+  };
+  control?: ReturnType<typeof useForm<EditFormData>>['control'];
+  showEditFields?: boolean;
 }
 
-const CommonFields = ({ register, errors }: CommonFieldsProps) => (
+const CommonFields = ({
+  register,
+  errors,
+  control,
+  showEditFields,
+}: CommonFieldsProps) => (
   <>
     <FieldGroup>
       <Label>필명</Label>
@@ -115,6 +127,41 @@ const CommonFields = ({ register, errors }: CommonFieldsProps) => (
       />
       {errors.storeName && <ErrorText>{errors.storeName.message}</ErrorText>}
     </FieldGroup>
+
+    {showEditFields && control && (
+      <>
+        <FieldGroup>
+          <Label>소개</Label>
+          <Controller
+            name="bio"
+            control={control}
+            render={({ field }) => (
+              <Textarea
+                {...field}
+                placeholder="서점 소개를 입력하세요"
+                rows={4}
+                maxLength={500}
+              />
+            )}
+          />
+          {errors.bio && <ErrorText>{errors.bio.message}</ErrorText>}
+        </FieldGroup>
+
+        <FieldGroup>
+          <Label>프로필 이미지 URL</Label>
+          <Controller
+            name="profileImage"
+            control={control}
+            render={({ field }) => (
+              <Input {...field} placeholder="https://example.com/image.jpg" />
+            )}
+          />
+          {errors.profileImage && (
+            <ErrorText>{errors.profileImage.message}</ErrorText>
+          )}
+        </FieldGroup>
+      </>
+    )}
   </>
 );
 
@@ -209,38 +256,12 @@ const EditForm = ({
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <CommonFields register={register} errors={errors} />
-
-      <FieldGroup>
-        <Label>소개</Label>
-        <Controller
-          name="bio"
-          control={control}
-          render={({ field }) => (
-            <Textarea
-              {...field}
-              placeholder="서점 소개를 입력하세요"
-              rows={4}
-              maxLength={500}
-            />
-          )}
-        />
-        {errors.bio && <ErrorText>{errors.bio.message}</ErrorText>}
-      </FieldGroup>
-
-      <FieldGroup>
-        <Label>프로필 이미지 URL</Label>
-        <Controller
-          name="profileImage"
-          control={control}
-          render={({ field }) => (
-            <Input {...field} placeholder="https://example.com/image.jpg" />
-          )}
-        />
-        {errors.profileImage && (
-          <ErrorText>{errors.profileImage.message}</ErrorText>
-        )}
-      </FieldGroup>
+      <CommonFields
+        register={register}
+        errors={errors}
+        control={control}
+        showEditFields
+      />
 
       <SubmitButton type="submit" disabled={!isDirty || isPending}>
         {isPending ? '저장 중...' : '저장'}
