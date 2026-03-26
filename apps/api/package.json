@@ -107,6 +107,7 @@
     "globalTeardown": "../testDocker/teardown.js",
     "testTimeout": 600000,
     "moduleNameMapper": {
+      "^isomorphic-dompurify$": "<rootDir>/../test/__mocks__/isomorphic-dompurify.ts",
       "^@src/(.*)$": "<rootDir>/$1",
       "^@test/(.*)$": "<rootDir>/../test/$1"
     }
