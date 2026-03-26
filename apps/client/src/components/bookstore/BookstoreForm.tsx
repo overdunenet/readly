@@ -53,20 +53,54 @@ interface EditModeProps {
 type BookstoreFormProps = CreateModeProps | EditModeProps;
 
 const BookstoreForm = (props: BookstoreFormProps) => {
-  const isEdit = props.mode === 'edit';
-
-  if (isEdit) {
-    return <EditModeForm bookstore={props.bookstore} />;
+  if (props.mode === 'edit') {
+    return <EditForm bookstore={props.bookstore} />;
   }
-
-  return <CreateModeForm onSuccess={props.onSuccess} />;
+  return <CreateForm onSuccess={props.onSuccess} />;
 };
 
 export default BookstoreForm;
 
-// --- Create Mode Form ---
+// --- 공통 필드 ---
 
-const CreateModeForm = ({ onSuccess }: { onSuccess: () => void }) => {
+interface CommonFieldsProps {
+  register: (
+    name: 'penName' | 'storeName',
+  ) => ReturnType<typeof useForm>['register'] extends (
+    ...args: infer _
+  ) => infer R
+    ? R
+    : never;
+  errors: { penName?: { message?: string }; storeName?: { message?: string } };
+}
+
+const CommonFields = ({ register, errors }: CommonFieldsProps) => (
+  <>
+    <FieldGroup>
+      <Label>필명</Label>
+      <Input
+        {...register('penName')}
+        placeholder="서점에서 사용할 필명을 입력해주세요"
+        maxLength={30}
+      />
+      {errors.penName && <ErrorText>{errors.penName.message}</ErrorText>}
+    </FieldGroup>
+
+    <FieldGroup>
+      <Label>서점 이름</Label>
+      <Input
+        {...register('storeName')}
+        placeholder="서점 이름을 입력해주세요"
+        maxLength={50}
+      />
+      {errors.storeName && <ErrorText>{errors.storeName.message}</ErrorText>}
+    </FieldGroup>
+  </>
+);
+
+// --- Create Form ---
+
+const CreateForm = ({ onSuccess }: { onSuccess: () => void }) => {
   const [error, setError] = useState<string | null>(null);
   const createMutation = trpc.bookstore.createBookstore.useMutation();
 
@@ -104,25 +138,7 @@ const CreateModeForm = ({ onSuccess }: { onSuccess: () => void }) => {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <FieldGroup>
-        <Label>필명</Label>
-        <Input
-          {...register('penName')}
-          placeholder="서점에서 사용할 필명을 입력해주세요"
-          maxLength={30}
-        />
-        {errors.penName && <ErrorText>{errors.penName.message}</ErrorText>}
-      </FieldGroup>
-
-      <FieldGroup>
-        <Label>서점 이름</Label>
-        <Input
-          {...register('storeName')}
-          placeholder="서점 이름을 입력해주세요"
-          maxLength={50}
-        />
-        {errors.storeName && <ErrorText>{errors.storeName.message}</ErrorText>}
-      </FieldGroup>
+      <CommonFields register={register} errors={errors} />
 
       <CheckboxGroup>
         <CheckboxInput
@@ -150,9 +166,9 @@ const CreateModeForm = ({ onSuccess }: { onSuccess: () => void }) => {
   );
 };
 
-// --- Edit Mode Form ---
+// --- Edit Form ---
 
-const EditModeForm = ({ bookstore }: { bookstore: Bookstore }) => {
+const EditForm = ({ bookstore }: { bookstore: Bookstore }) => {
   const utils = trpc.useUtils();
 
   const updateProfileMutation = trpc.bookstore.updateProfile.useMutation({
@@ -170,6 +186,7 @@ const EditModeForm = ({ bookstore }: { bookstore: Bookstore }) => {
   });
 
   const {
+    register,
     control,
     handleSubmit,
     reset,
@@ -205,33 +222,7 @@ const EditModeForm = ({ bookstore }: { bookstore: Bookstore }) => {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <FieldGroup>
-        <Label>필명</Label>
-        <Controller
-          name="penName"
-          control={control}
-          render={({ field }) => (
-            <Input {...field} placeholder="필명을 입력하세요" maxLength={30} />
-          )}
-        />
-        {errors.penName && <ErrorText>{errors.penName.message}</ErrorText>}
-      </FieldGroup>
-
-      <FieldGroup>
-        <Label>서점 이름</Label>
-        <Controller
-          name="storeName"
-          control={control}
-          render={({ field }) => (
-            <Input
-              {...field}
-              placeholder="서점 이름을 입력하세요"
-              maxLength={50}
-            />
-          )}
-        />
-        {errors.storeName && <ErrorText>{errors.storeName.message}</ErrorText>}
-      </FieldGroup>
+      <CommonFields register={register} errors={errors} />
 
       <FieldGroup>
         <Label>소개</Label>
