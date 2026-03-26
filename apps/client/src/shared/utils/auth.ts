@@ -16,5 +16,7 @@ export function getRedirectPathByStatus(
       return '/';
     case 'INACTIVE':
       return '/inactive';
+    default:
+      return '/';
   }
 }
