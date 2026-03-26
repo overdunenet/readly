@@ -13,7 +13,7 @@ import { AlertModal } from '@/shared/modal/AlertModal';
 type RouterOutputs = inferRouterOutputs<AppRouter>;
 type Bookstore = RouterOutputs['bookstore']['getMyBookstore'];
 
-const createSchema = z.object({
+const baseSchema = z.object({
   penName: z
     .string()
     .min(1, '필명을 입력해주세요')
@@ -22,18 +22,13 @@ const createSchema = z.object({
     .string()
     .min(1, '서점 이름을 입력해주세요')
     .max(50, '서점 이름은 50자 이내여야 합니다'),
+});
+
+const createSchema = baseSchema.extend({
   agreedToTerms: z.boolean().refine((v) => v === true, '약관에 동의해주세요'),
 });
 
-const editSchema = z.object({
-  penName: z
-    .string()
-    .min(1, '필명을 입력해주세요')
-    .max(30, '필명은 30자 이내여야 합니다'),
-  storeName: z
-    .string()
-    .min(1, '서점 이름을 입력해주세요')
-    .max(50, '서점 이름은 50자 이내여야 합니다'),
+const editSchema = baseSchema.extend({
   bio: z.string().max(500).optional().or(z.literal('')),
   profileImage: z
     .string()
@@ -58,19 +53,22 @@ interface EditModeProps {
 type BookstoreFormProps = CreateModeProps | EditModeProps;
 
 const BookstoreForm = (props: BookstoreFormProps) => {
-  if (props.mode === 'create') {
-    return <CreateForm onSuccess={props.onSuccess} />;
+  const isEdit = props.mode === 'edit';
+
+  if (isEdit) {
+    return <EditModeForm bookstore={props.bookstore} />;
   }
-  return <EditForm bookstore={props.bookstore} />;
+
+  return <CreateModeForm onSuccess={props.onSuccess} />;
 };
 
 export default BookstoreForm;
 
-// --- Create Form ---
+// --- Create Mode Form ---
 
-const CreateForm = ({ onSuccess }: { onSuccess: () => void }) => {
+const CreateModeForm = ({ onSuccess }: { onSuccess: () => void }) => {
   const [error, setError] = useState<string | null>(null);
-  const openMutation = trpc.bookstore.createBookstore.useMutation();
+  const createMutation = trpc.bookstore.createBookstore.useMutation();
 
   const {
     register,
@@ -88,7 +86,7 @@ const CreateForm = ({ onSuccess }: { onSuccess: () => void }) => {
 
   const onSubmit = (data: CreateFormType) => {
     setError(null);
-    openMutation
+    createMutation
       .mutateAsync({
         penName: data.penName,
         storeName: data.storeName,
@@ -142,16 +140,19 @@ const CreateForm = ({ onSuccess }: { onSuccess: () => void }) => {
 
       {error && <AlertBox>{error}</AlertBox>}
 
-      <SubmitButton type="submit" disabled={!isValid || openMutation.isPending}>
-        {openMutation.isPending ? '오픈 중...' : '서점 오픈하기'}
+      <SubmitButton
+        type="submit"
+        disabled={!isValid || createMutation.isPending}
+      >
+        {createMutation.isPending ? '오픈 중...' : '서점 오픈하기'}
       </SubmitButton>
     </Form>
   );
 };
 
-// --- Edit Form ---
+// --- Edit Mode Form ---
 
-const EditForm = ({ bookstore }: { bookstore: Bookstore }) => {
+const EditModeForm = ({ bookstore }: { bookstore: Bookstore }) => {
   const utils = trpc.useUtils();
 
   const updateProfileMutation = trpc.bookstore.updateProfile.useMutation({
