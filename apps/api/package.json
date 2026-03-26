@@ -41,6 +41,7 @@
     "config": "^3.3.12",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.5.0",
+    "isomorphic-dompurify": "^3.7.1",
     "nestjs-trpc-v2": "^1.4.1",
     "pg": "^8.16.0",
     "reflect-metadata": "^0.1.13",
@@ -57,6 +58,7 @@
     "@nestjs/testing": "^11.1.2",
     "@types/config": "^3.3.5",
     "@types/cookie-parser": "^1.4.7",
+    "@types/dompurify": "^3.2.0",
     "@types/express": "^4.17.13",
     "@types/glob": "^8.1.0",
     "@types/jest": "29.2.4",
@@ -105,6 +107,7 @@
     "globalTeardown": "../testDocker/teardown.js",
     "testTimeout": 600000,
     "moduleNameMapper": {
+      "^isomorphic-dompurify$": "<rootDir>/../test/__mocks__/isomorphic-dompurify.ts",
       "^@src/(.*)$": "<rootDir>/$1",
       "^@test/(.*)$": "<rootDir>/../test/$1"
     }

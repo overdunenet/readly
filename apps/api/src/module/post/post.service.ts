@@ -36,9 +36,19 @@ export class PostService {
     authorId: string,
     input: CreatePostInput
   ): Promise<PostEntity> {
+    const bookstore =
+      await this.repositoryProvider.BookstoreRepository.findOneBy({
+        userId: authorId,
+      });
+
+    if (!bookstore) {
+      throw new ForbiddenException('서점을 먼저 오픈해주세요');
+    }
+
     return await this.repositoryProvider.PostRepository.createPost({
       ...input,
       authorId,
+      bookstoreId: bookstore.id,
     });
   }
 

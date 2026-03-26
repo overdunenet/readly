@@ -210,6 +210,19 @@ Plan 파일의 Context 섹션에 위 내용을 명시하여 작업 목적이 희
 - [ ] 한 번에 하나의 기능/수정만 진행
 - [ ] 빌드 가능 상태를 유지
 
+### Step 3.1.5: 빌드/테스트 검증 — 커밋 전 필수
+
+변경된 워크스페이스에 따라 아래 검증을 실행한다. 실패 시 커밋하지 않고 수정 후 재검증한다.
+
+| 변경 범위               | 검증 명령어                                            |
+| ----------------------- | ------------------------------------------------------ |
+| `packages/api-types/**` | `npx tsc --noEmit -p packages/api-types/tsconfig.json` |
+| `apps/api/**`           | `yarn workspace @readly/api test`                      |
+| `apps/client/**`        | `yarn workspace @readly/client build`                  |
+
+- [ ] 영향받는 워크스페이스의 빌드 또는 tsc 검증 통과
+- [ ] 영향받는 워크스페이스의 테스트 통과
+
 ### Step 3.2: 단위별 커밋
 
 필수 규칙:

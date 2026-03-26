@@ -7,6 +7,7 @@ import {
   LayoutGrid,
   Menu,
   Settings,
+  Store,
   X,
 } from 'lucide-react';
 import tw from 'tailwind-styled-components';
@@ -41,6 +42,11 @@ const menuItems = [
     name: '설정',
     path: '/editor/settings',
     icon: <Settings size={20} />,
+  },
+  {
+    name: '내 서점',
+    path: '/editor/my-bookstore',
+    icon: <Store size={20} />,
   },
 ];
 

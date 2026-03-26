@@ -5,7 +5,7 @@ milestone: 'M-001'
 status: 'decomposed'
 label: 'feature:bookstore'
 created_at: 2026-03-09
-updated_at: 2026-03-21
+updated_at: 2026-03-25
 author: PM
 product_brief_ref: PM-DOCS/Context Output/PRODUCT_BRIEF.md
 progress:
@@ -51,6 +51,7 @@ F2 구현에 착수하기 전 F1에서 반드시 해결해야 할 항목:
 - 1인 1서점 (다중 서점 불가)
 - 서점 비활성화 불가 (한 번 열면 닫을 수 없음)
 - 해외 작가 서점은 Growth 이후
+- 포스트 작성은 서점 보유자(에디터)만 가능 (서점 필수화 정책)
 
 ## §2. 목표 & 성공 지표
 
@@ -69,15 +70,15 @@ F2 구현에 착수하기 전 F1에서 반드시 해결해야 할 항목:
 
 ## §3. 유저스토리
 
-| ID   | 역할 | 유저스토리                                          | 가치                                        | 스코프  |
-| ---- | ---- | --------------------------------------------------- | ------------------------------------------- | ------- |
-| US-1 | 유저 | 마이페이지에서 서점을 오픈하고 싶다                 | 내 작품을 발행·판매할 공간을 갖기 위해      | **MVP** |
-| US-2 | 유저 | 서점 프로필(필명, 소개글, 이미지)을 설정하고 싶다   | 독자에게 나를 알리고 정체성을 표현하기 위해 | **MVP** |
-| US-3 | 독자 | 작가의 서점 페이지를 방문하여 작품 목록을 보고 싶다 | 관심 작가의 작품을 한 곳에서 탐색하기 위해  | **MVP** |
-| US-4 | 유저 | 내 서점에서 작품 목록과 상태를 관리하고 싶다        | 발행된 작품을 효율적으로 관리하기 위해      | **MVP** |
-| US-5 | 작가 | 기존 플랫폼의 작품을 서점에 업로드하고 싶다         | 흩어진 작품을 한 곳에 모으기 위해           | Growth  |
-| US-6 | 작가 | 발행 디폴트(유/무료, 가격, 등급)를 설정하고 싶다    | 매번 같은 설정을 반복하지 않기 위해         | Growth  |
-| US-7 | 독자 | 서점에서 리뷰/응원의 글을 남기고 싶다               | 좋아하는 작가에게 피드백을 주기 위해        | Growth  |
+| ID   | 역할     | 유저스토리                                          | 가치                                        | 스코프       |
+| ---- | -------- | --------------------------------------------------- | ------------------------------------------- | ------------ |
+| US-1 | 유저     | 에디터 메뉴에서 서점을 오픈하고 싶다                | 내 작품을 발행·판매할 공간을 갖기 위해      | **MVP**      |
+| US-2 | 유저     | 서점 프로필(필명, 소개글, 이미지)을 설정하고 싶다   | 독자에게 나를 알리고 정체성을 표현하기 위해 | **MVP**      |
+| US-3 | 독자     | 작가의 서점 페이지를 방문하여 작품 목록을 보고 싶다 | 관심 작가의 작품을 한 곳에서 탐색하기 위해  | **MVP**      |
+| US-4 | 유저     | 내 서점에서 작품 목록과 상태를 관리하고 싶다        | 발행된 작품을 효율적으로 관리하기 위해      | **MVP**      |
+| US-5 | 작가     | 기존 플랫폼의 작품을 서점에 업로드하고 싶다         | 흩어진 작품을 한 곳에 모으기 위해           | Growth       |
+| US-6 | 작가     | 발행 디폴트(유/무료, 가격, 등급)를 설정하고 싶다    | 매번 같은 설정을 반복하지 않기 위해         | Growth       |
+| US-7 | ~~독자~~ | ~~서점에서 리뷰/응원의 글을 남기고 싶다~~           | ~~좋아하는 작가에게 피드백을 주기 위해~~    | **Spec Out** |
 
 ## §4. 유저 플로우
 
@@ -86,10 +87,11 @@ F2 구현에 착수하기 전 F1에서 반드시 해결해야 할 항목:
 **Flow 1: 서점 오픈 (US-1) [MVP]**
 
 ```
-[마이페이지] → [내 서점 영역: "서점 오픈하기" 버튼]
+[에디터 메뉴] → [내 서점 페이지 (/editor/my-bookstore)]
+  → 서점 미보유 시: 서점 오픈 폼 컴포넌트 분기 표시
   → [한국 유저 확인] → 비한국 유저: "현재 한국 유저만 서점 오픈 가능" 안내 → 종료
   → [서점 오픈 폼: 필명 + 서점명 입력] → [약관 동의] → [서점 생성 완료]
-  → [서점 관리 페이지로 이동]
+  → [서점 관리 대시보드로 전환]
 ```
 
 **Flow 2: 프로필 설정 (US-2) [MVP]**
@@ -122,6 +124,8 @@ F2 구현에 착수하기 전 F1에서 반드시 해결해야 할 항목:
 
 **Flow 5: 서점 페이지 방문 (US-3, 독자 관점) [MVP]**
 
+> 팔로우 대상은 유저 단위 (서점 단위가 아님, 향후 멀티 서점 대비)
+
 ```
 [홈/검색/포스트 상세] → [작가 프로필 클릭]
   → [서점 페이지]
@@ -151,7 +155,7 @@ F2 구현에 착수하기 전 F1에서 반드시 해결해야 할 항목:
 
 ### 대안 플로우
 
-- 이미 서점을 보유한 유저가 "서점 오픈" 접근 → 서점 관리 페이지로 바로 이동
+- 이미 서점을 보유한 유저가 "내 서점" 접근 → 서점 관리 대시보드가 바로 표시
 - 비로그인 독자가 서점 페이지 방문 → 열람 가능, 팔로우/구매/리뷰 시 로그인 유도
 - Word/HWP 파일 파싱 실패 → 수동 입력으로 안내
 
@@ -159,17 +163,17 @@ F2 구현에 착수하기 전 F1에서 반드시 해결해야 할 항목:
 
 > 상세: `screens.yml` 참조
 
-| ID      | 화면명               | Route                  | 뷰포트          |
-| ------- | -------------------- | ---------------------- | --------------- |
-| SCR-011 | 서점 오픈 폼         | /bookstore/open        | Phone + Desktop |
-| SCR-012 | 서점 관리 메인       | /my-bookstore          | Phone + Desktop |
-| SCR-013 | 서점 프로필 편집     | /my-bookstore/profile  | Phone + Desktop |
-| SCR-014 | 서점 발행 설정       | /my-bookstore/settings | Phone + Desktop |
-| SCR-015 | 작품 업로드          | /my-bookstore/upload   | Phone + Desktop |
-| SCR-016 | 작품 목록 관리       | /my-bookstore/works    | Phone + Desktop |
-| SCR-017 | 서점 페이지 (독자용) | /bookstore/:id         | Phone + Desktop |
-| SCR-018 | 서점 단편 전체       | /bookstore/:id/singles | Phone + Desktop |
-| SCR-019 | 서점 시리즈 전체     | /bookstore/:id/series  | Phone + Desktop |
+| ID      | 화면명               | Route                                                     | 뷰포트          |
+| ------- | -------------------- | --------------------------------------------------------- | --------------- |
+| SCR-011 | 서점 오픈 폼         | (별도 라우트 없음, /editor/my-bookstore 내 컴포넌트 분기) | Phone + Desktop |
+| SCR-012 | 서점 관리 메인       | /editor/my-bookstore                                      | Phone + Desktop |
+| SCR-013 | 서점 프로필 편집     | /editor/my-bookstore/profile                              | Phone + Desktop |
+| SCR-014 | 서점 발행 설정       | /editor/my-bookstore/settings                             | Phone + Desktop |
+| SCR-015 | 작품 업로드          | /editor/my-bookstore/upload                               | Phone + Desktop |
+| SCR-016 | 작품 목록 관리       | /editor/my-bookstore/works                                | Phone + Desktop |
+| SCR-017 | 서점 페이지 (독자용) | /bookstore/:id                                            | Phone + Desktop |
+| SCR-018 | 서점 단편 전체       | /bookstore/:id/singles                                    | Phone + Desktop |
+| SCR-019 | 서점 시리즈 전체     | /bookstore/:id/series                                     | Phone + Desktop |
 
 ## §6. 이벤트 정의
 
@@ -187,10 +191,10 @@ F2 구현에 착수하기 전 F1에서 반드시 해결해야 할 항목:
 
 ### US-1: 서점 오픈
 
-- **AC-1.1**: Given 한국 유저가 로그인 상태이고 서점이 없을 때, When 마이페이지에서 "서점 오픈하기"를 클릭하면, Then 서점 오픈 폼(필명 + 서점명)이 표시된다.
+- **AC-1.1**: Given 한국 유저가 로그인 상태이고 서점이 없을 때, When 에디터 메뉴에서 "내 서점"에 접근하면, Then 서점 오픈 폼(필명 + 서점명)이 컴포넌트 분기로 표시된다.
 - **AC-1.2**: Given 유효한 필명과 서점명을 입력하고 약관에 동의했을 때, When "서점 오픈" 버튼을 클릭하면, Then 서점이 생성되고 서점 관리 페이지로 이동한다.
-- **AC-1.3**: Given 비한국 유저가 서점 오픈을 시도할 때, When 서점 오픈 페이지에 접근하면, Then "현재 한국 유저만 서점 오픈 가능" 안내가 표시된다.
-- **AC-1.4**: Given 이미 서점을 보유한 유저일 때, When 서점 오픈 페이지에 접근하면, Then 서점 관리 페이지로 리다이렉트된다.
+- **AC-1.3**: Given 비한국 유저가 서점 오픈을 시도할 때, When 내 서점 페이지에 접근하면, Then "현재 한국 유저만 서점 오픈 가능" 안내가 표시된다.
+- **AC-1.4**: Given 이미 서점을 보유한 유저일 때, When 내 서점 페이지에 접근하면, Then 서점 관리 대시보드가 표시된다.
 
 ### US-2: 서점 프로필 설정
 
@@ -217,9 +221,9 @@ F2 구현에 착수하기 전 F1에서 반드시 해결해야 할 항목:
 - **AC-6.1**: Given 작가가 발행 설정 페이지에서 단편 기본값(유/무료, 가격, 등급)을 설정할 때, When 새 단편을 발행하면, Then 디폴트 값이 자동 적용되고 편별 수정이 가능하다.
 - **AC-6.2**: Given 작가가 시리즈 생성 시 기본값을 설정할 때, When 해당 시리즈의 새 회차를 발행하면, Then 시리즈 디폴트 값이 자동 적용된다.
 
-### US-7: 서점 리뷰
+### US-7: 서점 리뷰 -- **Spec Out**
 
-- **AC-7.1**: Given 로그인한 독자가 서점 페이지에서 리뷰를 작성할 때, When "등록" 버튼을 클릭하면, Then 리뷰가 서점 페이지 리뷰 섹션에 공개된다.
+- ~~**AC-7.1**: Given 로그인한 독자가 서점 페이지에서 리뷰를 작성할 때, When "등록" 버튼을 클릭하면, Then 리뷰가 서점 페이지 리뷰 섹션에 공개된다.~~
 
 ## §8. 기술 요건
 
@@ -227,11 +231,10 @@ F2 구현에 착수하기 전 F1에서 반드시 해결해야 할 항목:
 
 ### 새 Entity
 
-| Entity                | 테이블            | 설명                                                                                                    |
-| --------------------- | ----------------- | ------------------------------------------------------------------------------------------------------- |
-| BookstoreEntity       | bookstores        | 서점 정보 (userId, penName, storeName, bio, profileImage, genreTags:jsonb, country:enum, termsAgreedAt) |
-| BookstoreReviewEntity | bookstore_reviews | 서점 리뷰 (bookstoreId, reviewerId, content)                                                            |
-| PublishDefaultEntity  | publish_defaults  | 발행 디폴트 (bookstoreId, defaultAccessLevel, defaultPrice, defaultAgeRating)                           |
+| Entity                | 테이블            | 설명                                                                                                                                                                                              |
+| --------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BookstoreEntity       | bookstores        | 서점 정보 (userId, penName, storeName, bio, profileImage, genreTags:jsonb, country:enum, termsAgreedAt). 발행 디폴트(defaultAccessLevel, defaultPrice, defaultAgeRating)는 임베디드 컬럼으로 포함 |
+| BookstoreReviewEntity | bookstore_reviews | 서점 리뷰 (bookstoreId, reviewerId, content)                                                                                                                                                      |
 
 ### 기존 Entity 변경
 
@@ -249,10 +252,9 @@ F2 구현에 착수하기 전 F1에서 반드시 해결해야 할 항목:
 
 ### DB 마이그레이션 (순서 중요)
 
-1. `bookstores` 테이블 생성 (FK: user_id → users, UQ: user_id)
-2. `publish_defaults` 테이블 생성 (FK: bookstore_id → bookstores)
-3. `bookstore_reviews` 테이블 생성 (FK: bookstore_id, reviewer_id)
-4. `posts` 테이블에 `bookstore_id`, `sort_order` 컬럼 추가
+1. `bookstores` 테이블 생성 (FK: user_id → users, UQ: user_id, 발행 디폴트 컬럼 포함)
+2. `bookstore_reviews` 테이블 생성 (FK: bookstore_id, reviewer_id)
+3. `posts` 테이블에 `bookstore_id`, `sort_order` 컬럼 추가
 
 ### 외부 의존성
 
@@ -344,3 +346,21 @@ F2 구현에 착수하기 전 F1에서 반드시 해결해야 할 항목:
 - **CIS 산출물 (Design Thinking)**: PM-DOCS/Context Output/design-thinking_2026-03-21_bookstore-system.md
 - **구현 가이드**: PM-DOCS/Planning/Feature_PRD/feature#2_bookstore/IMPLEMENTATION_GUIDE.md
 - **F1 인증 PRD**: PM-DOCS/Planning/Feature_PRD/feature#1_auth/PRD.md
+
+## 변경 이력
+
+### [2026-03-25] 코드 리뷰 반영 문서 업데이트
+
+- **라우터 경로 변경**: `/my-bookstore/*` → `/editor/my-bookstore/*` (에디터 영역 그룹화)
+- **서점 오픈 페이지 삭제**: `/bookstore/open` 별도 라우트 제거 → `/editor/my-bookstore` 내 컴포넌트 분기
+- **PublishDefault 임베디드 전환**: 별도 테이블(`publish_defaults`) → BookstoreEntity 내 임베디드 컬럼
+- **서점 필수화 정책 명시**: 포스트 작성은 서점 보유자(에디터)만 가능
+- **팔로우 대상 명시**: 유저 단위 팔로우 (서점 단위 아님, 멀티 서점 대비)
+- **영향**: §1 MVP 제약, §4 유저 플로우, §5 화면 정의, §7 수용 기준, §8 기술 요건 업데이트
+
+### [2026-03-25] US-7 서점 리뷰 Spec Out
+
+- **결정**: 서점 자체 리뷰 기능 제거 (US-7, #121)
+- **사유**: 서점 자체에 리뷰를 다는 UX가 어색함. 향후 작품(Post) 리뷰를 서점 메인 화면에 인기 리뷰로 노출하는 별도 feature로 기획 예정.
+- **영향**: BookstoreReviewEntity 삭제, bookstoreReview Router 삭제, 관련 FE 컴포넌트(ReviewSection/Form/Item) 삭제
+- **관련 이슈**: #121 → closed (spec out)

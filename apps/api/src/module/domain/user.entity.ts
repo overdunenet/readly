@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { SocialAccountEntity } from './social-account.entity';
+import { Language } from './enums';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
@@ -42,6 +43,9 @@ export class UserEntity extends BaseEntity {
     default: UserStatus.PENDING_PHONE,
   })
   status: UserStatus;
+
+  @Column({ type: 'varchar', length: 10, default: Language.KO })
+  language: Language;
 
   @DeleteDateColumn()
   deletedAt: Date;

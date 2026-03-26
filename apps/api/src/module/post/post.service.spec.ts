@@ -9,6 +9,8 @@ import { PostService } from './post.service';
 import { EntityManager } from 'typeorm';
 import { UserEntity } from '../domain/user.entity';
 import { PostAccessLevel } from '../domain/post.entity';
+import { BookstoreEntity } from '../domain/bookstore.entity';
+import { Language } from '../domain/enums';
 
 describe('PostService - getAccessiblePosts', () => {
   let app: TestingModule;
@@ -25,6 +27,16 @@ describe('PostService - getAccessiblePosts', () => {
     user.nickname =
       overrides?.nickname ?? `user-${Math.random().toString(36).slice(2, 7)}`;
     return testingRepositoryProvider.UserRepository.save(user);
+  };
+
+  const createTestBookstore = async (userId: string) => {
+    const bookstore = BookstoreEntity.create({
+      userId,
+      penName: '테스트필명',
+      storeName: '테스트서점',
+      language: Language.KO,
+    });
+    return testingRepositoryProvider.BookstoreRepository.save(bookstore);
   };
 
   const createTestPost = async (
@@ -74,6 +86,7 @@ describe('PostService - getAccessiblePosts', () => {
 
   it('published + public 포스트만 반환한다', async () => {
     const user = await createTestUser();
+    await createTestBookstore(user.id);
 
     // draft 포스트 1개
     await createTestPost(user.id, { title: 'Draft', publish: false });
@@ -90,6 +103,7 @@ describe('PostService - getAccessiblePosts', () => {
 
   it('publishedAt DESC 순서로 정렬된다', async () => {
     const user = await createTestUser();
+    await createTestBookstore(user.id);
 
     await createTestPost(user.id, { title: '먼저 작성' });
     // 약간의 시간차를 위해 publishedAt을 직접 설정
@@ -107,6 +121,7 @@ describe('PostService - getAccessiblePosts', () => {
 
   it('author 정보가 포함된다', async () => {
     const user = await createTestUser({ nickname: '테스트작가' });
+    await createTestBookstore(user.id);
     await createTestPost(user.id, { title: 'Author 테스트' });
 
     const result = await service.getAccessiblePosts();
@@ -120,6 +135,7 @@ describe('PostService - getAccessiblePosts', () => {
 
   it('private 포스트는 반환하지 않는다', async () => {
     const user = await createTestUser();
+    await createTestBookstore(user.id);
 
     await createTestPost(user.id, {
       title: 'Private Post',

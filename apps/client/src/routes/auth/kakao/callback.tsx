@@ -63,7 +63,14 @@ function KakaoCallbackPage() {
             user: result.user,
           });
 
-          navigate({ to: getRedirectPathByStatus(result.user.status) });
+          const savedRedirect = sessionStorage.getItem('login_redirect');
+          sessionStorage.removeItem('login_redirect');
+          navigate({
+            to: getRedirectPathByStatus(
+              result.user.status,
+              savedRedirect ?? undefined,
+            ),
+          });
         })
         .catch((err: unknown) => {
           const message =

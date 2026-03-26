@@ -143,4 +143,16 @@ async findOne(@Param('id') id: number) {
 - Service는 RepositoryProvider만 사용 — 트랜잭션 컨텍스트 자동 전파
 - Cron 등 배치도 Controller MessagePattern 경유하여 트랜잭션 보장
 
+### 의존성 추가 시 Jest 호환성
+
+- 새 npm 패키지 추가 후 `yarn workspace @readly/api test` 실행하여 호환성 확인
+- `"type": "module"` (ESM-only) 패키지는 Jest에서 파싱 불가 → `moduleNameMapper`로 mock 필요
+- `transformIgnorePatterns`만으로는 해결 안 됨: ts-jest는 ESM `.js` 파일 transform 불가
+
+### 도메인 전제조건 변경 시 테스트 영향
+
+- Service 메서드에 새 guard/validation 추가 시, 해당 메서드를 호출하는 테스트를 grep으로 검색
+- 테스트 fixture에 새 전제조건 셋업 추가 (예: bookstore 필수 → `createTestBookstore()` 추가)
+- `app.module.ts`를 전체 로드하는 통합 테스트는 모든 모듈 의존성 영향을 받음에 유의
+
 </rules>

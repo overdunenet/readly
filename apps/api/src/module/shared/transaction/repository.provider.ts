@@ -8,6 +8,7 @@ import { getPaymentRepository } from '@src/module/domain/payment.entity';
 import { getCashBalanceRepository } from '@src/module/domain/cash-balance.entity';
 import { getCashRepository } from '@src/module/domain/cash.entity';
 import { getCashHistoryRepository } from '@src/module/domain/cash-history.entity';
+import { getBookstoreRepository } from '@src/module/domain/bookstore.entity';
 import { TransactionService } from '@src/module/shared/transaction/transaction.service';
 
 @Injectable()
@@ -48,5 +49,9 @@ export class RepositoryProvider {
 
   get CashHistoryRepository() {
     return getCashHistoryRepository(this.transaction);
+  }
+
+  get BookstoreRepository() {
+    return getBookstoreRepository(this.transaction);
   }
 }
