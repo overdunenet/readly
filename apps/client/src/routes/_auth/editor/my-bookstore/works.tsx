@@ -22,7 +22,7 @@ function WorksPage() {
   trpc.bookstore.getMyBookstore.useSuspenseQuery();
 
   const statusParam = selectedStatus === 'all' ? undefined : selectedStatus;
-  const { data: works } = trpc.bookstore.getMyWorks.useQuery({
+  const [works] = trpc.bookstore.getMyWorks.useSuspenseQuery({
     status: statusParam,
   });
 
@@ -39,7 +39,7 @@ function WorksPage() {
         onStatusChange={setSelectedStatus}
       />
 
-      {!works || works.length === 0 ? (
+      {works.length === 0 ? (
         <EmptyState>
           <EmptyIcon>
             <FileText size={48} />
