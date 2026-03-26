@@ -9,7 +9,7 @@ import {
   BookstoreNavMenu,
   CountryRestrictionNotice,
 } from '@/components/bookstore';
-import type { CreateFormData } from '@/components/bookstore/BookstoreForm';
+import type { BookstoreFormData } from '@/components/bookstore/BookstoreForm';
 import { trpc } from '@/shared';
 import { useAuthStore } from '@/stores/auth';
 
@@ -28,7 +28,7 @@ function MyBookstorePage() {
 
   const createMutation = trpc.bookstore.createBookstore.useMutation();
 
-  const handleCreate = (data: CreateFormData) => {
+  const handleCreate = (data: BookstoreFormData) => {
     setError(null);
     createMutation
       .mutateAsync({

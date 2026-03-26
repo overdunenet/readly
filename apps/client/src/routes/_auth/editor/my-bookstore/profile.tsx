@@ -3,7 +3,7 @@ import SnappyModal from 'react-snappy-modal';
 import tw from 'tailwind-styled-components';
 
 import { BookstoreForm } from '@/components/bookstore';
-import type { EditFormData } from '@/components/bookstore/BookstoreForm';
+import type { BookstoreFormData } from '@/components/bookstore/BookstoreForm';
 import { trpc } from '@/shared';
 import { AlertModal } from '@/shared/modal/AlertModal';
 
@@ -29,7 +29,7 @@ function ProfileEditPage() {
     },
   });
 
-  const handleSubmit = (data: EditFormData) => {
+  const handleSubmit = (data: BookstoreFormData) => {
     updateProfileMutation.mutate({
       penName: data.penName,
       storeName: data.storeName,

@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 // --- Schema ---
 
-const baseSchema = z.object({
+const formSchema = z.object({
   penName: z
     .string()
     .min(1, '필명을 입력해주세요')
@@ -15,13 +15,7 @@ const baseSchema = z.object({
     .string()
     .min(1, '서점 이름을 입력해주세요')
     .max(50, '서점 이름은 50자 이내여야 합니다'),
-});
-
-const createSchema = baseSchema.extend({
-  agreedToTerms: z.boolean().refine((v) => v === true, '약관에 동의해주세요'),
-});
-
-const editSchema = baseSchema.extend({
+  agreedToTerms: z.boolean().optional(),
   bio: z.string().max(500).optional().or(z.literal('')),
   profileImage: z
     .string()
@@ -30,245 +24,165 @@ const editSchema = baseSchema.extend({
     .or(z.literal('')),
 });
 
-export type CreateFormData = z.infer<typeof createSchema>;
-export type EditFormData = z.infer<typeof editSchema>;
+export type BookstoreFormData = z.infer<typeof formSchema>;
 
 // --- Props ---
 
-interface DefaultValue {
-  penName?: string;
-  storeName?: string;
-  bio?: string;
-  profileImage?: string;
-}
-
-interface CreateModeProps {
-  mode: 'create';
-  onSubmit: (data: CreateFormData) => void;
+export interface BookstoreFormProps {
+  mode: 'create' | 'edit';
+  defaultValue?: {
+    penName?: string;
+    storeName?: string;
+    bio?: string;
+    profileImage?: string;
+  };
+  onSubmit: (data: BookstoreFormData) => void;
   isPending?: boolean;
   error?: string | null;
 }
-
-interface EditModeProps {
-  mode: 'edit';
-  defaultValue: DefaultValue;
-  onSubmit: (data: EditFormData) => void;
-  isPending?: boolean;
-}
-
-export type BookstoreFormProps = CreateModeProps | EditModeProps;
 
 // --- Component ---
 
 const BookstoreForm = (props: BookstoreFormProps) => {
-  if (props.mode === 'edit') {
-    return (
-      <EditForm
-        defaultValue={props.defaultValue}
-        onSubmit={props.onSubmit}
-        isPending={props.isPending}
-      />
-    );
-  }
-  return (
-    <CreateForm
-      onSubmit={props.onSubmit}
-      isPending={props.isPending}
-      error={props.error}
-    />
-  );
-};
+  const isEdit = props.mode === 'edit';
 
-export default BookstoreForm;
-
-// --- 공통 필드 ---
-
-interface CommonFieldsProps {
-  register: (
-    name: 'penName' | 'storeName',
-  ) => ReturnType<typeof useForm>['register'] extends (
-    ...args: infer _
-  ) => infer R
-    ? R
-    : never;
-  errors: {
-    penName?: { message?: string };
-    storeName?: { message?: string };
-    bio?: { message?: string };
-    profileImage?: { message?: string };
-  };
-  control?: ReturnType<typeof useForm<EditFormData>>['control'];
-  showEditFields?: boolean;
-}
-
-const CommonFields = ({
-  register,
-  errors,
-  control,
-  showEditFields,
-}: CommonFieldsProps) => (
-  <>
-    <FieldGroup>
-      <Label>필명</Label>
-      <Input
-        {...register('penName')}
-        placeholder="서점에서 사용할 필명을 입력해주세요"
-        maxLength={30}
-      />
-      {errors.penName && <ErrorText>{errors.penName.message}</ErrorText>}
-    </FieldGroup>
-
-    <FieldGroup>
-      <Label>서점 이름</Label>
-      <Input
-        {...register('storeName')}
-        placeholder="서점 이름을 입력해주세요"
-        maxLength={50}
-      />
-      {errors.storeName && <ErrorText>{errors.storeName.message}</ErrorText>}
-    </FieldGroup>
-
-    {showEditFields && control && (
-      <>
-        <FieldGroup>
-          <Label>소개</Label>
-          <Controller
-            name="bio"
-            control={control}
-            render={({ field }) => (
-              <Textarea
-                {...field}
-                placeholder="서점 소개를 입력하세요"
-                rows={4}
-                maxLength={500}
-              />
-            )}
-          />
-          {errors.bio && <ErrorText>{errors.bio.message}</ErrorText>}
-        </FieldGroup>
-
-        <FieldGroup>
-          <Label>프로필 이미지 URL</Label>
-          <Controller
-            name="profileImage"
-            control={control}
-            render={({ field }) => (
-              <Input {...field} placeholder="https://example.com/image.jpg" />
-            )}
-          />
-          {errors.profileImage && (
-            <ErrorText>{errors.profileImage.message}</ErrorText>
-          )}
-        </FieldGroup>
-      </>
-    )}
-  </>
-);
-
-// --- Create Form ---
-
-const CreateForm = ({
-  onSubmit,
-  isPending,
-  error,
-}: {
-  onSubmit: (data: CreateFormData) => void;
-  isPending?: boolean;
-  error?: string | null;
-}) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-  } = useForm<CreateFormData>({
-    resolver: zodResolver(createSchema),
-    mode: 'onChange',
-    defaultValues: {
-      penName: '',
-      storeName: '',
-      agreedToTerms: false,
-    },
-  });
-
-  return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      <CommonFields register={register} errors={errors} />
-
-      <CheckboxGroup>
-        <CheckboxInput
-          type="checkbox"
-          id="agreedToTerms"
-          {...register('agreedToTerms')}
-        />
-        <CheckboxLabel htmlFor="agreedToTerms">
-          서점 운영 약관에 동의합니다
-        </CheckboxLabel>
-      </CheckboxGroup>
-      {errors.agreedToTerms && (
-        <ErrorText>{errors.agreedToTerms.message}</ErrorText>
-      )}
-
-      {error && <AlertBox>{error}</AlertBox>}
-
-      <SubmitButton type="submit" disabled={!isValid || isPending}>
-        {isPending ? '오픈 중...' : '서점 오픈하기'}
-      </SubmitButton>
-    </Form>
-  );
-};
-
-// --- Edit Form ---
-
-const EditForm = ({
-  defaultValue,
-  onSubmit,
-  isPending,
-}: {
-  defaultValue: DefaultValue;
-  onSubmit: (data: EditFormData) => void;
-  isPending?: boolean;
-}) => {
   const {
     register,
     control,
     handleSubmit,
     reset,
-    formState: { errors, isDirty },
-  } = useForm<EditFormData>({
-    resolver: zodResolver(editSchema),
+    formState: { errors, isValid, isDirty },
+  } = useForm<BookstoreFormData>({
+    resolver: zodResolver(
+      isEdit
+        ? formSchema
+        : formSchema.refine((d) => d.agreedToTerms === true, {
+            message: '약관에 동의해주세요',
+            path: ['agreedToTerms'],
+          }),
+    ),
     mode: 'onChange',
     defaultValues: {
       penName: '',
       storeName: '',
+      agreedToTerms: false,
       bio: '',
       profileImage: '',
     },
   });
 
   useEffect(() => {
-    reset({
-      penName: defaultValue.penName ?? '',
-      storeName: defaultValue.storeName ?? '',
-      bio: defaultValue.bio ?? '',
-      profileImage: defaultValue.profileImage ?? '',
-    });
-  }, [defaultValue, reset]);
+    if (isEdit && props.defaultValue) {
+      reset({
+        penName: props.defaultValue.penName ?? '',
+        storeName: props.defaultValue.storeName ?? '',
+        bio: props.defaultValue.bio ?? '',
+        profileImage: props.defaultValue.profileImage ?? '',
+      });
+    }
+  }, [isEdit, props.defaultValue, reset]);
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      <CommonFields
-        register={register}
-        errors={errors}
-        control={control}
-        showEditFields
-      />
+    <Form onSubmit={handleSubmit(props.onSubmit)}>
+      {/* 공통 필드 */}
+      <FieldGroup>
+        <Label>필명</Label>
+        <Input
+          {...register('penName')}
+          placeholder="서점에서 사용할 필명을 입력해주세요"
+          maxLength={30}
+        />
+        {errors.penName && <ErrorText>{errors.penName.message}</ErrorText>}
+      </FieldGroup>
 
-      <SubmitButton type="submit" disabled={!isDirty || isPending}>
-        {isPending ? '저장 중...' : '저장'}
+      <FieldGroup>
+        <Label>서점 이름</Label>
+        <Input
+          {...register('storeName')}
+          placeholder="서점 이름을 입력해주세요"
+          maxLength={50}
+        />
+        {errors.storeName && <ErrorText>{errors.storeName.message}</ErrorText>}
+      </FieldGroup>
+
+      {/* Edit 전용 필드 */}
+      {isEdit && (
+        <>
+          <FieldGroup>
+            <Label>소개</Label>
+            <Controller
+              name="bio"
+              control={control}
+              render={({ field }) => (
+                <Textarea
+                  {...field}
+                  placeholder="서점 소개를 입력하세요"
+                  rows={4}
+                  maxLength={500}
+                />
+              )}
+            />
+            {errors.bio && <ErrorText>{errors.bio.message}</ErrorText>}
+          </FieldGroup>
+
+          <FieldGroup>
+            <Label>프로필 이미지 URL</Label>
+            <Controller
+              name="profileImage"
+              control={control}
+              render={({ field }) => (
+                <Input {...field} placeholder="https://example.com/image.jpg" />
+              )}
+            />
+            {errors.profileImage && (
+              <ErrorText>{errors.profileImage.message}</ErrorText>
+            )}
+          </FieldGroup>
+        </>
+      )}
+
+      {/* Create 전용 필드 */}
+      {!isEdit && (
+        <>
+          <CheckboxGroup>
+            <CheckboxInput
+              type="checkbox"
+              id="agreedToTerms"
+              {...register('agreedToTerms')}
+            />
+            <CheckboxLabel htmlFor="agreedToTerms">
+              서점 운영 약관에 동의합니다
+            </CheckboxLabel>
+          </CheckboxGroup>
+          {errors.agreedToTerms && (
+            <ErrorText>{errors.agreedToTerms.message}</ErrorText>
+          )}
+        </>
+      )}
+
+      {/* 에러 표시 (create 모드) */}
+      {!isEdit && props.error && <AlertBox>{props.error}</AlertBox>}
+
+      {/* 제출 버튼 */}
+      <SubmitButton
+        type="submit"
+        disabled={
+          isEdit ? !isDirty || props.isPending : !isValid || props.isPending
+        }
+      >
+        {props.isPending
+          ? isEdit
+            ? '저장 중...'
+            : '오픈 중...'
+          : isEdit
+            ? '저장'
+            : '서점 오픈하기'}
       </SubmitButton>
     </Form>
   );
 };
+
+export default BookstoreForm;
 
 // Styled Components
 const Form = tw.form`
