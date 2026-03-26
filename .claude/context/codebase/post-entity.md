@@ -15,7 +15,6 @@ related_contexts:
   - business-access-control
   - business-payment
   - codebase-user-entity
-  - codebase-bookstore-module
 ---
 
 # PostEntity 및 권한 검증
@@ -67,9 +66,6 @@ export class PostEntity extends BaseEntity {
   @Column({ type: 'int', default: 0 })
   price: number;
 
-  @Column({ type: 'uuid', nullable: true, comment: '서점 ID' })
-  bookstoreId: string | null;
-
   @Column({ nullable: true, type: 'timestamp' })
   publishedAt: Date | null;
 
@@ -79,10 +75,6 @@ export class PostEntity extends BaseEntity {
   @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'author_id' })
   author: UserEntity;
-
-  @ManyToOne(() => BookstoreEntity, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'bookstore_id' })
-  bookstore: BookstoreEntity;
 }
 ```
 
@@ -95,24 +87,6 @@ export class PostEntity extends BaseEntity {
 | `mixed`     | 텍스트 + 이미지 혼합          | 미구현 (필드만 예약) |
 
 > 현재는 `text` 타입만 구현합니다. `contentType` 필드는 향후 확장을 위해 Entity에 포함합니다.
-
-## POST_STATUS 상수 객체
-
-status 필드의 매직 스트링을 제거하기 위한 상수 객체입니다. Entity 메서드, Service, Repository 전체에서 사용합니다.
-
-```typescript
-export const POST_STATUS = {
-  DRAFT: 'draft',
-  PUBLISHED: 'published',
-  SCHEDULED: 'scheduled',
-} as const satisfies Record<string, PostStatus>;
-```
-
-## 서점(Bookstore)과의 관계
-
-- `bookstoreId`는 nullable이며, `BookstoreEntity`와 ManyToOne 관계
-- 서점 삭제 시 `SET NULL` (포스트는 유지, 서점 참조만 해제)
-- 서점 필수화 정책: 에디터는 서점 보유 시에만 포스트 작성 가능 (비즈니스 규칙)
 
 ## Factory Method
 
@@ -256,10 +230,10 @@ export const getPostRepository = (source?) =>
 
 ## PostService
 
-| 파일                                          | 역할                    | 핵심 메서드                                                                                                             |
-| --------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| apps/api/src/module/post/post.service.ts      | Post 비즈니스 로직      | createPost(), updatePost(), publishPost(), unpublishPost(), deletePost(), getPost(), getMyPosts(), getAccessiblePosts() |
-| apps/api/src/module/post/post.service.spec.ts | PostService 통합 테스트 | getAccessiblePosts() 시나리오 5건                                                                                       |
+| 파일 | 역할 | 핵심 메서드 |
+| ---- | ---- | ----------- |
+| apps/api/src/module/post/post.service.ts | Post 비즈니스 로직 | createPost(), updatePost(), publishPost(), unpublishPost(), deletePost(), getPost(), getMyPosts(), getAccessiblePosts() |
+| apps/api/src/module/post/post.service.spec.ts | PostService 통합 테스트 | getAccessiblePosts() 시나리오 5건 |
 
 ### getAccessiblePosts()
 
@@ -334,4 +308,3 @@ const createPostSchema = z.object({
 
 - `business/access-control.md`: 접근 권한 정책
 - `codebase/user-entity.md`: UserEntity와의 관계
-- `codebase/bookstore-module.md`: BookstoreEntity와의 관계 (bookstoreId)
