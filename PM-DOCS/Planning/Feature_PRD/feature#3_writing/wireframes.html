@@ -789,7 +789,7 @@
     <div class="meta">
       <span>Feature: F3</span>
       <span>Milestone: M-001</span>
-      <span>화면 수: 4개</span>
+      <span>화면 수: 3개</span>
       <span>생성일: 2026-03-25</span>
     </div>
   </header>
@@ -817,7 +817,7 @@
                 <span style="font-size:13px; font-weight:600;">글쓰기</span>
               </div>
               <div class="editor-header-right">
-                <span class="btn btn-ghost btn-sm">임시저장 3</span>
+                <span class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--color-text-muted);">자동저장됨</span>
                 <span class="btn btn-primary btn-sm">발행하기</span>
               </div>
             </div>
@@ -838,7 +838,7 @@
                 <span style="font-size:14px; font-weight:600;">글쓰기</span>
               </div>
               <div class="editor-header-right" style="gap:var(--space-sm);">
-                <span class="btn btn-ghost btn-sm">임시저장 3</span>
+                <span class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--color-text-muted);">자동저장됨</span>
                 <span class="btn btn-primary btn-sm" style="padding:6px 16px;">발행하기</span>
               </div>
             </div>
@@ -853,7 +853,7 @@
 
     <!-- Editor Toolbar -->
     <div class="screen-group">
-      <div class="screen-group-title">CKEditor 툴바</div>
+      <div class="screen-group-title">에디터 툴바</div>
       <div class="screen-group-route">에디터 본문 위 툴바</div>
       <div class="screen-group-states">
 
@@ -876,7 +876,7 @@
             </div>
           </div>
           <div class="screen-meta">
-            <div class="screen-name">CKEditor 툴바</div>
+            <div class="screen-name">에디터 툴바</div>
           </div>
         </div>
 
@@ -940,7 +940,7 @@
   <div class="screen-grid" style="margin-bottom:var(--space-xl);">
     <div class="screen-group">
       <div class="screen-group-title">SCR-020: 에디터 메인</div>
-      <div class="screen-group-route">/write (신규), /write/:postId (수정)</div>
+      <div class="screen-group-route">/write/:postId (신규/수정 공통)</div>
       <div class="screen-group-states">
 
         <!-- Phone: 빈 에디터 -->
@@ -960,7 +960,7 @@
                   <span style="font-size:16px; color:var(--color-text-muted);">&#8592;</span>
                 </div>
                 <div class="editor-header-right">
-                  <span class="btn btn-ghost btn-sm" style="color:#d1d5db;">임시저장 0</span>
+                  <span class="btn btn-ghost btn-sm" style="color:#d1d5db; font-size:10px;">대기 중</span>
                   <span class="btn btn-primary btn-sm" style="opacity:0.5;">발행하기</span>
                 </div>
               </div>
@@ -1016,7 +1016,7 @@
                   <span style="font-size:16px; color:var(--color-text-muted);">&#8592;</span>
                 </div>
                 <div class="editor-header-right">
-                  <span class="btn btn-ghost btn-sm">임시저장 1</span>
+                  <span class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--color-text-muted);">자동저장됨</span>
                   <span class="btn btn-primary btn-sm">발행하기</span>
                 </div>
               </div>
@@ -1070,7 +1070,7 @@
                   <span style="font-size:16px; color:var(--color-text-muted);">&#8592;</span>
                 </div>
                 <div class="editor-header-right">
-                  <span class="btn btn-ghost btn-sm">임시저장 2</span>
+                  <span class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--color-text-muted);">자동저장됨</span>
                   <span class="btn btn-primary btn-sm">발행하기</span>
                 </div>
               </div>
@@ -1117,10 +1117,10 @@
           </div>
         </div>
 
-        <!-- Phone: 임시저장 복원 토스트 -->
+        <!-- Phone: 자동저장 실패 -->
         <div class="screen-card">
           <div class="viewport-label">PHONE</div>
-          <div class="state-label">임시저장 복원</div>
+          <div class="state-label">자동저장 실패</div>
           <div class="phone-frame">
             <div class="phone-status-bar">
               <span>9:41</span>
@@ -1133,62 +1133,12 @@
                   <span style="font-size:16px; color:var(--color-text-muted);">&#8592;</span>
                 </div>
                 <div class="editor-header-right">
-                  <span class="btn btn-ghost btn-sm">임시저장 2</span>
-                  <span class="btn btn-primary btn-sm" style="opacity:0.5;">발행하기</span>
-                </div>
-              </div>
-              <!-- Toast -->
-              <div style="padding:var(--space-xs) var(--space-sm);">
-                <div style="background:var(--color-primary-light); border:1px solid #bfdbfe; border-radius:var(--radius-sm); padding:8px var(--space-sm); display:flex; align-items:center; justify-content:space-between;">
-                  <span style="font-size:11px; color:var(--color-primary);">이전 글이 있습니다. 이어서 쓸까요?</span>
-                  <div style="display:flex; gap:4px;">
-                    <span class="btn btn-primary btn-sm" style="padding:3px 8px; font-size:10px;">불러오기</span>
-                    <span class="btn btn-ghost btn-sm" style="padding:3px 8px; font-size:10px;">새 글</span>
-                  </div>
-                </div>
-              </div>
-              <div class="title-field title-placeholder">제목을 입력하세요</div>
-              <div class="editor-body" style="flex:1; color:#d1d5db;">
-                <p>본문을 작성하세요...</p>
-              </div>
-              <div class="status-bar">
-                <div class="status-bar-left">
-                  <span style="color:#d1d5db;">대기 중</span>
-                </div>
-                <span>0자</span>
-              </div>
-            </div>
-            <div class="phone-home-indicator"></div>
-          </div>
-          <div class="screen-meta">
-            <div class="screen-id">SCR-020</div>
-            <div class="screen-name">임시저장 복원</div>
-          </div>
-        </div>
-
-        <!-- Phone: 저장 실패 -->
-        <div class="screen-card">
-          <div class="viewport-label">PHONE</div>
-          <div class="state-label">저장 실패</div>
-          <div class="phone-frame">
-            <div class="phone-status-bar">
-              <span>9:41</span>
-              <div class="notch"></div>
-              <span>100%</span>
-            </div>
-            <div class="phone-content" style="display:flex; flex-direction:column;">
-              <div class="editor-header">
-                <div class="editor-header-left">
-                  <span style="font-size:16px; color:var(--color-text-muted);">&#8592;</span>
-                </div>
-                <div class="editor-header-right">
-                  <span class="btn btn-ghost btn-sm">임시저장 1</span>
                   <span class="btn btn-primary btn-sm">발행하기</span>
                 </div>
               </div>
               <!-- Error Toast -->
               <div class="error-toast" style="display:flex; align-items:center; justify-content:space-between;">
-                <span>자동 저장에 실패했습니다</span>
+                <span>자동저장에 실패했습니다</span>
                 <span class="btn btn-sm" style="color:var(--color-danger); font-size:10px; padding:2px 6px; border:1px solid #fecaca; border-radius:3px;">수동 저장</span>
               </div>
               <div class="title-field">봄날의 산책, 그 첫번째 이야기</div>
@@ -1206,7 +1156,7 @@
           </div>
           <div class="screen-meta">
             <div class="screen-id">SCR-020</div>
-            <div class="screen-name">저장 실패</div>
+            <div class="screen-name">자동저장 실패</div>
           </div>
         </div>
 
@@ -1259,7 +1209,7 @@
                   <span style="font-size:14px; font-weight:600;">글쓰기</span>
                 </div>
                 <div class="editor-header-right" style="gap:var(--space-sm);">
-                  <span class="btn btn-ghost btn-sm">임시저장 2</span>
+                  <span class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--color-text-muted);">자동저장됨</span>
                   <span class="btn btn-primary btn-sm" style="padding:6px 16px;">발행하기</span>
                 </div>
               </div>
@@ -1313,222 +1263,6 @@
           <div class="screen-meta">
             <div class="screen-id">SCR-020</div>
             <div class="screen-name">에디터 메인 (Desktop)</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== SCR-021: 임시저장 모달 ===== -->
-  <div class="screen-grid" style="margin-bottom:var(--space-xl);">
-    <div class="screen-group">
-      <div class="screen-group-title">SCR-021: 임시저장 모달</div>
-      <div class="screen-group-route">(모달)</div>
-      <div class="screen-group-states">
-
-        <!-- Phone: 목록 표시 -->
-        <div class="screen-card">
-          <div class="viewport-label">PHONE</div>
-          <div class="modal-label">MODAL</div>
-          <div class="state-label">목록 표시</div>
-          <div class="phone-frame">
-            <div class="phone-status-bar">
-              <span>9:41</span>
-              <div class="notch"></div>
-              <span>100%</span>
-            </div>
-            <div class="phone-content" style="display:flex; flex-direction:column; position:relative;">
-              <!-- Dimmed background -->
-              <div style="flex:1; background:rgba(0,0,0,0.3);"></div>
-              <!-- Modal -->
-              <div style="background:var(--color-bg-card); border-radius:var(--radius-md) var(--radius-md) 0 0; padding:0;">
-                <!-- Handle -->
-                <div style="display:flex; justify-content:center; padding:var(--space-sm) 0;">
-                  <div style="width:36px; height:4px; background:#d1d5db; border-radius:2px;"></div>
-                </div>
-                <!-- Header -->
-                <div style="display:flex; align-items:center; justify-content:space-between; padding:0 var(--space-md) var(--space-sm);">
-                  <span style="font-size:15px; font-weight:600;">임시저장 목록</span>
-                  <span style="font-size:11px; color:var(--color-text-muted);">최대 5개</span>
-                </div>
-                <!-- List -->
-                <div class="list-item" style="padding:var(--space-sm) var(--space-md);">
-                  <div style="flex:1;">
-                    <div style="font-size:13px; font-weight:500;">봄날의 산책, 그 첫번째 이야기</div>
-                    <div style="font-size:10px; color:var(--color-text-muted); display:flex; gap:var(--space-sm); margin-top:2px;">
-                      <span>14:32</span>
-                      <span>1,234자</span>
-                      <span class="badge badge-info" style="font-size:9px;">수동</span>
-                    </div>
-                  </div>
-                  <div style="display:flex; gap:4px;">
-                    <span class="btn btn-primary btn-sm" style="font-size:10px; padding:3px 8px;">불러오기</span>
-                    <span class="btn btn-ghost btn-sm" style="font-size:10px; padding:3px 6px; color:var(--color-danger);">삭제</span>
-                  </div>
-                </div>
-                <div class="list-item" style="padding:var(--space-sm) var(--space-md);">
-                  <div style="flex:1;">
-                    <div style="font-size:13px; font-weight:500;">여름 바다에 관한 단상</div>
-                    <div style="font-size:10px; color:var(--color-text-muted); display:flex; gap:var(--space-sm); margin-top:2px;">
-                      <span>13:10</span>
-                      <span>856자</span>
-                      <span class="badge badge-neutral" style="font-size:9px;">자동</span>
-                    </div>
-                  </div>
-                  <div style="display:flex; gap:4px;">
-                    <span class="btn btn-primary btn-sm" style="font-size:10px; padding:3px 8px;">불러오기</span>
-                    <span class="btn btn-ghost btn-sm" style="font-size:10px; padding:3px 6px; color:var(--color-danger);">삭제</span>
-                  </div>
-                </div>
-                <div class="list-item" style="padding:var(--space-sm) var(--space-md); border-bottom:none;">
-                  <div style="flex:1;">
-                    <div style="font-size:13px; font-weight:500;">제목 없음</div>
-                    <div style="font-size:10px; color:var(--color-text-muted); display:flex; gap:var(--space-sm); margin-top:2px;">
-                      <span>어제 18:45</span>
-                      <span>320자</span>
-                      <span class="badge badge-neutral" style="font-size:9px;">자동</span>
-                    </div>
-                  </div>
-                  <div style="display:flex; gap:4px;">
-                    <span class="btn btn-primary btn-sm" style="font-size:10px; padding:3px 8px;">불러오기</span>
-                    <span class="btn btn-ghost btn-sm" style="font-size:10px; padding:3px 6px; color:var(--color-danger);">삭제</span>
-                  </div>
-                </div>
-                <!-- Bottom Padding -->
-                <div style="height:var(--space-md);"></div>
-              </div>
-            </div>
-            <div class="phone-home-indicator"></div>
-          </div>
-          <div class="screen-meta">
-            <div class="screen-id">SCR-021</div>
-            <div class="screen-name">목록 표시</div>
-          </div>
-        </div>
-
-        <!-- Phone: 목록 비어있음 -->
-        <div class="screen-card">
-          <div class="viewport-label">PHONE</div>
-          <div class="modal-label">MODAL</div>
-          <div class="state-label">목록 비어있음</div>
-          <div class="phone-frame">
-            <div class="phone-status-bar">
-              <span>9:41</span>
-              <div class="notch"></div>
-              <span>100%</span>
-            </div>
-            <div class="phone-content" style="display:flex; flex-direction:column; position:relative;">
-              <div style="flex:1; background:rgba(0,0,0,0.3);"></div>
-              <div style="background:var(--color-bg-card); border-radius:var(--radius-md) var(--radius-md) 0 0; padding:0;">
-                <div style="display:flex; justify-content:center; padding:var(--space-sm) 0;">
-                  <div style="width:36px; height:4px; background:#d1d5db; border-radius:2px;"></div>
-                </div>
-                <div style="display:flex; align-items:center; justify-content:space-between; padding:0 var(--space-md) var(--space-sm);">
-                  <span style="font-size:15px; font-weight:600;">임시저장 목록</span>
-                </div>
-                <div class="empty-state" style="padding:var(--space-xl) var(--space-md);">
-                  <div class="icon-placeholder" style="width:40px; height:40px;"></div>
-                  <div style="font-size:13px; color:var(--color-text-muted);">임시저장된 글이 없습니다</div>
-                </div>
-                <div style="height:var(--space-md);"></div>
-              </div>
-            </div>
-            <div class="phone-home-indicator"></div>
-          </div>
-          <div class="screen-meta">
-            <div class="screen-id">SCR-021</div>
-            <div class="screen-name">목록 비어있음</div>
-          </div>
-        </div>
-
-        <!-- Phone: 불러오기 확인 -->
-        <div class="screen-card">
-          <div class="viewport-label">PHONE</div>
-          <div class="modal-label">MODAL</div>
-          <div class="state-label">불러오기 확인</div>
-          <div class="phone-frame">
-            <div class="phone-status-bar">
-              <span>9:41</span>
-              <div class="notch"></div>
-              <span>100%</span>
-            </div>
-            <div class="phone-content" style="display:flex; flex-direction:column; position:relative;">
-              <div style="flex:1; background:rgba(0,0,0,0.4);"></div>
-              <!-- Confirm Dialog -->
-              <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:var(--color-bg-card); border-radius:var(--radius-md); padding:var(--space-lg); width:220px; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
-                <div style="font-size:14px; font-weight:600; margin-bottom:var(--space-sm); text-align:center;">내용 대체 확인</div>
-                <div style="font-size:12px; color:var(--color-text-muted); text-align:center; margin-bottom:var(--space-md);">현재 작성 중인 내용이 대체됩니다. 계속하시겠습니까?</div>
-                <div style="display:flex; gap:var(--space-sm);">
-                  <span class="btn btn-secondary btn-sm" style="flex:1; text-align:center;">취소</span>
-                  <span class="btn btn-primary btn-sm" style="flex:1; text-align:center;">불러오기</span>
-                </div>
-              </div>
-            </div>
-            <div class="phone-home-indicator"></div>
-          </div>
-          <div class="screen-meta">
-            <div class="screen-id">SCR-021</div>
-            <div class="screen-name">불러오기 확인</div>
-          </div>
-        </div>
-
-        <!-- Desktop: 목록 표시 -->
-        <div class="screen-card">
-          <div class="viewport-label">DESKTOP</div>
-          <div class="modal-label">MODAL</div>
-          <div class="state-label">목록 표시</div>
-          <div class="desktop-frame" style="min-height:320px; position:relative;">
-            <div class="browser-bar">
-              <div class="browser-dots"><span></span><span></span><span></span></div>
-              <div class="browser-url">readly.com/write</div>
-            </div>
-            <div class="desktop-content" style="position:relative;">
-              <!-- Dimmed -->
-              <div style="position:absolute; inset:0; background:rgba(0,0,0,0.3);"></div>
-              <!-- Center Modal -->
-              <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:var(--color-bg-card); border-radius:var(--radius-md); width:340px; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
-                <div style="display:flex; align-items:center; justify-content:space-between; padding:var(--space-md); border-bottom:1px solid var(--color-border);">
-                  <span style="font-size:15px; font-weight:600;">임시저장 목록</span>
-                  <div style="display:flex; align-items:center; gap:var(--space-sm);">
-                    <span style="font-size:11px; color:var(--color-text-muted);">최대 5개</span>
-                    <span style="font-size:14px; color:var(--color-text-muted); cursor:pointer;">&#10005;</span>
-                  </div>
-                </div>
-                <div class="list-item" style="padding:var(--space-sm) var(--space-md);">
-                  <div style="flex:1;">
-                    <div style="font-size:13px; font-weight:500;">봄날의 산책, 그 첫번째 이야기</div>
-                    <div style="font-size:10px; color:var(--color-text-muted); display:flex; gap:var(--space-sm); margin-top:2px;">
-                      <span>14:32</span>
-                      <span>1,234자</span>
-                      <span class="badge badge-info" style="font-size:9px;">수동</span>
-                    </div>
-                  </div>
-                  <div style="display:flex; gap:4px;">
-                    <span class="btn btn-primary btn-sm" style="font-size:10px; padding:3px 8px;">불러오기</span>
-                    <span class="btn btn-ghost btn-sm" style="font-size:10px; padding:3px 6px; color:var(--color-danger);">삭제</span>
-                  </div>
-                </div>
-                <div class="list-item" style="padding:var(--space-sm) var(--space-md); border-bottom:none;">
-                  <div style="flex:1;">
-                    <div style="font-size:13px; font-weight:500;">여름 바다에 관한 단상</div>
-                    <div style="font-size:10px; color:var(--color-text-muted); display:flex; gap:var(--space-sm); margin-top:2px;">
-                      <span>13:10</span>
-                      <span>856자</span>
-                      <span class="badge badge-neutral" style="font-size:9px;">자동</span>
-                    </div>
-                  </div>
-                  <div style="display:flex; gap:4px;">
-                    <span class="btn btn-primary btn-sm" style="font-size:10px; padding:3px 8px;">불러오기</span>
-                    <span class="btn btn-ghost btn-sm" style="font-size:10px; padding:3px 6px; color:var(--color-danger);">삭제</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="screen-meta">
-            <div class="screen-id">SCR-021</div>
-            <div class="screen-name">임시저장 모달 (Desktop)</div>
           </div>
         </div>
 
@@ -2217,31 +1951,18 @@
       <div class="screen-group-states">
 
         <div class="screen-card">
-          <div class="state-label">임시저장 완료</div>
+          <div class="state-label">자동저장 완료</div>
           <div style="width:var(--phone-width); padding:var(--space-sm);">
-            <div class="success-toast">임시저장 완료</div>
+            <div class="success-toast">자동 저장됨 14:35</div>
           </div>
         </div>
 
         <div class="screen-card">
-          <div class="state-label">저장 실패</div>
+          <div class="state-label">자동저장 실패</div>
           <div style="width:var(--phone-width); padding:var(--space-sm);">
             <div class="error-toast" style="display:flex; align-items:center; justify-content:space-between;">
-              <span>자동 저장에 실패했습니다</span>
+              <span>자동저장에 실패했습니다</span>
               <span style="font-size:10px; text-decoration:underline; cursor:pointer;">수동 저장</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="screen-card">
-          <div class="state-label">임시저장 복원 안내</div>
-          <div style="width:var(--phone-width); padding:var(--space-sm);">
-            <div style="background:var(--color-primary-light); border:1px solid #bfdbfe; border-radius:var(--radius-sm); padding:8px var(--space-sm); display:flex; align-items:center; justify-content:space-between;">
-              <span style="font-size:11px; color:var(--color-primary);">이전 글이 있습니다</span>
-              <div style="display:flex; gap:4px;">
-                <span class="btn btn-primary btn-sm" style="padding:3px 8px; font-size:10px;">불러오기</span>
-                <span class="btn btn-ghost btn-sm" style="padding:3px 8px; font-size:10px;">새 글</span>
-              </div>
             </div>
           </div>
         </div>

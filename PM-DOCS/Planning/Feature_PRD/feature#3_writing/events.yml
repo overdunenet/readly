@@ -11,20 +11,20 @@ events:
     properties:
       - name: 'mode'
         type: 'string'
-        description: '에디터 모드 (new: 새 글, edit: 기존 글 수정)'
+        description: '에디터 모드 (new: 새 글, edit: 기존 글 수정, draft_resume: draft 이어쓰기)'
         required: true
         pii: false
       - name: 'post_id'
         type: 'string'
-        description: '수정 시 대상 포스트 ID (새 글이면 null)'
-        required: false
-        pii: false
-      - name: 'has_draft'
-        type: 'boolean'
-        description: '진입 시 복원 가능한 임시저장 존재 여부'
+        description: '포스트 ID (새 글도 즉시 생성되므로 항상 존재)'
         required: true
         pii: false
-    kpi: '에디터 진입 수, 신규/수정 비율'
+      - name: 'post_status'
+        type: 'string'
+        description: '포스트 상태 (draft / published)'
+        required: true
+        pii: false
+    kpi: '에디터 진입 수, 신규/수정/이어쓰기 비율'
     funnel: 'editor_opened -> publish_sheet_opened -> post_published'
 
   - name: 'paywall_inserted'
@@ -76,19 +76,29 @@ events:
     kpi: '게시선 위치 조정 빈도, 평균 무료/유료 비율'
     funnel: ''
 
-  - name: 'draft_auto_saved'
-    trigger: '30초 주기 자동 임시저장 실행'
+  - name: 'post_auto_saved'
+    trigger: '30초 주기 자동저장 실행 (PostEntity 직접 업데이트)'
     screen_id: 'SCR-020'
     category: 'system'
     properties:
+      - name: 'post_id'
+        type: 'string'
+        description: '저장 대상 포스트 ID'
+        required: true
+        pii: false
       - name: 'content_length'
         type: 'number'
         description: '저장 시점 본문 글자 수'
         required: true
         pii: false
-      - name: 'save_type'
+      - name: 'save_trigger'
         type: 'string'
         description: '저장 트리거 (interval: 30초 주기, beforeunload: 이탈 감지, session_backup: 세션 백업)'
+        required: true
+        pii: false
+      - name: 'save_target'
+        type: 'string'
+        description: '저장 대상 (post: draft 상태 글 직접 저장 / draft_fields: 발행된 글 임시 수정본에 저장)'
         required: true
         pii: false
       - name: 'success'
@@ -96,56 +106,7 @@ events:
         description: '저장 성공 여부'
         required: true
         pii: false
-    kpi: '자동 저장 성공률, 저장 실패 빈도'
-    funnel: ''
-
-  - name: 'draft_manual_saved'
-    trigger: '작가가 수동 임시저장 (Cmd/Ctrl+S 또는 버튼 클릭)'
-    screen_id: 'SCR-020'
-    category: 'interaction'
-    properties:
-      - name: 'content_length'
-        type: 'number'
-        description: '저장 시점 본문 글자 수'
-        required: true
-        pii: false
-      - name: 'draft_count'
-        type: 'number'
-        description: '저장 후 전체 임시저장 수 (최대 5개)'
-        required: true
-        pii: false
-    kpi: '수동 저장 빈도 (작가 저장 습관 파악)'
-    funnel: ''
-
-  - name: 'draft_loaded'
-    trigger: '작가가 임시저장 모달에서 항목을 불러오기'
-    screen_id: 'SCR-021'
-    category: 'interaction'
-    properties:
-      - name: 'draft_type'
-        type: 'string'
-        description: '불러온 임시저장 유형 (auto / manual / edit_snapshot)'
-        required: true
-        pii: false
-      - name: 'draft_age_seconds'
-        type: 'number'
-        description: '저장 시점으로부터 경과 시간 (초)'
-        required: true
-        pii: false
-    kpi: '임시저장 불러오기 빈도, 복구 시간 분포'
-    funnel: ''
-
-  - name: 'draft_deleted'
-    trigger: '작가가 임시저장 모달에서 항목을 삭제'
-    screen_id: 'SCR-021'
-    category: 'interaction'
-    properties:
-      - name: 'draft_type'
-        type: 'string'
-        description: '삭제한 임시저장 유형 (auto / manual / edit_snapshot)'
-        required: true
-        pii: false
-    kpi: '임시저장 삭제 빈도'
+    kpi: '자동저장 성공률, 저장 실패 빈도, draft_fields 저장 비율'
     funnel: ''
 
   - name: 'publish_sheet_opened'
