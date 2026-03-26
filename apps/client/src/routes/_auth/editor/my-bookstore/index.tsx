@@ -1,12 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router';
 import tw from 'tailwind-styled-components';
 
+import { useState } from 'react';
+
 import {
   BookstoreForm,
   BookstoreProfile,
   BookstoreNavMenu,
   CountryRestrictionNotice,
 } from '@/components/bookstore';
+import type { CreateFormData } from '@/components/bookstore/BookstoreForm';
 import { trpc } from '@/shared';
 import { useAuthStore } from '@/stores/auth';
 
@@ -17,10 +20,31 @@ export const Route = createFileRoute('/_auth/editor/my-bookstore/')({
 function MyBookstorePage() {
   const user = useAuthStore((state) => state.user);
   const utils = trpc.useUtils();
+  const [error, setError] = useState<string | null>(null);
 
   const myBookstoreQuery = trpc.bookstore.getMyBookstore.useQuery(undefined, {
     retry: false,
   });
+
+  const createMutation = trpc.bookstore.createBookstore.useMutation();
+
+  const handleCreate = (data: CreateFormData) => {
+    setError(null);
+    createMutation
+      .mutateAsync({
+        penName: data.penName,
+        storeName: data.storeName,
+        termsAgreed: true,
+      })
+      .then(() => {
+        utils.bookstore.getMyBookstore.invalidate();
+      })
+      .catch((err: unknown) => {
+        setError(
+          err instanceof Error ? err.message : '서점 오픈에 실패했습니다',
+        );
+      });
+  };
 
   // 비한국 유저 안내
   if (user?.language !== 'ko' && myBookstoreQuery.error) {
@@ -44,10 +68,6 @@ function MyBookstorePage() {
       return <CountryRestrictionNotice />;
     }
 
-    const handleOpenSuccess = () => {
-      utils.bookstore.getMyBookstore.invalidate();
-    };
-
     return (
       <PageContainer>
         <OpenSection>
@@ -55,7 +75,12 @@ function MyBookstorePage() {
           <OpenDescription>
             서점을 오픈하고 작품을 발행해보세요.
           </OpenDescription>
-          <BookstoreForm mode="create" onSuccess={handleOpenSuccess} />
+          <BookstoreForm
+            mode="create"
+            onSubmit={handleCreate}
+            isPending={createMutation.isPending}
+            error={error}
+          />
         </OpenSection>
       </PageContainer>
     );

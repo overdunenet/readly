@@ -1,17 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { AppRouter } from '@readly/api-types/src/server';
-import type { inferRouterOutputs } from '@trpc/server';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import SnappyModal from 'react-snappy-modal';
 import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
-import { trpc } from '@/shared';
-import { AlertModal } from '@/shared/modal/AlertModal';
-
-type RouterOutputs = inferRouterOutputs<AppRouter>;
-type Bookstore = RouterOutputs['bookstore']['getMyBookstore'];
+// --- Schema ---
 
 const baseSchema = z.object({
   penName: z
@@ -37,26 +30,53 @@ const editSchema = baseSchema.extend({
     .or(z.literal('')),
 });
 
-type CreateFormType = z.infer<typeof createSchema>;
-type EditFormType = z.infer<typeof editSchema>;
+export type CreateFormData = z.infer<typeof createSchema>;
+export type EditFormData = z.infer<typeof editSchema>;
+
+// --- Props ---
+
+interface DefaultValue {
+  penName?: string;
+  storeName?: string;
+  bio?: string;
+  profileImage?: string;
+}
 
 interface CreateModeProps {
   mode: 'create';
-  onSuccess: () => void;
+  onSubmit: (data: CreateFormData) => void;
+  isPending?: boolean;
+  error?: string | null;
 }
 
 interface EditModeProps {
   mode: 'edit';
-  bookstore: Bookstore;
+  defaultValue: DefaultValue;
+  onSubmit: (data: EditFormData) => void;
+  isPending?: boolean;
 }
 
-type BookstoreFormProps = CreateModeProps | EditModeProps;
+export type BookstoreFormProps = CreateModeProps | EditModeProps;
+
+// --- Component ---
 
 const BookstoreForm = (props: BookstoreFormProps) => {
   if (props.mode === 'edit') {
-    return <EditForm bookstore={props.bookstore} />;
+    return (
+      <EditForm
+        defaultValue={props.defaultValue}
+        onSubmit={props.onSubmit}
+        isPending={props.isPending}
+      />
+    );
   }
-  return <CreateForm onSuccess={props.onSuccess} />;
+  return (
+    <CreateForm
+      onSubmit={props.onSubmit}
+      isPending={props.isPending}
+      error={props.error}
+    />
+  );
 };
 
 export default BookstoreForm;
@@ -100,15 +120,20 @@ const CommonFields = ({ register, errors }: CommonFieldsProps) => (
 
 // --- Create Form ---
 
-const CreateForm = ({ onSuccess }: { onSuccess: () => void }) => {
-  const [error, setError] = useState<string | null>(null);
-  const createMutation = trpc.bookstore.createBookstore.useMutation();
-
+const CreateForm = ({
+  onSubmit,
+  isPending,
+  error,
+}: {
+  onSubmit: (data: CreateFormData) => void;
+  isPending?: boolean;
+  error?: string | null;
+}) => {
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm<CreateFormType>({
+  } = useForm<CreateFormData>({
     resolver: zodResolver(createSchema),
     mode: 'onChange',
     defaultValues: {
@@ -117,24 +142,6 @@ const CreateForm = ({ onSuccess }: { onSuccess: () => void }) => {
       agreedToTerms: false,
     },
   });
-
-  const onSubmit = (data: CreateFormType) => {
-    setError(null);
-    createMutation
-      .mutateAsync({
-        penName: data.penName,
-        storeName: data.storeName,
-        termsAgreed: true,
-      })
-      .then(() => {
-        onSuccess();
-      })
-      .catch((err: unknown) => {
-        setError(
-          err instanceof Error ? err.message : '서점 오픈에 실패했습니다',
-        );
-      });
-  };
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -156,11 +163,8 @@ const CreateForm = ({ onSuccess }: { onSuccess: () => void }) => {
 
       {error && <AlertBox>{error}</AlertBox>}
 
-      <SubmitButton
-        type="submit"
-        disabled={!isValid || createMutation.isPending}
-      >
-        {createMutation.isPending ? '오픈 중...' : '서점 오픈하기'}
+      <SubmitButton type="submit" disabled={!isValid || isPending}>
+        {isPending ? '오픈 중...' : '서점 오픈하기'}
       </SubmitButton>
     </Form>
   );
@@ -168,30 +172,22 @@ const CreateForm = ({ onSuccess }: { onSuccess: () => void }) => {
 
 // --- Edit Form ---
 
-const EditForm = ({ bookstore }: { bookstore: Bookstore }) => {
-  const utils = trpc.useUtils();
-
-  const updateProfileMutation = trpc.bookstore.updateProfile.useMutation({
-    onSuccess: () => {
-      utils.bookstore.getMyBookstore.invalidate();
-      SnappyModal.show(
-        <AlertModal title="저장 완료" message="프로필이 수정되었습니다." />,
-      );
-    },
-    onError: (error) => {
-      SnappyModal.show(
-        <AlertModal title="저장 실패" message={error.message} />,
-      );
-    },
-  });
-
+const EditForm = ({
+  defaultValue,
+  onSubmit,
+  isPending,
+}: {
+  defaultValue: DefaultValue;
+  onSubmit: (data: EditFormData) => void;
+  isPending?: boolean;
+}) => {
   const {
     register,
     control,
     handleSubmit,
     reset,
     formState: { errors, isDirty },
-  } = useForm<EditFormType>({
+  } = useForm<EditFormData>({
     resolver: zodResolver(editSchema),
     mode: 'onChange',
     defaultValues: {
@@ -204,21 +200,12 @@ const EditForm = ({ bookstore }: { bookstore: Bookstore }) => {
 
   useEffect(() => {
     reset({
-      penName: bookstore.penName,
-      storeName: bookstore.storeName,
-      bio: bookstore.bio ?? '',
-      profileImage: bookstore.profileImage ?? '',
+      penName: defaultValue.penName ?? '',
+      storeName: defaultValue.storeName ?? '',
+      bio: defaultValue.bio ?? '',
+      profileImage: defaultValue.profileImage ?? '',
     });
-  }, [bookstore, reset]);
-
-  const onSubmit = (data: EditFormType) => {
-    updateProfileMutation.mutate({
-      penName: data.penName,
-      storeName: data.storeName,
-      bio: data.bio || undefined,
-      profileImage: data.profileImage || undefined,
-    });
-  };
+  }, [defaultValue, reset]);
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -255,11 +242,8 @@ const EditForm = ({ bookstore }: { bookstore: Bookstore }) => {
         )}
       </FieldGroup>
 
-      <SubmitButton
-        type="submit"
-        disabled={!isDirty || updateProfileMutation.isPending}
-      >
-        {updateProfileMutation.isPending ? '저장 중...' : '저장'}
+      <SubmitButton type="submit" disabled={!isDirty || isPending}>
+        {isPending ? '저장 중...' : '저장'}
       </SubmitButton>
     </Form>
   );
