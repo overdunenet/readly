@@ -192,6 +192,12 @@ export class PostController {
 
 > 상세: [ddd.md](./ddd.md)
 
+### api-types 수정 시 필수 검증
+
+- [ ] `packages/api-types/` 파일 수정 후: `npx tsc --noEmit -p packages/api-types/tsconfig.json`
+- [ ] `z.nativeEnum()`은 별도 정의된 enum 참조만 허용 (인라인 enum 선언 금지)
+- [ ] 이 패키지는 client + api 양쪽에서 참조 — 깨지면 모든 CI 실패
+
 ### 기타
 
 - [ ] Zod 스키마 정의 (input/output)
