@@ -33,8 +33,8 @@ export interface BookstoreFormProps {
   defaultValue?: {
     penName?: string;
     storeName?: string;
-    bio?: string;
-    profileImage?: string;
+    bio?: string | null;
+    profileImage?: string | null;
   };
   onSubmit: (data: BookstoreFormData) => void;
   isPending?: boolean;
