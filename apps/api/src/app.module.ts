@@ -6,6 +6,7 @@ import { FollowModule } from '@src/module/follow/follow.module';
 import { AuthModule } from '@src/module/auth/auth.module';
 import { CashModule } from '@src/module/cash/cash.module';
 import { PaymentModule } from '@src/module/payment/payment.module';
+import { BookstoreModule } from '@src/module/bookstore/bookstore.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PaymentModule } from '@src/module/payment/payment.module';
     AuthModule,
     CashModule,
     PaymentModule,
+    BookstoreModule,
   ],
   controllers: [],
   providers: [],

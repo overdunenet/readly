@@ -1,4 +1,5 @@
 import { UserStatus } from '../domain/user.entity';
+import { Language } from '../domain/enums';
 
 export interface UserResponse {
   id: string;
@@ -6,4 +7,5 @@ export interface UserResponse {
   nickname: string;
   profileImage: string | null;
   status: UserStatus;
+  language: Language;
 }

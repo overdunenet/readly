@@ -8,11 +8,18 @@ import {
 } from 'typeorm';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { UserEntity } from './user.entity';
+import { BookstoreEntity } from './bookstore.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
 export type PostAccessLevel = 'public' | 'subscriber' | 'purchaser' | 'private';
 export type PostStatus = 'draft' | 'published' | 'scheduled';
+
+export const POST_STATUS = {
+  DRAFT: 'draft',
+  PUBLISHED: 'published',
+  SCHEDULED: 'scheduled',
+} as const;
 
 @Entity('posts')
 export class PostEntity extends BaseEntity {
@@ -67,6 +74,20 @@ export class PostEntity extends BaseEntity {
   @JoinColumn({ name: 'author_id' })
   author: UserEntity;
 
+  @Column({ type: 'uuid', nullable: true, comment: '서점 ID' })
+  bookstoreId: string | null;
+
+  @ManyToOne(() => BookstoreEntity, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'bookstore_id' })
+  bookstore: BookstoreEntity;
+
+  @Column({
+    type: 'integer',
+    nullable: true,
+    comment: '서점 내 정렬 순서',
+  })
+  sortOrder: number | null;
+
   @DeleteDateColumn()
   deletedAt: Date;
 
@@ -79,12 +100,14 @@ export class PostEntity extends BaseEntity {
     accessLevel?: PostAccessLevel;
     price?: number;
     authorId: string;
+    bookstoreId?: string;
   }): PostEntity {
-    const { authorId, ...postEditInput } = input;
+    const { authorId, bookstoreId, ...postEditInput } = input;
 
     const post = new PostEntity();
-    post.status = 'draft';
+    post.status = POST_STATUS.DRAFT;
     post.authorId = authorId;
+    post.bookstoreId = bookstoreId ?? null;
 
     // edit 메서드를 활용하여 나머지 필드 설정
     post.edit(postEditInput);
@@ -123,19 +146,19 @@ export class PostEntity extends BaseEntity {
 
   // 포스트 즉시 발행
   publish(): void {
-    if (this.status === 'published') {
+    if (this.status === POST_STATUS.PUBLISHED) {
       throw new Error('Post is already published');
     }
-    this.status = 'published';
+    this.status = POST_STATUS.PUBLISHED;
     this.publishedAt = new Date();
   }
 
   // 포스트 임시저장으로 변경
   unpublish(): void {
-    if (this.status === 'draft') {
+    if (this.status === POST_STATUS.DRAFT) {
       throw new Error('Post is already draft');
     }
-    this.status = 'draft';
+    this.status = POST_STATUS.DRAFT;
     this.publishedAt = null;
   }
 
@@ -152,7 +175,7 @@ export class PostEntity extends BaseEntity {
     }
 
     // 발행되지 않은 포스트는 작성자만 접근 가능
-    if (this.status !== 'published') {
+    if (this.status !== POST_STATUS.PUBLISHED) {
       return false;
     }
 
@@ -186,6 +209,7 @@ export const getPostRepository = (
         accessLevel?: PostAccessLevel;
         price?: number;
         authorId: string;
+        bookstoreId?: string;
       }): Promise<PostEntity> {
         const post = PostEntity.create(input);
         return this.save(post);
@@ -196,7 +220,7 @@ export const getPostRepository = (
       },
 
       async findPublished(): Promise<PostEntity[]> {
-        return this.findBy({ status: 'published' });
+        return this.findBy({ status: POST_STATUS.PUBLISHED });
       },
 
       async findOneByIdForEdit(

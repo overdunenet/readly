@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import tw from 'tailwind-styled-components';
 
@@ -11,11 +12,25 @@ interface FollowButtonProps {
 
 const FollowButton = ({ followeeId }: FollowButtonProps) => {
   const user = useAuthStore((state) => state.user);
+  const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const { isFollowing, isLoading, toggleFollow } = useFollow(followeeId);
 
-  if (!user || user.id === followeeId) {
+  // 자기 자신에게는 팔로우 버튼 미표시
+  if (user?.id === followeeId) {
     return null;
+  }
+
+  // 비로그인 시 팔로우 버튼 표시 → 클릭 시 로그인 페이지로 이동
+  if (!user) {
+    const handleLoginRedirect = () => {
+      navigate({
+        to: '/login',
+        search: { redirect: window.location.pathname },
+      });
+    };
+
+    return <FollowBtn onClick={handleLoginRedirect}>팔로우</FollowBtn>;
   }
 
   if (isFollowing) {

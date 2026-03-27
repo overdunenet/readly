@@ -57,6 +57,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - 한 커밋 = 한 가지 목적
 - 각 커밋 후 빌드 에러 없음
 - 되돌리기 용이한 단위
+- 커밋 전 영향받는 워크스페이스의 빌드/테스트 검증 필수 (CLAUDE.md Phase 3 Step 3.1.5 참조)
 
 </rules>
 

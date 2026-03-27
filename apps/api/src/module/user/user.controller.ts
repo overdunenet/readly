@@ -21,6 +21,7 @@ export class UserController {
       nickname: user.nickname,
       profileImage: user.profileImage,
       status: user.status,
+      language: user.language,
     };
   }
 
@@ -43,6 +44,7 @@ export class UserController {
       nickname: user.nickname,
       profileImage: user.profileImage,
       status: user.status,
+      language: user.language,
     };
   }
 }

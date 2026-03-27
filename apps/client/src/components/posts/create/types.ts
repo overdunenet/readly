@@ -14,9 +14,3 @@ export const createPostSchema = z.object({
 });
 
 export type CreatePostForm = z.infer<typeof createPostSchema>;
-
-export interface AccessLevelOption {
-  value: string;
-  label: string;
-  description: string;
-}

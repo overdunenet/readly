@@ -40,6 +40,7 @@ const postResponseSchema = z.object({
   accessLevel: postAccessLevelSchema,
   status: z.enum(['draft', 'published', 'scheduled']),
   price: z.number(),
+  bookstoreId: z.string().uuid().nullable(),
   publishedAt: z.date().nullish(),
   scheduledAt: z.date().nullish(),
   createdAt: z.date(),

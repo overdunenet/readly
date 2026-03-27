@@ -1,7 +1,9 @@
 import { Controller, Control, FieldErrors } from 'react-hook-form';
 import tw from 'tailwind-styled-components';
 
-import { CreatePostForm, AccessLevelOption } from './types';
+import { ACCESS_LEVEL_OPTIONS } from '@/shared/constants/access-level';
+
+import { CreatePostForm } from './types';
 
 interface PermissionPriceSectionProps {
   control: Control<CreatePostForm>;
@@ -25,7 +27,7 @@ export function PermissionPriceSection({
           control={control}
           render={({ field }) => (
             <AccessLevelGrid>
-              {accessLevelOptions.map((option) => (
+              {ACCESS_LEVEL_OPTIONS.map((option) => (
                 <AccessLevelOptionComponent key={option.value}>
                   <AccessLevelRadio
                     {...field}
@@ -83,21 +85,6 @@ export function PermissionPriceSection({
     </FormSection>
   );
 }
-
-const accessLevelOptions: AccessLevelOption[] = [
-  { value: 'public', label: '전체 공개', description: '누구나 볼 수 있습니다' },
-  {
-    value: 'subscriber',
-    label: '구독자 전용',
-    description: '구독자만 볼 수 있습니다',
-  },
-  {
-    value: 'purchaser',
-    label: '구매자 전용',
-    description: '개별 구매한 사람만 볼 수 있습니다',
-  },
-  { value: 'private', label: '비공개', description: '작성자만 볼 수 있습니다' },
-];
 
 // Styled Components
 const FormSection = tw.div`

@@ -1,6 +1,7 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router';
 import * as React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Toaster } from 'sonner';
 
 import { useAuthStore } from '../stores/auth';
 import { refreshAuth } from '../utils/auth';
@@ -29,6 +30,7 @@ function RootComponent() {
         <meta property="og:type" content="website" />
       </Helmet>
       <Outlet />
+      <Toaster position="bottom-center" />
     </React.Fragment>
   );
 }

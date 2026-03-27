@@ -1,16 +1,30 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useSearch } from '@tanstack/react-router';
 import { useState } from 'react';
 import tw from 'tailwind-styled-components';
+import { z } from 'zod';
+
+const loginSearchSchema = z.object({
+  redirect: z.string().optional(),
+});
 
 export const Route = createFileRoute('/login')({
+  validateSearch: loginSearchSchema,
   component: LoginPage,
 });
 
 function LoginPage() {
+  const { redirect } = useSearch({ from: '/login' });
   const [error, setError] = useState<string | null>(null);
+
+  const saveRedirect = () => {
+    if (redirect) {
+      sessionStorage.setItem('login_redirect', redirect);
+    }
+  };
 
   const handleNaverLogin = () => {
     setError(null);
+    saveRedirect();
     const clientId = import.meta.env.VITE_NAVER_CLIENT_ID;
     if (!clientId) {
       setError('네이버 로그인을 시작할 수 없습니다');
@@ -29,6 +43,7 @@ function LoginPage() {
 
   const handleKakaoLogin = () => {
     setError(null);
+    saveRedirect();
     const clientId = import.meta.env.VITE_KAKAO_CLIENT_ID;
     if (!clientId) {
       setError('카카오 로그인을 시작할 수 없습니다');
