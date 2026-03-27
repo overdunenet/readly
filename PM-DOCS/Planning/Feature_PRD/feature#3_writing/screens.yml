@@ -1,0 +1,101 @@
+# screens.yml - Feature 화면 정의서
+# Feature: 글쓰기 & 발행
+
+feature: 'writing'
+screens:
+  - id: 'SCR-020'
+    name: '에디터 메인'
+    route: '/write/:postId'
+    viewport: [phone, desktop]
+    scope: mvp
+    description: 'WYSIWYG 에디터. 제목+본문 작성, 유료 게시선 삽입/삭제/드래그, 노션 스타일 30초 자동저장, 발행하기 진입점.'
+    entry_conditions:
+      - '로그인 상태'
+      - '서점 보유 유저'
+      - '"글쓰기" 클릭 시 PostEntity(status=draft) 생성 후 /write/:postId 진입'
+      - '내 글 관리에서 draft 글 클릭 시 /write/:postId 진입 (이어쓰기)'
+      - '내 글 관리에서 발행된 글 클릭 시 /write/:postId 진입 (수정)'
+    ui_elements:
+      - '뒤로가기 버튼'
+      - '제목 입력 필드'
+      - '에디터 툴바 (B/I/U, H1/H2, 링크, 이미지 삽입, 게시선)'
+      - '본문 편집 영역 (WYSIWYG)'
+      - '유료 게시선 (삽입 시 시각적 구분선, 드래그 가능)'
+      - '상태 바 (유료 발행 예정 / 전자책 뷰어 표시 안내)'
+      - '발행하기 버튼'
+      - '하단 자동저장 상태 표시 ("자동 저장됨 HH:MM")'
+    states:
+      - name: '빈 에디터'
+        description: '새 글 작성 시작 대기 (PostEntity status=draft 생성 직후)'
+      - name: '작성 중'
+        description: '제목/본문 입력 중, 30초마다 PostEntity 자동저장'
+      - name: '게시선 삽입됨'
+        description: '유료 게시선 존재, 상태 바에 "유료 발행 예정" 표시'
+      - name: '기존 글 수정'
+        description: '발행된 글 수정 모드. 임시 수정본(draftTitle/draftFreeContent/draftPaidContent)이 있으면 임시 수정본 로드, 없으면 발행본 로드. 수정 내용은 임시 수정본(draft fields)에 자동저장되며 발행본은 변경되지 않음. 재발행 시 임시 수정본이 발행본에 반영됨.'
+      - name: '자동저장 실패'
+        description: '자동저장 실패 시 "자동저장 실패" 토스트 + 수동 저장 유도'
+      - name: '서점 미보유'
+        description: '"서점을 먼저 오픈해주세요" 안내 + 서점 오픈 페이지 이동'
+
+  - id: 'SCR-022'
+    name: '발행 시트'
+    route: '(바텀시트)'
+    viewport: [phone, desktop]
+    scope: mvp
+    description: '2단계 발행 시트. 분류(단편/시리즈), 가격(게시선 기반 자동), 접근 권한, 메타데이터(썸네일/요약문/태그), 전자책 뷰어 안내 배지.'
+    entry_conditions:
+      - 'SCR-020에서 "발행하기" 버튼 클릭'
+      - '제목이 입력된 상태'
+    ui_elements:
+      - '분류 선택 (단편 기본 / 시리즈)'
+      - '시리즈 드롭다운 (기존 시리즈 목록)'
+      - '"새 시리즈 만들기" 버튼'
+      - '시리즈명 입력 필드 (즉석 생성 시)'
+      - '회차 번호 표시 (시리즈 선택 시 자동 부여)'
+      - '가격 설정 (유료: 가격 입력 / 무료: 게시선 기반 자동 판정)'
+      - '접근 권한 선택 (전체공개/구독자 전용/구매자 전용/비공개)'
+      - '썸네일 영역 (자동 생성 or 직접 업로드)'
+      - '요약문 영역 (본문 첫 200자 자동 추출, 수정 가능)'
+      - '태그 입력 (추가/삭제)'
+      - '전자책 뷰어 안내 배지 (조건 충족 시)'
+      - '미리보기 버튼'
+      - '발행하기 버튼'
+      - '닫기 버튼'
+    states:
+      - name: '기본 (무료)'
+        description: '게시선 없음. 가격 "무료", 분류 "단편", 접근 "전체공개" 기본 선택'
+      - name: '유료 (게시선 있음)'
+        description: '게시선 존재. 가격 "유료" 자동 선택 + 가격 입력 활성화'
+      - name: '시리즈 선택'
+        description: '시리즈 드롭다운 펼쳐짐, 기존 시리즈 목록 표시'
+      - name: '즉석 시리즈 생성'
+        description: '시리즈명 입력 필드 표시, 생성 후 회차 #1 자동 부여'
+      - name: '전자책 뷰어 안내'
+        description: '시리즈 + 1000자 이상일 때 "이 글은 전자책 뷰어로 표시됩니다" 배지'
+      - name: '발행 중'
+        description: '발행 요청 처리 중 (버튼 로딩 상태)'
+      - name: '발행 에러'
+        description: '발행 실패 시 에러 메시지 + 재시도 버튼'
+
+  - id: 'SCR-023'
+    name: '미리보기'
+    route: '(모달)'
+    viewport: [phone, desktop]
+    scope: mvp
+    description: '독자 뷰 시뮬레이션. 게시선 기준으로 무료/유료 영역 구분 표시.'
+    entry_conditions:
+      - 'SCR-022에서 "미리보기" 버튼 클릭'
+    ui_elements:
+      - '에디터로 돌아가기 버튼'
+      - '제목 표시'
+      - '작가명 / 날짜 / 태그 표시'
+      - '본문 렌더링 (독자 뷰)'
+      - '유료 게시선 표시 (게시선 있는 경우)'
+      - '"여기부터 유료 콘텐츠입니다" + 구매 안내 (게시선 있는 경우)'
+      - '유료 영역 블러 처리 (게시선 있는 경우)'
+    states:
+      - name: '무료 글'
+        description: '게시선 없음. 전체 본문이 독자 뷰로 표시'
+      - name: '유료 글'
+        description: '게시선 기준. 무료 영역 + 게시선 + 유료 영역(블러 + 구매 안내)'

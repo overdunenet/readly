@@ -142,7 +142,7 @@ function SettingsPage() {
       </Section>
 
       <Section>
-        <SectionTitle>에디터 설정</SectionTitle>
+        <SectionTitle>내 서점 관리 설정</SectionTitle>
         <ComingSoon>
           <ComingSoonText>추가 설정 옵션 준비 중</ComingSoonText>
         </ComingSoon>

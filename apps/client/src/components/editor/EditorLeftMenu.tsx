@@ -73,7 +73,7 @@ export default function EditorLeftMenu({
       {/* Sidebar */}
       <Sidebar $isOpen={isSidebarOpen}>
         <SidebarHeader>
-          <SidebarTitle>에디터</SidebarTitle>
+          <SidebarTitle>내 서점 관리</SidebarTitle>
           <CloseButton onClick={() => setIsSidebarOpen(false)}>
             <X size={24} />
           </CloseButton>

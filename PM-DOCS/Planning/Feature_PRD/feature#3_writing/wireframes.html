@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F3 글쓰기 & 발행 - 화면 구조도</title>
+  <!-- viewport-config: { default: "both", overrides: {} } -->
+  <style>
+    /* ===== Design Tokens ===== */
+    :root {
+      --color-primary: #2563eb;
+      --color-primary-light: #eff6ff;
+      --color-bg-page: #f9fafb;
+      --color-bg-card: #ffffff;
+      --color-border: #e5e7eb;
+      --color-text-primary: #111827;
+      --color-text-secondary: #374151;
+      --color-text-muted: #6b7280;
+      --color-success: #16a34a;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --header-height: 56px;
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 24px;
+
+      /* Frame Sizes */
+      --phone-width: 260px;
+      --phone-height: 520px;
+      --desktop-width: 480px;
+      --desktop-height: 340px;
+    }
+
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--color-bg-page);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      padding: var(--space-xl);
+    }
+
+    /* ===== Page Header ===== */
+    .page-header {
+      max-width: 1600px;
+      margin: 0 auto var(--space-xl);
+    }
+    .page-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+    }
+    .page-header .meta {
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+    .page-header .meta span + span::before {
+      content: ' · ';
+    }
+
+    /* ===== Screen Grid ===== */
+    .screen-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xl);
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* ===== Screen Group ===== */
+    .screen-group {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      width: 100%;
+    }
+    .screen-group-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+    .screen-group-route {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      font-family: monospace;
+      margin-bottom: var(--space-md);
+    }
+    .screen-group-states {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-lg);
+    }
+
+    /* ===== Screen Card ===== */
+    .screen-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ===== State Label ===== */
+    .state-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-sm);
+      text-align: center;
+    }
+
+    /* ===== Viewport Label ===== */
+    .viewport-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: var(--space-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== Phone Frame ===== */
+    .phone-frame {
+      width: var(--phone-width);
+      height: var(--phone-height);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Phone Status Bar */
+    .phone-status-bar {
+      height: 28px;
+      background: var(--color-bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-md);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      flex-shrink: 0;
+    }
+    .phone-status-bar .notch {
+      width: 80px;
+      height: 20px;
+      background: var(--color-text-primary);
+      border-radius: 10px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 4px;
+    }
+
+    /* Phone Content */
+    .phone-content {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--color-bg-page);
+    }
+
+    /* Phone Home Indicator */
+    .phone-home-indicator {
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .phone-home-indicator::after {
+      content: '';
+      width: 100px;
+      height: 4px;
+      background: var(--color-text-primary);
+      border-radius: 2px;
+      opacity: 0.2;
+    }
+
+    /* ===== Desktop Frame ===== */
+    .desktop-frame {
+      width: var(--desktop-width);
+      min-height: var(--desktop-height);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.06);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Browser Bar */
+    .browser-bar {
+      height: 32px;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-sm);
+      gap: var(--space-sm);
+      border-bottom: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+    .browser-dots {
+      display: flex;
+      gap: 4px;
+    }
+    .browser-dots span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d1d5db;
+    }
+    .browser-url {
+      flex: 1;
+      height: 20px;
+      background: var(--color-bg-card);
+      border-radius: 4px;
+      font-size: 11px;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-sm);
+    }
+
+    /* Desktop Content */
+    .desktop-content {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--color-bg-page);
+    }
+
+    /* ===== Modal Label ===== */
+    .modal-label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: var(--space-sm);
+    }
+
+    /* ===== Screen Meta ===== */
+    .screen-meta {
+      margin-top: var(--space-sm);
+      text-align: center;
+    }
+    .screen-meta .screen-id {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+    .screen-meta .screen-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+
+    /* ===== Common UI Components ===== */
+
+    /* App Header (Editor) */
+    .editor-header {
+      height: 44px;
+      background: var(--color-bg-card);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-sm);
+      flex-shrink: 0;
+    }
+    .editor-header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .editor-header-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+    }
+    .btn-secondary {
+      background: var(--color-bg-card);
+      color: var(--color-text-secondary);
+      border: 1px solid var(--color-border);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--color-text-muted);
+      padding: 6px 8px;
+    }
+    .btn-danger {
+      color: var(--color-danger);
+      background: transparent;
+    }
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+    .btn-full {
+      width: 100%;
+    }
+    .btn-loading {
+      background: #93c5fd;
+      color: white;
+      pointer-events: none;
+    }
+
+    /* Input */
+    .input-field {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      background: var(--color-bg-card);
+    }
+    .input-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      margin-bottom: 3px;
+      display: block;
+    }
+
+    /* Card */
+    .card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      border: 1px solid var(--color-border);
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .badge-success { background: #dcfce7; color: var(--color-success); }
+    .badge-danger { background: #fef2f2; color: var(--color-danger); }
+    .badge-info { background: var(--color-primary-light); color: var(--color-primary); }
+    .badge-neutral { background: #f3f4f6; color: var(--color-text-muted); }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+
+    /* Toggle */
+    .toggle-group {
+      display: flex;
+      background: #f3f4f6;
+      border-radius: var(--radius-sm);
+      padding: 2px;
+    }
+    .toggle-item {
+      flex: 1;
+      text-align: center;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .toggle-item.active {
+      background: var(--color-bg-card);
+      color: var(--color-primary);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    /* List Item */
+    .list-item {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* Scroll Hint */
+    .scroll-hint {
+      height: 30px;
+      background: linear-gradient(transparent, var(--color-bg-page));
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: var(--space-xs);
+      font-size: 10px;
+      color: var(--color-text-muted);
+    }
+
+    /* Empty State */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-xl) var(--space-md);
+      color: var(--color-text-muted);
+      text-align: center;
+    }
+    .empty-state .icon-placeholder {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #f3f4f6;
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Error Toast */
+    .error-toast {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: var(--color-danger);
+      padding: 6px var(--space-sm);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      margin: var(--space-xs) var(--space-sm);
+    }
+
+    /* Success Toast */
+    .success-toast {
+      background: #dcfce7;
+      border: 1px solid #bbf7d0;
+      color: var(--color-success);
+      padding: 6px var(--space-sm);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      margin: var(--space-xs) var(--space-sm);
+    }
+
+    /* Warning Toast */
+    .warning-toast {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      padding: 6px var(--space-sm);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      margin: var(--space-xs) var(--space-sm);
+    }
+
+    /* ===== Section Divider ===== */
+    .section-divider {
+      max-width: 1600px;
+      margin: var(--space-xl) auto;
+      padding-top: var(--space-xl);
+      border-top: 2px solid var(--color-border);
+    }
+    .section-divider h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+    }
+
+    /* ===== Editor-Specific ===== */
+
+    /* Toolbar */
+    .editor-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 6px var(--space-sm);
+      background: var(--color-bg-card);
+      border-bottom: 1px solid var(--color-border);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .toolbar-btn {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      background: transparent;
+      border: none;
+    }
+    .toolbar-btn:hover {
+      background: #f3f4f6;
+    }
+    .toolbar-btn.active {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+    }
+    .toolbar-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--color-border);
+      margin: 0 4px;
+    }
+
+    /* Title Field */
+    .title-field {
+      padding: var(--space-md) var(--space-md) var(--space-sm);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      border: none;
+      outline: none;
+      background: var(--color-bg-page);
+    }
+    .title-placeholder {
+      color: #d1d5db;
+    }
+
+    /* Editor Body */
+    .editor-body {
+      padding: 0 var(--space-md);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--color-text-secondary);
+      flex: 1;
+    }
+    .editor-body p {
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Paywall Line */
+    .paywall-line {
+      margin: var(--space-md) 0;
+      padding: var(--space-sm) var(--space-md);
+      background: linear-gradient(90deg, var(--color-primary-light), #dbeafe, var(--color-primary-light));
+      border: 1px dashed var(--color-primary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: grab;
+    }
+    .paywall-line-text {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .paywall-line-actions {
+      display: flex;
+      gap: 4px;
+    }
+    .paywall-line-btn {
+      font-size: 10px;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 3px;
+      padding: 2px 6px;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-sm);
+      font-size: 10px;
+      color: var(--color-text-muted);
+      background: var(--color-bg-card);
+      border-top: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+    .status-bar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .status-paid {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+    .status-saved {
+      color: var(--color-success);
+    }
+    .status-failed {
+      color: var(--color-danger);
+    }
+
+    /* ===== Publish Sheet Specific ===== */
+    .sheet-section {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .sheet-section:last-child {
+      border-bottom: none;
+    }
+    .sheet-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-xs);
+    }
+
+    /* Tag */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      background: #f3f4f6;
+      border-radius: 12px;
+      font-size: 11px;
+      color: var(--color-text-secondary);
+    }
+    .tag-remove {
+      font-size: 10px;
+      color: var(--color-text-muted);
+      cursor: pointer;
+    }
+
+    /* Thumbnail */
+    .thumbnail-area {
+      width: 100%;
+      height: 60px;
+      background: #f3f4f6;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--color-text-muted);
+      border: 1px dashed var(--color-border);
+    }
+
+    /* Select Dropdown */
+    .select-field {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      background: var(--color-bg-card);
+      color: var(--color-text-secondary);
+      appearance: none;
+    }
+
+    /* Price Input */
+    .price-input-group {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .price-input-group .input-field {
+      flex: 1;
+    }
+    .price-unit {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+
+    /* ===== Preview Specific ===== */
+    .preview-header {
+      padding: var(--space-md);
+      background: var(--color-bg-card);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .preview-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+    .preview-meta {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .preview-body {
+      padding: var(--space-md);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--color-text-secondary);
+    }
+    .preview-blur {
+      filter: blur(4px);
+      user-select: none;
+      pointer-events: none;
+    }
+    .paywall-notice {
+      text-align: center;
+      padding: var(--space-md);
+      background: #f3f4f6;
+      border-radius: var(--radius-sm);
+      margin: var(--space-md);
+    }
+    .paywall-notice-icon {
+      font-size: 20px;
+      margin-bottom: var(--space-xs);
+    }
+    .paywall-notice-text {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-xs);
+    }
+    .paywall-notice-sub {
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+
+    /* Overlay (for modals/sheets) */
+    .overlay-bg {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+    }
+
+    /* ===== Utility ===== */
+    .text-center { text-align: center; }
+    .text-muted { color: var(--color-text-muted); }
+    .text-sm { font-size: 12px; }
+    .text-xs { font-size: 10px; }
+    .mt-xs { margin-top: var(--space-xs); }
+    .mt-sm { margin-top: var(--space-sm); }
+    .mt-md { margin-top: var(--space-md); }
+    .mb-xs { margin-bottom: var(--space-xs); }
+    .mb-sm { margin-bottom: var(--space-sm); }
+    .mb-md { margin-bottom: var(--space-md); }
+    .p-sm { padding: var(--space-sm); }
+    .p-md { padding: var(--space-md); }
+    .gap-xs { gap: var(--space-xs); }
+    .gap-sm { gap: var(--space-sm); }
+    .flex { display: flex; }
+    .flex-col { display: flex; flex-direction: column; }
+    .flex-center { display: flex; align-items: center; justify-content: center; }
+    .flex-between { display: flex; align-items: center; justify-content: space-between; }
+    .flex-1 { flex: 1; }
+    .w-full { width: 100%; }
+
+    /* Desktop editor specific */
+    .desktop-editor-layout {
+      display: flex;
+      flex: 1;
+    }
+    .desktop-editor-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      background: var(--color-bg-page);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== Page Header ===== -->
+  <header class="page-header">
+    <h1>F3 글쓰기 & 발행 - 화면 구조도</h1>
+    <div class="meta">
+      <span>Feature: F3</span>
+      <span>Milestone: M-001</span>
+      <span>화면 수: 3개</span>
+      <span>생성일: 2026-03-25</span>
+    </div>
+  </header>
+
+  <!-- ===== Common Elements ===== -->
+  <div class="section-divider">
+    <h2>공통 영역</h2>
+  </div>
+  <div class="screen-grid">
+
+    <!-- Editor Header -->
+    <div class="screen-group">
+      <div class="screen-group-title">에디터 헤더</div>
+      <div class="screen-group-route">모든 에디터 화면 공통</div>
+      <div class="screen-group-states">
+
+        <!-- Phone -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">기본</div>
+          <div style="width:var(--phone-width); background:var(--color-bg-card); border-radius:var(--radius-sm); box-shadow:0 2px 8px rgba(0,0,0,0.08); overflow:hidden;">
+            <div class="editor-header">
+              <div class="editor-header-left">
+                <span style="font-size:16px; color:var(--color-text-muted);">&#8592;</span>
+                <span style="font-size:13px; font-weight:600;">글쓰기</span>
+              </div>
+              <div class="editor-header-right">
+                <span class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--color-text-muted);">자동저장됨</span>
+                <span class="btn btn-primary btn-sm">발행하기</span>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-name">에디터 헤더 (Phone)</div>
+          </div>
+        </div>
+
+        <!-- Desktop -->
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div class="state-label">기본</div>
+          <div style="width:var(--desktop-width); background:var(--color-bg-card); border-radius:var(--radius-sm); box-shadow:0 2px 8px rgba(0,0,0,0.08); overflow:hidden;">
+            <div class="editor-header" style="height:48px; padding:0 var(--space-md);">
+              <div class="editor-header-left">
+                <span style="font-size:18px; color:var(--color-text-muted);">&#8592;</span>
+                <span style="font-size:14px; font-weight:600;">글쓰기</span>
+              </div>
+              <div class="editor-header-right" style="gap:var(--space-sm);">
+                <span class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--color-text-muted);">자동저장됨</span>
+                <span class="btn btn-primary btn-sm" style="padding:6px 16px;">발행하기</span>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-name">에디터 헤더 (Desktop)</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Editor Toolbar -->
+    <div class="screen-group">
+      <div class="screen-group-title">에디터 툴바</div>
+      <div class="screen-group-route">에디터 본문 위 툴바</div>
+      <div class="screen-group-states">
+
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">기본</div>
+          <div style="width:var(--phone-width); background:var(--color-bg-card); border-radius:var(--radius-sm); box-shadow:0 2px 8px rgba(0,0,0,0.08); overflow:hidden;">
+            <div class="editor-toolbar">
+              <button class="toolbar-btn"><b>B</b></button>
+              <button class="toolbar-btn"><i>I</i></button>
+              <button class="toolbar-btn" style="text-decoration:underline;">U</button>
+              <div class="toolbar-divider"></div>
+              <button class="toolbar-btn" style="font-size:10px;">H1</button>
+              <button class="toolbar-btn" style="font-size:10px;">H2</button>
+              <div class="toolbar-divider"></div>
+              <button class="toolbar-btn" style="font-size:10px;">&#128279;</button>
+              <button class="toolbar-btn" style="font-size:10px;">&#128247;</button>
+              <div class="toolbar-divider"></div>
+              <button class="toolbar-btn active" style="font-size:9px; width:auto; padding:0 6px;">&#9135; 게시선</button>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-name">에디터 툴바</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="screen-group">
+      <div class="screen-group-title">상태 바</div>
+      <div class="screen-group-route">에디터 하단 상태 표시</div>
+      <div class="screen-group-states">
+
+        <div class="screen-card">
+          <div class="state-label">자동 저장 완료</div>
+          <div style="width:var(--phone-width); background:var(--color-bg-card); border-radius:var(--radius-sm); box-shadow:0 2px 8px rgba(0,0,0,0.08); overflow:hidden;">
+            <div class="status-bar">
+              <div class="status-bar-left">
+                <span class="status-saved">&#10003; 자동 저장됨 14:32</span>
+              </div>
+              <span>1,234자</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-card">
+          <div class="state-label">유료 발행 예정</div>
+          <div style="width:var(--phone-width); background:var(--color-bg-card); border-radius:var(--radius-sm); box-shadow:0 2px 8px rgba(0,0,0,0.08); overflow:hidden;">
+            <div class="status-bar">
+              <div class="status-bar-left">
+                <span class="status-paid">&#9670; 유료 발행 예정</span>
+                <span class="status-saved">&#10003; 14:32</span>
+              </div>
+              <span>2,456자</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-card">
+          <div class="state-label">저장 실패</div>
+          <div style="width:var(--phone-width); background:var(--color-bg-card); border-radius:var(--radius-sm); box-shadow:0 2px 8px rgba(0,0,0,0.08); overflow:hidden;">
+            <div class="status-bar">
+              <div class="status-bar-left">
+                <span class="status-failed">&#10007; 저장 실패 - 수동 저장 필요</span>
+              </div>
+              <span>1,234자</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== Screens ===== -->
+  <div class="section-divider">
+    <h2>화면 목록</h2>
+  </div>
+
+  <!-- ===== SCR-020: 에디터 메인 ===== -->
+  <div class="screen-grid" style="margin-bottom:var(--space-xl);">
+    <div class="screen-group">
+      <div class="screen-group-title">SCR-020: 에디터 메인</div>
+      <div class="screen-group-route">/write/:postId (신규/수정 공통)</div>
+      <div class="screen-group-states">
+
+        <!-- Phone: 빈 에디터 -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">빈 에디터</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>100%</span>
+            </div>
+            <div class="phone-content" style="display:flex; flex-direction:column;">
+              <!-- Editor Header -->
+              <div class="editor-header">
+                <div class="editor-header-left">
+                  <span style="font-size:16px; color:var(--color-text-muted);">&#8592;</span>
+                </div>
+                <div class="editor-header-right">
+                  <span class="btn btn-ghost btn-sm" style="color:#d1d5db; font-size:10px;">대기 중</span>
+                  <span class="btn btn-primary btn-sm" style="opacity:0.5;">발행하기</span>
+                </div>
+              </div>
+              <!-- Toolbar -->
+              <div class="editor-toolbar">
+                <button class="toolbar-btn"><b>B</b></button>
+                <button class="toolbar-btn"><i>I</i></button>
+                <button class="toolbar-btn" style="text-decoration:underline;">U</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" style="font-size:10px;">H1</button>
+                <button class="toolbar-btn" style="font-size:10px;">H2</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" style="font-size:10px;">&#128279;</button>
+                <button class="toolbar-btn" style="font-size:10px;">&#128247;</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" style="font-size:9px; width:auto; padding:0 6px;">&#9135; 게시선</button>
+              </div>
+              <!-- Title -->
+              <div class="title-field title-placeholder">제목을 입력하세요</div>
+              <!-- Body -->
+              <div class="editor-body" style="flex:1; color:#d1d5db;">
+                <p>본문을 작성하세요...</p>
+              </div>
+              <!-- Status Bar -->
+              <div class="status-bar">
+                <div class="status-bar-left">
+                  <span style="color:#d1d5db;">대기 중</span>
+                </div>
+                <span>0자</span>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-020</div>
+            <div class="screen-name">빈 에디터</div>
+          </div>
+        </div>
+
+        <!-- Phone: 작성 중 -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">작성 중</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>100%</span>
+            </div>
+            <div class="phone-content" style="display:flex; flex-direction:column;">
+              <div class="editor-header">
+                <div class="editor-header-left">
+                  <span style="font-size:16px; color:var(--color-text-muted);">&#8592;</span>
+                </div>
+                <div class="editor-header-right">
+                  <span class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--color-text-muted);">자동저장됨</span>
+                  <span class="btn btn-primary btn-sm">발행하기</span>
+                </div>
+              </div>
+              <div class="editor-toolbar">
+                <button class="toolbar-btn"><b>B</b></button>
+                <button class="toolbar-btn"><i>I</i></button>
+                <button class="toolbar-btn" style="text-decoration:underline;">U</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" style="font-size:10px;">H1</button>
+                <button class="toolbar-btn" style="font-size:10px;">H2</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" style="font-size:10px;">&#128279;</button>
+                <button class="toolbar-btn" style="font-size:10px;">&#128247;</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" style="font-size:9px; width:auto; padding:0 6px;">&#9135; 게시선</button>
+              </div>
+              <div class="title-field">봄날의 산책, 그 첫번째 이야기</div>
+              <div class="editor-body" style="flex:1;">
+                <p>따스한 봄 햇살이 창가에 비추는 오후, 나는 오랜만에 집 밖으로 나섰다.</p>
+                <p>거리의 벚꽃은 이미 만개하여 분홍빛 눈처럼 흩날리고 있었고, 사람들의 표정에도 봄이 묻어 있었다.</p>
+                <p>이 계절이 오면 항상 떠오르는 기억이 있다...</p>
+              </div>
+              <div class="status-bar">
+                <div class="status-bar-left">
+                  <span class="status-saved">&#10003; 자동 저장됨 14:32</span>
+                </div>
+                <span>1,234자</span>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-020</div>
+            <div class="screen-name">작성 중</div>
+          </div>
+        </div>
+
+        <!-- Phone: 게시선 삽입됨 -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">게시선 삽입됨</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>100%</span>
+            </div>
+            <div class="phone-content" style="display:flex; flex-direction:column;">
+              <div class="editor-header">
+                <div class="editor-header-left">
+                  <span style="font-size:16px; color:var(--color-text-muted);">&#8592;</span>
+                </div>
+                <div class="editor-header-right">
+                  <span class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--color-text-muted);">자동저장됨</span>
+                  <span class="btn btn-primary btn-sm">발행하기</span>
+                </div>
+              </div>
+              <div class="editor-toolbar">
+                <button class="toolbar-btn"><b>B</b></button>
+                <button class="toolbar-btn"><i>I</i></button>
+                <button class="toolbar-btn" style="text-decoration:underline;">U</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" style="font-size:10px;">H1</button>
+                <button class="toolbar-btn" style="font-size:10px;">H2</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" style="font-size:10px;">&#128279;</button>
+                <button class="toolbar-btn" style="font-size:10px;">&#128247;</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" style="font-size:9px; width:auto; padding:0 6px; opacity:0.4;">&#9135; 게시선</button>
+              </div>
+              <div class="title-field">봄날의 산책, 그 첫번째 이야기</div>
+              <div class="editor-body" style="flex:1;">
+                <p>따스한 봄 햇살이 창가에 비추는 오후, 나는 오랜만에 집 밖으로 나섰다.</p>
+                <p>거리의 벚꽃은 이미 만개하여...</p>
+                <!-- Paywall Line -->
+                <div class="paywall-line">
+                  <div class="paywall-line-text">&#9135; 여기부터 유료 콘텐츠</div>
+                  <div class="paywall-line-actions">
+                    <span class="paywall-line-btn">&#8597;</span>
+                    <span class="paywall-line-btn">&#10005;</span>
+                  </div>
+                </div>
+                <p style="color:var(--color-text-muted);">이 계절이 오면 항상 떠오르는 기억이 있다. 그때 나는...</p>
+              </div>
+              <div class="status-bar">
+                <div class="status-bar-left">
+                  <span class="status-paid">&#9670; 유료 발행 예정</span>
+                  <span class="status-saved">&#10003; 14:35</span>
+                </div>
+                <span>2,456자</span>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-020</div>
+            <div class="screen-name">게시선 삽입됨</div>
+          </div>
+        </div>
+
+        <!-- Phone: 자동저장 실패 -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">자동저장 실패</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>100%</span>
+            </div>
+            <div class="phone-content" style="display:flex; flex-direction:column;">
+              <div class="editor-header">
+                <div class="editor-header-left">
+                  <span style="font-size:16px; color:var(--color-text-muted);">&#8592;</span>
+                </div>
+                <div class="editor-header-right">
+                  <span class="btn btn-primary btn-sm">발행하기</span>
+                </div>
+              </div>
+              <!-- Error Toast -->
+              <div class="error-toast" style="display:flex; align-items:center; justify-content:space-between;">
+                <span>자동저장에 실패했습니다</span>
+                <span class="btn btn-sm" style="color:var(--color-danger); font-size:10px; padding:2px 6px; border:1px solid #fecaca; border-radius:3px;">수동 저장</span>
+              </div>
+              <div class="title-field">봄날의 산책, 그 첫번째 이야기</div>
+              <div class="editor-body" style="flex:1;">
+                <p>따스한 봄 햇살이 창가에 비추는 오후...</p>
+              </div>
+              <div class="status-bar">
+                <div class="status-bar-left">
+                  <span class="status-failed">&#10007; 저장 실패</span>
+                </div>
+                <span>1,234자</span>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-020</div>
+            <div class="screen-name">자동저장 실패</div>
+          </div>
+        </div>
+
+        <!-- Phone: 서점 미보유 -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="state-label">서점 미보유</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>100%</span>
+            </div>
+            <div class="phone-content" style="display:flex; flex-direction:column;">
+              <div class="editor-header">
+                <div class="editor-header-left">
+                  <span style="font-size:16px; color:var(--color-text-muted);">&#8592;</span>
+                </div>
+                <div class="editor-header-right"></div>
+              </div>
+              <div class="empty-state" style="flex:1;">
+                <div class="icon-placeholder" style="width:56px; height:56px; display:flex; align-items:center; justify-content:center; font-size:24px; background:#f3f4f6; border-radius:50%;">&#128218;</div>
+                <div style="font-size:15px; font-weight:600; color:var(--color-text-primary); margin-bottom:var(--space-xs);">서점을 먼저 오픈해주세요</div>
+                <div style="font-size:12px; color:var(--color-text-muted); margin-bottom:var(--space-md);">글을 쓰려면 나만의 서점이 필요합니다</div>
+                <span class="btn btn-primary" style="width:auto; padding:8px 24px;">서점 오픈하기</span>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-020</div>
+            <div class="screen-name">서점 미보유</div>
+          </div>
+        </div>
+
+        <!-- Desktop: 작성 중 + 게시선 -->
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div class="state-label">작성 중 (게시선 삽입됨)</div>
+          <div class="desktop-frame" style="min-height:380px;">
+            <div class="browser-bar">
+              <div class="browser-dots"><span></span><span></span><span></span></div>
+              <div class="browser-url">readly.com/write</div>
+            </div>
+            <div class="desktop-content" style="display:flex; flex-direction:column;">
+              <!-- Desktop Editor Header -->
+              <div class="editor-header" style="height:48px; padding:0 var(--space-lg);">
+                <div class="editor-header-left">
+                  <span style="font-size:18px; color:var(--color-text-muted);">&#8592;</span>
+                  <span style="font-size:14px; font-weight:600;">글쓰기</span>
+                </div>
+                <div class="editor-header-right" style="gap:var(--space-sm);">
+                  <span class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--color-text-muted);">자동저장됨</span>
+                  <span class="btn btn-primary btn-sm" style="padding:6px 16px;">발행하기</span>
+                </div>
+              </div>
+              <!-- Desktop Toolbar -->
+              <div class="editor-toolbar" style="padding:6px var(--space-lg);">
+                <button class="toolbar-btn"><b>B</b></button>
+                <button class="toolbar-btn"><i>I</i></button>
+                <button class="toolbar-btn" style="text-decoration:underline;">U</button>
+                <button class="toolbar-btn" style="text-decoration: line-through;">S</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" style="font-size:10px;">H1</button>
+                <button class="toolbar-btn" style="font-size:10px;">H2</button>
+                <button class="toolbar-btn" style="font-size:10px;">H3</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" style="font-size:10px;">&#128279;</button>
+                <button class="toolbar-btn" style="font-size:10px;">&#128247;</button>
+                <button class="toolbar-btn" style="font-size:10px;">&#8220;</button>
+                <button class="toolbar-btn" style="font-size:10px;">&#8212;</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" style="font-size:9px; width:auto; padding:0 8px; opacity:0.4;">&#9135; 게시선</button>
+              </div>
+              <!-- Desktop Editor Content (centered, max-width) -->
+              <div style="flex:1; background:var(--color-bg-page); display:flex; justify-content:center; padding:0 var(--space-lg);">
+                <div style="width:100%; max-width:360px;">
+                  <div style="padding:var(--space-md) 0 var(--space-sm); font-size:18px; font-weight:700;">봄날의 산책, 그 첫번째 이야기</div>
+                  <div style="font-size:12px; line-height:1.8; color:var(--color-text-secondary);">
+                    <p style="margin-bottom:var(--space-sm);">따스한 봄 햇살이 창가에 비추는 오후, 나는 오랜만에 집 밖으로 나섰다. 거리의 벚꽃은 이미 만개하여 분홍빛 눈처럼 흩날리고 있었다.</p>
+                    <p style="margin-bottom:var(--space-sm);">사람들의 표정에도 봄이 묻어 있었다.</p>
+                    <!-- Paywall -->
+                    <div class="paywall-line">
+                      <div class="paywall-line-text">&#9135; 여기부터 유료 콘텐츠</div>
+                      <div class="paywall-line-actions">
+                        <span class="paywall-line-btn">&#8597; 이동</span>
+                        <span class="paywall-line-btn">&#10005; 삭제</span>
+                      </div>
+                    </div>
+                    <p style="margin-bottom:var(--space-sm); color:var(--color-text-muted);">이 계절이 오면 항상 떠오르는 기억이 있다. 그때 나는 아직 이 도시에 오지 않았고...</p>
+                  </div>
+                </div>
+              </div>
+              <!-- Desktop Status Bar -->
+              <div class="status-bar" style="padding:0 var(--space-lg);">
+                <div class="status-bar-left">
+                  <span class="status-paid">&#9670; 유료 발행 예정</span>
+                  <span class="status-saved">&#10003; 자동 저장됨 14:35</span>
+                </div>
+                <span>2,456자</span>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-020</div>
+            <div class="screen-name">에디터 메인 (Desktop)</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCR-022: 발행 시트 ===== -->
+  <div class="screen-grid" style="margin-bottom:var(--space-xl);">
+    <div class="screen-group">
+      <div class="screen-group-title">SCR-022: 발행 시트</div>
+      <div class="screen-group-route">(바텀시트)</div>
+      <div class="screen-group-states">
+
+        <!-- Phone: 기본 (무료) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="modal-label">BOTTOM SHEET</div>
+          <div class="state-label">기본 (무료)</div>
+          <div class="phone-frame" style="height:580px;">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>100%</span>
+            </div>
+            <div class="phone-content" style="display:flex; flex-direction:column; position:relative;">
+              <!-- Dimmed top -->
+              <div style="height:40px; background:rgba(0,0,0,0.3);"></div>
+              <!-- Bottom Sheet -->
+              <div style="flex:1; background:var(--color-bg-card); border-radius:var(--radius-md) var(--radius-md) 0 0; overflow-y:auto;">
+                <!-- Handle -->
+                <div style="display:flex; justify-content:center; padding:var(--space-sm) 0;">
+                  <div style="width:36px; height:4px; background:#d1d5db; border-radius:2px;"></div>
+                </div>
+                <!-- Sheet Header -->
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:0 var(--space-md) var(--space-sm);">
+                  <span style="font-size:15px; font-weight:600;">발행하기</span>
+                  <span style="font-size:14px; color:var(--color-text-muted); cursor:pointer;">&#10005;</span>
+                </div>
+
+                <!-- Section: 분류 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">분류</div>
+                  <div class="toggle-group">
+                    <div class="toggle-item active">단편</div>
+                    <div class="toggle-item">시리즈</div>
+                  </div>
+                </div>
+
+                <!-- Section: 가격 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">가격</div>
+                  <div style="display:flex; align-items:center; gap:var(--space-sm);">
+                    <span class="badge badge-success">무료</span>
+                    <span style="font-size:11px; color:var(--color-text-muted);">게시선을 삽입하면 유료로 전환됩니다</span>
+                  </div>
+                </div>
+
+                <!-- Section: 접근 권한 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">접근 권한</div>
+                  <div class="toggle-group">
+                    <div class="toggle-item active" style="font-size:10px;">전체공개</div>
+                    <div class="toggle-item" style="font-size:10px;">구독자</div>
+                    <div class="toggle-item" style="font-size:10px;">구매자</div>
+                    <div class="toggle-item" style="font-size:10px;">비공개</div>
+                  </div>
+                </div>
+
+                <!-- Section: 썸네일 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">썸네일</div>
+                  <div class="thumbnail-area">자동 생성됨 (직접 업로드)</div>
+                </div>
+
+                <!-- Section: 요약문 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">요약문</div>
+                  <div style="font-size:11px; color:var(--color-text-muted); background:#f9fafb; padding:var(--space-sm); border-radius:var(--radius-sm); border:1px solid var(--color-border);">따스한 봄 햇살이 창가에 비추는 오후, 나는 오랜만에 집 밖으로 나섰다. 거리의 벚꽃은 이미 만개하여 분홍빛...</div>
+                  <div style="font-size:10px; color:var(--color-text-muted); margin-top:3px;">본문 첫 200자 자동 추출 (수정 가능)</div>
+                </div>
+
+                <!-- Section: 태그 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">태그</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:var(--space-xs);">
+                    <span class="tag">에세이 <span class="tag-remove">&#10005;</span></span>
+                    <span class="tag">봄 <span class="tag-remove">&#10005;</span></span>
+                  </div>
+                  <input class="input-field" placeholder="태그 입력 후 Enter" style="font-size:11px; padding:6px 8px;">
+                </div>
+
+                <!-- Actions -->
+                <div style="padding:var(--space-md); display:flex; gap:var(--space-sm);">
+                  <span class="btn btn-secondary" style="flex:1;">미리보기</span>
+                  <span class="btn btn-primary" style="flex:2;">발행하기</span>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-022</div>
+            <div class="screen-name">기본 (무료)</div>
+          </div>
+        </div>
+
+        <!-- Phone: 유료 (게시선 있음) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="modal-label">BOTTOM SHEET</div>
+          <div class="state-label">유료 (게시선 있음)</div>
+          <div class="phone-frame" style="height:580px;">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>100%</span>
+            </div>
+            <div class="phone-content" style="display:flex; flex-direction:column; position:relative;">
+              <div style="height:40px; background:rgba(0,0,0,0.3);"></div>
+              <div style="flex:1; background:var(--color-bg-card); border-radius:var(--radius-md) var(--radius-md) 0 0; overflow-y:auto;">
+                <div style="display:flex; justify-content:center; padding:var(--space-sm) 0;">
+                  <div style="width:36px; height:4px; background:#d1d5db; border-radius:2px;"></div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:0 var(--space-md) var(--space-sm);">
+                  <span style="font-size:15px; font-weight:600;">발행하기</span>
+                  <span style="font-size:14px; color:var(--color-text-muted);">&#10005;</span>
+                </div>
+
+                <!-- 분류 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">분류</div>
+                  <div class="toggle-group">
+                    <div class="toggle-item active">단편</div>
+                    <div class="toggle-item">시리즈</div>
+                  </div>
+                </div>
+
+                <!-- 가격 (유료) -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">가격</div>
+                  <div style="display:flex; align-items:center; gap:var(--space-sm); margin-bottom:var(--space-xs);">
+                    <span class="badge badge-info">유료</span>
+                    <span style="font-size:10px; color:var(--color-text-muted);">게시선 기반 자동 판정</span>
+                  </div>
+                  <div class="price-input-group">
+                    <input class="input-field" value="300" style="font-size:13px; padding:6px 8px;">
+                    <span class="price-unit">원</span>
+                  </div>
+                  <div style="font-size:10px; color:var(--color-text-muted); margin-top:3px;">100원~100,000원, 100원 단위</div>
+                </div>
+
+                <!-- 접근 권한 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">접근 권한</div>
+                  <div class="toggle-group">
+                    <div class="toggle-item" style="font-size:10px;">전체공개</div>
+                    <div class="toggle-item" style="font-size:10px;">구독자</div>
+                    <div class="toggle-item active" style="font-size:10px;">구매자</div>
+                    <div class="toggle-item" style="font-size:10px;">비공개</div>
+                  </div>
+                </div>
+
+                <!-- 썸네일 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">썸네일</div>
+                  <div class="thumbnail-area">자동 생성됨 (직접 업로드)</div>
+                </div>
+
+                <!-- 요약문 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">요약문</div>
+                  <div style="font-size:11px; color:var(--color-text-muted); background:#f9fafb; padding:var(--space-sm); border-radius:var(--radius-sm); border:1px solid var(--color-border);">따스한 봄 햇살이 창가에 비추는 오후, 나는 오랜만에 집 밖으로 나섰다...</div>
+                </div>
+
+                <!-- 태그 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">태그</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                    <span class="tag">에세이 <span class="tag-remove">&#10005;</span></span>
+                    <span class="tag">봄 <span class="tag-remove">&#10005;</span></span>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div style="padding:var(--space-md); display:flex; gap:var(--space-sm);">
+                  <span class="btn btn-secondary" style="flex:1;">미리보기</span>
+                  <span class="btn btn-primary" style="flex:2;">발행하기</span>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-022</div>
+            <div class="screen-name">유료 (게시선 있음)</div>
+          </div>
+        </div>
+
+        <!-- Phone: 시리즈 선택 -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="modal-label">BOTTOM SHEET</div>
+          <div class="state-label">시리즈 선택</div>
+          <div class="phone-frame" style="height:580px;">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>100%</span>
+            </div>
+            <div class="phone-content" style="display:flex; flex-direction:column; position:relative;">
+              <div style="height:40px; background:rgba(0,0,0,0.3);"></div>
+              <div style="flex:1; background:var(--color-bg-card); border-radius:var(--radius-md) var(--radius-md) 0 0; overflow-y:auto;">
+                <div style="display:flex; justify-content:center; padding:var(--space-sm) 0;">
+                  <div style="width:36px; height:4px; background:#d1d5db; border-radius:2px;"></div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:0 var(--space-md) var(--space-sm);">
+                  <span style="font-size:15px; font-weight:600;">발행하기</span>
+                  <span style="font-size:14px; color:var(--color-text-muted);">&#10005;</span>
+                </div>
+
+                <!-- 분류: 시리즈 선택됨 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">분류</div>
+                  <div class="toggle-group" style="margin-bottom:var(--space-sm);">
+                    <div class="toggle-item">단편</div>
+                    <div class="toggle-item active">시리즈</div>
+                  </div>
+                  <!-- Series Dropdown -->
+                  <div class="input-label">시리즈 선택</div>
+                  <select class="select-field" style="margin-bottom:var(--space-xs);">
+                    <option>봄날 산책 시리즈</option>
+                    <option>도시 에세이 모음</option>
+                  </select>
+                  <div style="font-size:10px; color:var(--color-primary); margin-bottom:var(--space-xs);">회차: #4 (자동 부여)</div>
+                  <span class="btn btn-ghost btn-sm" style="color:var(--color-primary); padding:0; font-size:11px;">+ 새 시리즈 만들기</span>
+                </div>
+
+                <!-- 나머지 섹션 축약 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">가격</div>
+                  <span class="badge badge-success">무료</span>
+                </div>
+
+                <div class="sheet-section">
+                  <div class="sheet-section-title">접근 권한</div>
+                  <div class="toggle-group">
+                    <div class="toggle-item active" style="font-size:10px;">전체공개</div>
+                    <div class="toggle-item" style="font-size:10px;">구독자</div>
+                    <div class="toggle-item" style="font-size:10px;">구매자</div>
+                    <div class="toggle-item" style="font-size:10px;">비공개</div>
+                  </div>
+                </div>
+
+                <!-- 전자책 뷰어 안내 배지 -->
+                <div class="sheet-section">
+                  <div style="background:var(--color-primary-light); border:1px solid #bfdbfe; border-radius:var(--radius-sm); padding:var(--space-sm); display:flex; align-items:center; gap:var(--space-sm);">
+                    <span style="font-size:14px;">&#128214;</span>
+                    <div>
+                      <div style="font-size:11px; font-weight:600; color:var(--color-primary);">전자책 뷰어로 표시됩니다</div>
+                      <div style="font-size:10px; color:var(--color-text-muted);">시리즈 + 1,000자 이상</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="padding:var(--space-md); display:flex; gap:var(--space-sm);">
+                  <span class="btn btn-secondary" style="flex:1;">미리보기</span>
+                  <span class="btn btn-primary" style="flex:2;">발행하기</span>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-022</div>
+            <div class="screen-name">시리즈 선택</div>
+          </div>
+        </div>
+
+        <!-- Phone: 즉석 시리즈 생성 -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="modal-label">BOTTOM SHEET</div>
+          <div class="state-label">즉석 시리즈 생성</div>
+          <div class="phone-frame" style="height:580px;">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>100%</span>
+            </div>
+            <div class="phone-content" style="display:flex; flex-direction:column; position:relative;">
+              <div style="height:40px; background:rgba(0,0,0,0.3);"></div>
+              <div style="flex:1; background:var(--color-bg-card); border-radius:var(--radius-md) var(--radius-md) 0 0; overflow-y:auto;">
+                <div style="display:flex; justify-content:center; padding:var(--space-sm) 0;">
+                  <div style="width:36px; height:4px; background:#d1d5db; border-radius:2px;"></div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:0 var(--space-md) var(--space-sm);">
+                  <span style="font-size:15px; font-weight:600;">발행하기</span>
+                  <span style="font-size:14px; color:var(--color-text-muted);">&#10005;</span>
+                </div>
+
+                <!-- 분류: 새 시리즈 생성 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">분류</div>
+                  <div class="toggle-group" style="margin-bottom:var(--space-sm);">
+                    <div class="toggle-item">단편</div>
+                    <div class="toggle-item active">시리즈</div>
+                  </div>
+                  <div class="input-label">새 시리즈명</div>
+                  <div style="display:flex; gap:var(--space-xs);">
+                    <input class="input-field" value="가을 바다 이야기" style="flex:1; font-size:12px; padding:6px 8px;">
+                    <span class="btn btn-primary btn-sm">만들기</span>
+                  </div>
+                  <div style="font-size:10px; color:var(--color-primary); margin-top:4px;">회차: #1 (자동 부여)</div>
+                </div>
+
+                <!-- 나머지 축약 -->
+                <div class="sheet-section">
+                  <div class="sheet-section-title">가격</div>
+                  <span class="badge badge-success">무료</span>
+                </div>
+
+                <div class="sheet-section">
+                  <div class="sheet-section-title">접근 권한</div>
+                  <div class="toggle-group">
+                    <div class="toggle-item active" style="font-size:10px;">전체공개</div>
+                    <div class="toggle-item" style="font-size:10px;">구독자</div>
+                    <div class="toggle-item" style="font-size:10px;">구매자</div>
+                    <div class="toggle-item" style="font-size:10px;">비공개</div>
+                  </div>
+                </div>
+
+                <div style="padding:var(--space-md); display:flex; gap:var(--space-sm);">
+                  <span class="btn btn-secondary" style="flex:1;">미리보기</span>
+                  <span class="btn btn-primary" style="flex:2;">발행하기</span>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-022</div>
+            <div class="screen-name">즉석 시리즈 생성</div>
+          </div>
+        </div>
+
+        <!-- Phone: 발행 중 (로딩) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="modal-label">BOTTOM SHEET</div>
+          <div class="state-label">발행 중</div>
+          <div class="phone-frame" style="height:580px;">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>100%</span>
+            </div>
+            <div class="phone-content" style="display:flex; flex-direction:column; position:relative;">
+              <div style="height:40px; background:rgba(0,0,0,0.3);"></div>
+              <div style="flex:1; background:var(--color-bg-card); border-radius:var(--radius-md) var(--radius-md) 0 0; overflow-y:auto;">
+                <div style="display:flex; justify-content:center; padding:var(--space-sm) 0;">
+                  <div style="width:36px; height:4px; background:#d1d5db; border-radius:2px;"></div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:0 var(--space-md) var(--space-sm);">
+                  <span style="font-size:15px; font-weight:600;">발행하기</span>
+                </div>
+
+                <div class="sheet-section">
+                  <div class="sheet-section-title">분류</div>
+                  <span style="font-size:12px;">단편</span>
+                </div>
+                <div class="sheet-section">
+                  <div class="sheet-section-title">가격</div>
+                  <span class="badge badge-success">무료</span>
+                </div>
+                <div class="sheet-section">
+                  <div class="sheet-section-title">접근 권한</div>
+                  <span style="font-size:12px;">전체공개</span>
+                </div>
+
+                <div style="padding:var(--space-md); display:flex; gap:var(--space-sm);">
+                  <span class="btn btn-loading btn-full">발행 중...</span>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-022</div>
+            <div class="screen-name">발행 중</div>
+          </div>
+        </div>
+
+        <!-- Phone: 발행 에러 -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="modal-label">BOTTOM SHEET</div>
+          <div class="state-label">발행 에러</div>
+          <div class="phone-frame" style="height:580px;">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>100%</span>
+            </div>
+            <div class="phone-content" style="display:flex; flex-direction:column; position:relative;">
+              <div style="height:40px; background:rgba(0,0,0,0.3);"></div>
+              <div style="flex:1; background:var(--color-bg-card); border-radius:var(--radius-md) var(--radius-md) 0 0; overflow-y:auto;">
+                <div style="display:flex; justify-content:center; padding:var(--space-sm) 0;">
+                  <div style="width:36px; height:4px; background:#d1d5db; border-radius:2px;"></div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:0 var(--space-md) var(--space-sm);">
+                  <span style="font-size:15px; font-weight:600;">발행하기</span>
+                  <span style="font-size:14px; color:var(--color-text-muted);">&#10005;</span>
+                </div>
+
+                <!-- Error -->
+                <div class="error-toast" style="margin:0 var(--space-md);">
+                  발행에 실패했습니다. 잠시 후 다시 시도해주세요.
+                </div>
+
+                <div class="sheet-section">
+                  <div class="sheet-section-title">분류</div>
+                  <span style="font-size:12px;">단편</span>
+                </div>
+                <div class="sheet-section">
+                  <div class="sheet-section-title">가격</div>
+                  <span class="badge badge-success">무료</span>
+                </div>
+
+                <div style="padding:var(--space-md); display:flex; gap:var(--space-sm);">
+                  <span class="btn btn-secondary" style="flex:1;">미리보기</span>
+                  <span class="btn btn-primary" style="flex:2;">다시 시도</span>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-022</div>
+            <div class="screen-name">발행 에러</div>
+          </div>
+        </div>
+
+        <!-- Desktop: 기본 (무료) -->
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div class="modal-label">MODAL</div>
+          <div class="state-label">기본 (무료)</div>
+          <div class="desktop-frame" style="min-height:380px; position:relative;">
+            <div class="browser-bar">
+              <div class="browser-dots"><span></span><span></span><span></span></div>
+              <div class="browser-url">readly.com/write</div>
+            </div>
+            <div class="desktop-content" style="position:relative;">
+              <div style="position:absolute; inset:0; background:rgba(0,0,0,0.3);"></div>
+              <!-- Center Modal -->
+              <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:var(--color-bg-card); border-radius:var(--radius-md); width:380px; max-height:320px; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:var(--space-md); border-bottom:1px solid var(--color-border); position:sticky; top:0; background:var(--color-bg-card); z-index:1;">
+                  <span style="font-size:15px; font-weight:600;">발행하기</span>
+                  <span style="font-size:14px; color:var(--color-text-muted); cursor:pointer;">&#10005;</span>
+                </div>
+
+                <div class="sheet-section">
+                  <div class="sheet-section-title">분류</div>
+                  <div class="toggle-group">
+                    <div class="toggle-item active">단편</div>
+                    <div class="toggle-item">시리즈</div>
+                  </div>
+                </div>
+                <div class="sheet-section">
+                  <div class="sheet-section-title">가격</div>
+                  <div style="display:flex; align-items:center; gap:var(--space-sm);">
+                    <span class="badge badge-success">무료</span>
+                    <span style="font-size:10px; color:var(--color-text-muted);">게시선을 삽입하면 유료로 전환됩니다</span>
+                  </div>
+                </div>
+                <div class="sheet-section">
+                  <div class="sheet-section-title">접근 권한</div>
+                  <div class="toggle-group">
+                    <div class="toggle-item active" style="font-size:10px;">전체공개</div>
+                    <div class="toggle-item" style="font-size:10px;">구독자</div>
+                    <div class="toggle-item" style="font-size:10px;">구매자</div>
+                    <div class="toggle-item" style="font-size:10px;">비공개</div>
+                  </div>
+                </div>
+                <div class="sheet-section">
+                  <div class="sheet-section-title">썸네일</div>
+                  <div class="thumbnail-area">자동 생성됨 (직접 업로드)</div>
+                </div>
+                <div class="sheet-section">
+                  <div class="sheet-section-title">요약문</div>
+                  <div style="font-size:11px; color:var(--color-text-muted); background:#f9fafb; padding:var(--space-sm); border-radius:var(--radius-sm); border:1px solid var(--color-border);">따스한 봄 햇살이 창가에 비추는 오후...</div>
+                </div>
+                <div class="sheet-section">
+                  <div class="sheet-section-title">태그</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                    <span class="tag">에세이 <span class="tag-remove">&#10005;</span></span>
+                    <span class="tag">봄 <span class="tag-remove">&#10005;</span></span>
+                  </div>
+                </div>
+                <div style="padding:var(--space-md); display:flex; gap:var(--space-sm); border-top:1px solid var(--color-border); position:sticky; bottom:0; background:var(--color-bg-card);">
+                  <span class="btn btn-secondary" style="flex:1;">미리보기</span>
+                  <span class="btn btn-primary" style="flex:2;">발행하기</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-022</div>
+            <div class="screen-name">발행 시트 (Desktop)</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCR-023: 미리보기 ===== -->
+  <div class="screen-grid" style="margin-bottom:var(--space-xl);">
+    <div class="screen-group">
+      <div class="screen-group-title">SCR-023: 미리보기</div>
+      <div class="screen-group-route">(모달)</div>
+      <div class="screen-group-states">
+
+        <!-- Phone: 무료 글 -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="modal-label">MODAL</div>
+          <div class="state-label">무료 글</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>100%</span>
+            </div>
+            <div class="phone-content" style="display:flex; flex-direction:column;">
+              <!-- Preview Header -->
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:var(--space-sm) var(--space-md); background:var(--color-bg-card); border-bottom:1px solid var(--color-border);">
+                <span style="font-size:13px; color:var(--color-primary); font-weight:500;">&#8592; 에디터로 돌아가기</span>
+                <span class="badge badge-neutral">미리보기</span>
+              </div>
+              <!-- Post Content -->
+              <div style="flex:1; overflow-y:auto;">
+                <div class="preview-header">
+                  <div class="preview-title">봄날의 산책, 그 첫번째 이야기</div>
+                  <div class="preview-meta">
+                    <span>김작가</span>
+                    <span>2026.03.25</span>
+                    <span class="tag" style="font-size:9px; padding:1px 5px;">에세이</span>
+                  </div>
+                </div>
+                <div class="preview-body">
+                  <p style="margin-bottom:var(--space-sm);">따스한 봄 햇살이 창가에 비추는 오후, 나는 오랜만에 집 밖으로 나섰다.</p>
+                  <p style="margin-bottom:var(--space-sm);">거리의 벚꽃은 이미 만개하여 분홍빛 눈처럼 흩날리고 있었고, 사람들의 표정에도 봄이 묻어 있었다.</p>
+                  <p style="margin-bottom:var(--space-sm);">이 계절이 오면 항상 떠오르는 기억이 있다. 그때 나는 아직 이 도시에 오지 않았고...</p>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-023</div>
+            <div class="screen-name">무료 글</div>
+          </div>
+        </div>
+
+        <!-- Phone: 유료 글 (구매자 전용) -->
+        <div class="screen-card">
+          <div class="viewport-label">PHONE</div>
+          <div class="modal-label">MODAL</div>
+          <div class="state-label">유료 글 (구매자 전용)</div>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="notch"></div>
+              <span>100%</span>
+            </div>
+            <div class="phone-content" style="display:flex; flex-direction:column;">
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:var(--space-sm) var(--space-md); background:var(--color-bg-card); border-bottom:1px solid var(--color-border);">
+                <span style="font-size:13px; color:var(--color-primary); font-weight:500;">&#8592; 에디터로 돌아가기</span>
+                <span class="badge badge-neutral">미리보기</span>
+              </div>
+              <div style="flex:1; overflow-y:auto;">
+                <div class="preview-header">
+                  <div class="preview-title">봄날의 산책, 그 첫번째 이야기</div>
+                  <div class="preview-meta">
+                    <span>김작가</span>
+                    <span>2026.03.25</span>
+                    <span class="badge badge-info" style="font-size:9px;">300원</span>
+                  </div>
+                </div>
+                <!-- Free Section -->
+                <div class="preview-body">
+                  <p style="margin-bottom:var(--space-sm);">따스한 봄 햇살이 창가에 비추는 오후, 나는 오랜만에 집 밖으로 나섰다.</p>
+                  <p style="margin-bottom:var(--space-sm);">거리의 벚꽃은 이미 만개하여 분홍빛 눈처럼 흩날리고 있었다.</p>
+                </div>
+                <!-- Paywall Notice -->
+                <div class="paywall-notice">
+                  <div class="paywall-notice-icon">&#128274;</div>
+                  <div class="paywall-notice-text">여기부터 유료 콘텐츠입니다</div>
+                  <div class="paywall-notice-sub">구매하면 볼 수 있어요</div>
+                  <div style="margin-top:var(--space-sm);">
+                    <span class="btn btn-primary btn-sm" style="width:auto; padding:6px 16px;">300원에 구매하기</span>
+                  </div>
+                </div>
+                <!-- Blurred Content -->
+                <div class="preview-body preview-blur" style="margin-top:var(--space-xs);">
+                  <p style="margin-bottom:var(--space-sm);">이 계절이 오면 항상 떠오르는 기억이 있다. 그때 나는 아직 이 도시에 오지 않았고...</p>
+                  <p>어렴풋이 기억나는 벚꽃 길은 지금도 그 자리에 있을까...</p>
+                </div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-023</div>
+            <div class="screen-name">유료 글 (구매자 전용)</div>
+          </div>
+        </div>
+
+        <!-- Desktop: 유료 글 -->
+        <div class="screen-card">
+          <div class="viewport-label">DESKTOP</div>
+          <div class="modal-label">MODAL</div>
+          <div class="state-label">유료 글 (구매자 전용)</div>
+          <div class="desktop-frame" style="min-height:380px; position:relative;">
+            <div class="browser-bar">
+              <div class="browser-dots"><span></span><span></span><span></span></div>
+              <div class="browser-url">readly.com/write - 미리보기</div>
+            </div>
+            <div class="desktop-content" style="position:relative;">
+              <div style="position:absolute; inset:0; background:rgba(0,0,0,0.3);"></div>
+              <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:var(--color-bg-card); border-radius:var(--radius-md); width:380px; max-height:320px; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+                <!-- Header -->
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:var(--space-sm) var(--space-md); border-bottom:1px solid var(--color-border); position:sticky; top:0; background:var(--color-bg-card); z-index:1;">
+                  <span style="font-size:13px; color:var(--color-primary); font-weight:500;">&#8592; 에디터로 돌아가기</span>
+                  <span class="badge badge-neutral">미리보기</span>
+                </div>
+                <!-- Content -->
+                <div class="preview-header">
+                  <div class="preview-title">봄날의 산책, 그 첫번째 이야기</div>
+                  <div class="preview-meta">
+                    <span>김작가</span>
+                    <span>2026.03.25</span>
+                    <span class="badge badge-info" style="font-size:9px;">300원</span>
+                    <span class="tag" style="font-size:9px; padding:1px 5px;">에세이</span>
+                  </div>
+                </div>
+                <div class="preview-body">
+                  <p style="margin-bottom:var(--space-sm);">따스한 봄 햇살이 창가에 비추는 오후, 나는 오랜만에 집 밖으로 나섰다.</p>
+                  <p style="margin-bottom:var(--space-sm);">거리의 벚꽃은 이미 만개하여 분홍빛 눈처럼 흩날리고 있었다.</p>
+                </div>
+                <div class="paywall-notice">
+                  <div class="paywall-notice-icon">&#128274;</div>
+                  <div class="paywall-notice-text">여기부터 유료 콘텐츠입니다</div>
+                  <div class="paywall-notice-sub">구매하면 볼 수 있어요</div>
+                  <div style="margin-top:var(--space-sm);">
+                    <span class="btn btn-primary btn-sm" style="width:auto; padding:6px 16px;">300원에 구매하기</span>
+                  </div>
+                </div>
+                <div class="preview-body preview-blur" style="margin-top:var(--space-xs);">
+                  <p style="margin-bottom:var(--space-sm);">이 계절이 오면 항상 떠오르는 기억이 있다. 그때 나는 아직 이 도시에 오지 않았고...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-meta">
+            <div class="screen-id">SCR-023</div>
+            <div class="screen-name">미리보기 (Desktop)</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Common Patterns ===== -->
+  <div class="section-divider">
+    <h2>공통 패턴</h2>
+  </div>
+  <div class="screen-grid">
+
+    <div class="screen-group">
+      <div class="screen-group-title">토스트 / 알림 패턴</div>
+      <div class="screen-group-route">에디터 전역에서 사용되는 토스트 메시지</div>
+      <div class="screen-group-states">
+
+        <div class="screen-card">
+          <div class="state-label">자동저장 완료</div>
+          <div style="width:var(--phone-width); padding:var(--space-sm);">
+            <div class="success-toast">자동 저장됨 14:35</div>
+          </div>
+        </div>
+
+        <div class="screen-card">
+          <div class="state-label">자동저장 실패</div>
+          <div style="width:var(--phone-width); padding:var(--space-sm);">
+            <div class="error-toast" style="display:flex; align-items:center; justify-content:space-between;">
+              <span>자동저장에 실패했습니다</span>
+              <span style="font-size:10px; text-decoration:underline; cursor:pointer;">수동 저장</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-card">
+          <div class="state-label">유료->무료 전환 경고</div>
+          <div style="width:var(--phone-width); padding:var(--space-sm);">
+            <div style="background:var(--color-bg-card); border-radius:var(--radius-md); padding:var(--space-md); box-shadow:0 4px 16px rgba(0,0,0,0.15); text-align:center;">
+              <div style="font-size:13px; font-weight:600; margin-bottom:var(--space-xs);">무료 전환 확인</div>
+              <div style="font-size:11px; color:var(--color-text-muted); margin-bottom:var(--space-md);">12명이 이미 구매했습니다.<br>무료로 전환하시겠습니까?</div>
+              <div style="display:flex; gap:var(--space-sm);">
+                <span class="btn btn-secondary btn-sm" style="flex:1;">취소</span>
+                <span class="btn btn-sm" style="flex:1; background:var(--color-danger); color:white;">무료 전환</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="screen-group">
+      <div class="screen-group-title">유료 게시선 패턴</div>
+      <div class="screen-group-route">에디터 내 게시선 UI</div>
+      <div class="screen-group-states">
+
+        <div class="screen-card">
+          <div class="state-label">게시선 기본</div>
+          <div style="width:var(--phone-width); padding:var(--space-sm);">
+            <div class="paywall-line">
+              <div class="paywall-line-text">&#9135; 여기부터 유료 콘텐츠</div>
+              <div class="paywall-line-actions">
+                <span class="paywall-line-btn">&#8597; 이동</span>
+                <span class="paywall-line-btn">&#10005; 삭제</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-card">
+          <div class="state-label">게시선 드래그 중</div>
+          <div style="width:var(--phone-width); padding:var(--space-sm);">
+            <div class="paywall-line" style="border-color:var(--color-primary); background:linear-gradient(90deg, #dbeafe, #bfdbfe, #dbeafe); box-shadow:0 2px 8px rgba(37,99,235,0.2); cursor:grabbing;">
+              <div class="paywall-line-text">&#9135; 여기부터 유료 콘텐츠</div>
+              <div class="paywall-line-actions">
+                <span class="paywall-line-btn" style="border-color:var(--color-primary); color:var(--color-primary);">&#8597; 이동 중</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="screen-group">
+      <div class="screen-group-title">전자책 뷰어 안내 배지</div>
+      <div class="screen-group-route">발행 시트 내 조건부 표시</div>
+      <div class="screen-group-states">
+
+        <div class="screen-card">
+          <div class="state-label">조건 충족 (시리즈 + 1000자 이상)</div>
+          <div style="width:var(--phone-width); padding:var(--space-sm);">
+            <div style="background:var(--color-primary-light); border:1px solid #bfdbfe; border-radius:var(--radius-sm); padding:var(--space-sm); display:flex; align-items:center; gap:var(--space-sm);">
+              <span style="font-size:16px;">&#128214;</span>
+              <div>
+                <div style="font-size:11px; font-weight:600; color:var(--color-primary);">이 글은 전자책 뷰어로 표시됩니다</div>
+                <div style="font-size:10px; color:var(--color-text-muted);">시리즈 + 1,000자 이상 조건 충족</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-card">
+          <div class="state-label">조건 미충족</div>
+          <div style="width:var(--phone-width); padding:var(--space-sm);">
+            <div style="font-size:11px; color:var(--color-text-muted); text-align:center; padding:var(--space-md);">(배지 미표시 - 조건 미충족)</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

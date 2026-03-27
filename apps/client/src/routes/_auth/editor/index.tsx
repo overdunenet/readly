@@ -10,7 +10,7 @@ function Dashboard() {
     <Container>
       <Header>
         <Title>대시보드</Title>
-        <Subtitle>에디터 활동 개요</Subtitle>
+        <Subtitle>내 서점 관리 활동 개요</Subtitle>
       </Header>
 
       <Grid>

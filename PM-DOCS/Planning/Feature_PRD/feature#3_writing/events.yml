@@ -1,0 +1,256 @@
+# events.yml - Feature 이벤트 정의서
+# Feature: 글쓰기 & 발행
+# 범위: 작가향 이벤트 (에디터 내부 행동 추적)
+
+feature: 'writing'
+events:
+  - name: 'editor_opened'
+    trigger: '작가가 에디터에 진입'
+    screen_id: 'SCR-020'
+    category: 'navigation'
+    properties:
+      - name: 'mode'
+        type: 'string'
+        description: '에디터 모드 (new: 새 글, edit: 기존 글 수정, draft_resume: draft 이어쓰기)'
+        required: true
+        pii: false
+      - name: 'post_id'
+        type: 'string'
+        description: '포스트 ID (새 글도 즉시 생성되므로 항상 존재)'
+        required: true
+        pii: false
+      - name: 'post_status'
+        type: 'string'
+        description: '포스트 상태 (draft / published)'
+        required: true
+        pii: false
+    kpi: '에디터 진입 수, 신규/수정/이어쓰기 비율'
+    funnel: 'editor_opened -> publish_sheet_opened -> post_published'
+
+  - name: 'paywall_inserted'
+    trigger: '작가가 유료 게시선을 삽입'
+    screen_id: 'SCR-020'
+    category: 'interaction'
+    properties:
+      - name: 'position_ratio'
+        type: 'number'
+        description: '게시선 위치 비율 (0~1, 전체 본문 대비)'
+        required: true
+        pii: false
+      - name: 'content_length'
+        type: 'number'
+        description: '삽입 시점 전체 본문 글자 수'
+        required: true
+        pii: false
+    kpi: '유료 전환 의도 비율 (paywall_inserted / editor_opened)'
+    funnel: 'editor_opened -> paywall_inserted -> post_published (유료)'
+
+  - name: 'paywall_removed'
+    trigger: '작가가 유료 게시선을 삭제'
+    screen_id: 'SCR-020'
+    category: 'interaction'
+    properties:
+      - name: 'had_purchasers'
+        type: 'boolean'
+        description: '기구매자 존재 여부 (수정 모드에서만 의미)'
+        required: true
+        pii: false
+    kpi: '유료 -> 무료 전환 빈도'
+    funnel: 'paywall_inserted -> paywall_removed'
+
+  - name: 'paywall_moved'
+    trigger: '작가가 유료 게시선 위치를 드래그로 변경'
+    screen_id: 'SCR-020'
+    category: 'interaction'
+    properties:
+      - name: 'from_ratio'
+        type: 'number'
+        description: '이동 전 위치 비율 (0~1)'
+        required: true
+        pii: false
+      - name: 'to_ratio'
+        type: 'number'
+        description: '이동 후 위치 비율 (0~1)'
+        required: true
+        pii: false
+    kpi: '게시선 위치 조정 빈도, 평균 무료/유료 비율'
+    funnel: ''
+
+  - name: 'post_auto_saved'
+    trigger: '30초 주기 자동저장 실행 (PostEntity 직접 업데이트)'
+    screen_id: 'SCR-020'
+    category: 'system'
+    properties:
+      - name: 'post_id'
+        type: 'string'
+        description: '저장 대상 포스트 ID'
+        required: true
+        pii: false
+      - name: 'content_length'
+        type: 'number'
+        description: '저장 시점 본문 글자 수'
+        required: true
+        pii: false
+      - name: 'save_trigger'
+        type: 'string'
+        description: '저장 트리거 (interval: 30초 주기, beforeunload: 이탈 감지, session_backup: 세션 백업)'
+        required: true
+        pii: false
+      - name: 'save_target'
+        type: 'string'
+        description: '저장 대상 (post: draft 상태 글 직접 저장 / draft_fields: 발행된 글 임시 수정본에 저장)'
+        required: true
+        pii: false
+      - name: 'success'
+        type: 'boolean'
+        description: '저장 성공 여부'
+        required: true
+        pii: false
+    kpi: '자동저장 성공률, 저장 실패 빈도, draft_fields 저장 비율'
+    funnel: ''
+
+  - name: 'publish_sheet_opened'
+    trigger: '작가가 발행 시트를 열음'
+    screen_id: 'SCR-022'
+    category: 'navigation'
+    properties:
+      - name: 'has_paywall'
+        type: 'boolean'
+        description: '게시선 존재 여부 (유료/무료 자동 판정)'
+        required: true
+        pii: false
+      - name: 'content_length'
+        type: 'number'
+        description: '본문 글자 수'
+        required: true
+        pii: false
+    kpi: '발행 시트 도달률 (publish_sheet_opened / editor_opened)'
+    funnel: 'editor_opened -> publish_sheet_opened -> post_published'
+
+  - name: 'series_created_inline'
+    trigger: '작가가 발행 시트에서 즉석 시리즈 생성'
+    screen_id: 'SCR-022'
+    category: 'interaction'
+    properties:
+      - name: 'series_name_length'
+        type: 'number'
+        description: '시리즈명 글자 수'
+        required: true
+        pii: false
+    kpi: '즉석 시리즈 생성 빈도, 시리즈 전환율'
+    funnel: 'publish_sheet_opened -> series_created_inline -> post_published'
+
+  - name: 'preview_opened'
+    trigger: '작가가 미리보기 화면 진입'
+    screen_id: 'SCR-023'
+    category: 'navigation'
+    properties:
+      - name: 'has_paywall'
+        type: 'boolean'
+        description: '게시선 존재 여부'
+        required: true
+        pii: false
+    kpi: '미리보기 사용률 (preview_opened / publish_sheet_opened)'
+    funnel: 'publish_sheet_opened -> preview_opened -> post_published'
+
+  - name: 'post_published'
+    trigger: '글 발행 완료'
+    screen_id: 'SCR-022'
+    category: 'conversion'
+    properties:
+      - name: 'post_type'
+        type: 'string'
+        description: '포스트 유형 (single: 단편, series_episode: 시리즈 회차)'
+        required: true
+        pii: false
+      - name: 'is_paid'
+        type: 'boolean'
+        description: '유료 여부'
+        required: true
+        pii: false
+      - name: 'price'
+        type: 'number'
+        description: '유료 시 가격 (무료면 0, 유료 시 100~100,000원 범위, 100원 단위)'
+        required: true
+        pii: false
+      - name: 'access_level'
+        type: 'string'
+        description: '접근 권한 (public / subscriber / purchaser / private)'
+        required: true
+        pii: false
+      - name: 'content_length'
+        type: 'number'
+        description: '본문 글자 수'
+        required: true
+        pii: false
+      - name: 'has_thumbnail'
+        type: 'boolean'
+        description: '커스텀 썸네일 설정 여부'
+        required: true
+        pii: false
+      - name: 'has_custom_summary'
+        type: 'boolean'
+        description: '요약문을 수동 수정했는지 여부'
+        required: true
+        pii: false
+      - name: 'tag_count'
+        type: 'number'
+        description: '태그 수'
+        required: true
+        pii: false
+      - name: 'viewer_badge'
+        type: 'boolean'
+        description: '전자책 뷰어 안내 배지 표시 여부'
+        required: true
+        pii: false
+      - name: 'time_to_publish_seconds'
+        type: 'number'
+        description: '에디터 진입부터 발행까지 소요 시간 (초)'
+        required: true
+        pii: false
+      - name: 'smart_default_kept'
+        type: 'boolean'
+        description: 'Smart Default를 수정 없이 사용했는지 여부'
+        required: true
+        pii: false
+    kpi: '발행 전환율, 유료 비율, Smart Default 채택률, 첫 글 발행 시간'
+    funnel: 'editor_opened -> publish_sheet_opened -> post_published'
+
+  - name: 'post_publish_failed'
+    trigger: '글 발행 실패'
+    screen_id: 'SCR-022'
+    category: 'error'
+    properties:
+      - name: 'error_type'
+        type: 'string'
+        description: '에러 유형 (network / validation / server_error 등)'
+        required: true
+        pii: false
+    kpi: '발행 실패율, 에러 유형 분포'
+    funnel: 'publish_sheet_opened -> post_publish_failed'
+
+  - name: 'paid_to_free_warning_shown'
+    trigger: '유료 -> 무료 전환 시 기구매자 경고 팝업 표시'
+    screen_id: 'SCR-020'
+    category: 'system'
+    properties:
+      - name: 'purchaser_count'
+        type: 'number'
+        description: '기구매자 수'
+        required: true
+        pii: false
+    kpi: '유료 -> 무료 전환 시도 빈도'
+    funnel: ''
+
+  - name: 'paid_to_free_confirmed'
+    trigger: '유료 -> 무료 전환 경고에서 "확인" 선택'
+    screen_id: 'SCR-020'
+    category: 'interaction'
+    properties:
+      - name: 'purchaser_count'
+        type: 'number'
+        description: '기구매자 수'
+        required: true
+        pii: false
+    kpi: '유료 -> 무료 전환 확정 비율 (confirmed / warning_shown)'
+    funnel: 'paid_to_free_warning_shown -> paid_to_free_confirmed'
