@@ -33,6 +33,16 @@ function uploadFile(file: File): Promise<string> {
   });
 }
 
+function pickImageFile(): Promise<File | null> {
+  return new Promise((resolve) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = () => resolve(input.files?.[0] ?? null);
+    input.click();
+  });
+}
+
 const ALLOWED_SLASH_ITEMS = new Set([
   'Paragraph',
   'Heading',
@@ -50,34 +60,20 @@ function DirectFileReplaceButton() {
 
   if (!isFileBlock) return null;
 
-  const handleClick = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = async () => {
-      const file = input.files?.[0];
-      if (!file) return;
-      const dataUrl = await uploadFile(file);
-      editor.updateBlock(selectedBlocks[0].id, {
-        props: { url: dataUrl, name: file.name } as Record<string, string>,
-      });
-    };
-    input.click();
+  const handleClick = async () => {
+    const file = await pickImageFile();
+    if (!file) return;
+    const dataUrl = await uploadFile(file);
+    editor.updateBlock(selectedBlocks[0].id, {
+      props: { url: dataUrl, name: file.name } as Record<string, string>,
+    });
   };
 
   return (
     <button
-      className="bn-button"
+      className="bn-file-replace-button"
       onClick={handleClick}
       title="이미지 교체"
-      style={{
-        padding: '4px 8px',
-        fontSize: '0.8rem',
-        cursor: 'pointer',
-        background: 'none',
-        border: 'none',
-        color: '#374151',
-      }}
     >
       교체
     </button>
@@ -101,58 +97,46 @@ function CustomFormattingToolbar() {
   );
 }
 
-function useDirectFileUpload(editor: ReturnType<typeof useCreateBlockNote>) {
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const targetBlockIdRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.style.display = 'none';
-    input.addEventListener('change', async () => {
-      const file = input.files?.[0];
-      const blockId = targetBlockIdRef.current;
-      if (!file || !blockId) return;
-
-      const dataUrl = await uploadFile(file);
-      editor.updateBlock(blockId, {
-        props: { url: dataUrl, name: file.name } as Record<string, string>,
-      });
-      input.value = '';
-      targetBlockIdRef.current = null;
-    });
-    document.body.appendChild(input);
-    fileInputRef.current = input;
-
-    return () => {
-      document.body.removeChild(input);
-    };
-  }, [editor]);
-
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
+function useDirectFileUpload(
+  editor: ReturnType<typeof useCreateBlockNote>,
+  containerRef: React.RefObject<HTMLDivElement | null>,
+) {
+  const handleClick = useCallback(
+    async (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const addButton = target.closest('.bn-add-file-button');
       if (!addButton) return;
 
       const blockOuter = addButton.closest('.bn-block-outer');
       const blockId = blockOuter?.getAttribute('data-id');
-      if (!blockId || !fileInputRef.current) return;
+      if (!blockId) return;
 
       e.preventDefault();
       e.stopPropagation();
-      targetBlockIdRef.current = blockId;
-      fileInputRef.current.click();
-    };
 
-    document.addEventListener('click', handleClick, true);
-    return () => document.removeEventListener('click', handleClick, true);
-  }, []);
+      const file = await pickImageFile();
+      if (!file) return;
+
+      const dataUrl = await uploadFile(file);
+      editor.updateBlock(blockId, {
+        props: { url: dataUrl, name: file.name } as Record<string, string>,
+      });
+    },
+    [editor],
+  );
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    container.addEventListener('click', handleClick, true);
+    return () => container.removeEventListener('click', handleClick, true);
+  }, [containerRef, handleClick]);
 }
 
 function BlockEditorInner({ value, onChange, placeholder }: BlockEditorProps) {
   const initialLoadedRef = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const editor = useCreateBlockNote(
     {
@@ -165,7 +149,7 @@ function BlockEditorInner({ value, onChange, placeholder }: BlockEditorProps) {
     [],
   );
 
-  useDirectFileUpload(editor);
+  useDirectFileUpload(editor, containerRef);
 
   useEffect(() => {
     if (!initialLoadedRef.current && value) {
@@ -198,21 +182,23 @@ function BlockEditorInner({ value, onChange, placeholder }: BlockEditorProps) {
   );
 
   return (
-    <BlockNoteView
-      editor={editor}
-      onChange={handleChange}
-      slashMenu={false}
-      filePanel={false}
-      formattingToolbar={false}
-    >
-      <FormattingToolbarController
-        formattingToolbar={CustomFormattingToolbar}
-      />
-      <SuggestionMenuController
-        triggerCharacter="/"
-        getItems={getSlashMenuItems}
-      />
-    </BlockNoteView>
+    <div ref={containerRef}>
+      <BlockNoteView
+        editor={editor}
+        onChange={handleChange}
+        slashMenu={false}
+        filePanel={false}
+        formattingToolbar={false}
+      >
+        <FormattingToolbarController
+          formattingToolbar={CustomFormattingToolbar}
+        />
+        <SuggestionMenuController
+          triggerCharacter="/"
+          getItems={getSlashMenuItems}
+        />
+      </BlockNoteView>
+    </div>
   );
 }
 

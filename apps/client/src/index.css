@@ -51,6 +51,21 @@
   padding: 4px;
 }
 
+/* 이미지 교체 버튼 */
+.bn-file-replace-button {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: #374151;
+  border-radius: 0.25rem;
+}
+
+.bn-file-replace-button:hover {
+  background-color: #f3f4f6;
+}
+
 /* Snappy Modal Customization */
 .snappy-modal-backdrop {
   background-color: rgba(0, 0, 0, 0.5);
