@@ -9,6 +9,7 @@ import {
   FormattingToolbar,
   FormattingToolbarController,
   SuggestionMenuController,
+  TextAlignButton,
   getDefaultReactSlashMenuItems,
   useCreateBlockNote,
 } from '@blocknote/react';
@@ -48,9 +49,62 @@ function CustomFormattingToolbar() {
       <BasicTextStyleButton basicTextStyle="underline" />
       <BasicTextStyleButton basicTextStyle="strike" />
       <CreateLinkButton />
+      <TextAlignButton textAlignment="left" />
+      <TextAlignButton textAlignment="center" />
+      <TextAlignButton textAlignment="right" />
       <FileReplaceButton />
     </FormattingToolbar>
   );
+}
+
+function useDirectFileUpload(editor: ReturnType<typeof useCreateBlockNote>) {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const targetBlockIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.style.display = 'none';
+    input.addEventListener('change', async () => {
+      const file = input.files?.[0];
+      const blockId = targetBlockIdRef.current;
+      if (!file || !blockId) return;
+
+      const dataUrl = await uploadFile(file);
+      editor.updateBlock(blockId, {
+        props: { url: dataUrl, name: file.name } as Record<string, string>,
+      });
+      input.value = '';
+      targetBlockIdRef.current = null;
+    });
+    document.body.appendChild(input);
+    fileInputRef.current = input;
+
+    return () => {
+      document.body.removeChild(input);
+    };
+  }, [editor]);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const addButton = target.closest('.bn-add-file-button');
+      if (!addButton) return;
+
+      const blockOuter = addButton.closest('.bn-block-outer');
+      const blockId = blockOuter?.getAttribute('data-id');
+      if (!blockId || !fileInputRef.current) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      targetBlockIdRef.current = blockId;
+      fileInputRef.current.click();
+    };
+
+    document.addEventListener('click', handleClick, true);
+    return () => document.removeEventListener('click', handleClick, true);
+  }, []);
 }
 
 function BlockEditorInner({ value, onChange, placeholder }: BlockEditorProps) {
@@ -66,6 +120,8 @@ function BlockEditorInner({ value, onChange, placeholder }: BlockEditorProps) {
     },
     [],
   );
+
+  useDirectFileUpload(editor);
 
   useEffect(() => {
     if (!initialLoadedRef.current && value) {
@@ -102,6 +158,7 @@ function BlockEditorInner({ value, onChange, placeholder }: BlockEditorProps) {
       editor={editor}
       onChange={handleChange}
       slashMenu={false}
+      filePanel={false}
       formattingToolbar={false}
     >
       <FormattingToolbarController
