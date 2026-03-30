@@ -5,8 +5,6 @@ import {
   BasicTextStyleButton,
   BlockTypeSelect,
   CreateLinkButton,
-  FilePanelController,
-  FilePanel,
   FileReplaceButton,
   FormattingToolbar,
   FormattingToolbarController,
@@ -40,12 +38,6 @@ const ALLOWED_SLASH_ITEMS = new Set([
   'Heading 3',
   'Image',
 ]);
-
-function UploadOnlyFilePanel(props: { blockId: string }) {
-  return (
-    <FilePanel {...props} tabs={[{ name: 'upload', tabPanel: undefined }]} />
-  );
-}
 
 function CustomFormattingToolbar() {
   return (
@@ -110,7 +102,6 @@ function BlockEditorInner({ value, onChange, placeholder }: BlockEditorProps) {
       editor={editor}
       onChange={handleChange}
       slashMenu={false}
-      filePanel={false}
       formattingToolbar={false}
     >
       <FormattingToolbarController
@@ -120,7 +111,6 @@ function BlockEditorInner({ value, onChange, placeholder }: BlockEditorProps) {
         triggerCharacter="/"
         getItems={getSlashMenuItems}
       />
-      <FilePanelController filePanel={UploadOnlyFilePanel} />
     </BlockNoteView>
   );
 }
