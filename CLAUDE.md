@@ -48,6 +48,17 @@ yarn workspace api migration:run # 데이터베이스 마이그레이션
 yarn workspace client dev        # Web App 시작
 ```
 
+## GPM 태스크 관리
+
+이 프로젝트는 [GPM](https://www.npmjs.com/package/github-project-manager)으로 GitHub Project V2 태스크를 관리합니다.
+
+- `/gpm next` — 다음 작업 추천
+- `/gpm done` — 현재 작업 완료 처리
+- `/gpm status` — 프로젝트 현황 브리핑
+- `/gpm plan` — 작업 계획 수립
+- `/gpm sync` — GitHub 동기화
+- `/gpm create <title>` — 태스크 생성
+
 ## 문서 구조
 
 상세 문서는 다음 위치를 참조하세요:
