@@ -45,7 +45,7 @@ function pickImageFile(): Promise<File | null> {
 
 const ALLOWED_SLASH_ITEMS = new Set([
   'Paragraph',
-  'Heading',
+  'Heading 1',
   'Heading 2',
   'Heading 3',
   'Image',
