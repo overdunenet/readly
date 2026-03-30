@@ -267,6 +267,12 @@ const editorConfig: EditorConfig = {
 />
 ```
 
+## FE-first 구현 원칙 (BFF)
+
+- **FE를 먼저 설계**하고, 필요한 API 스펙을 정의한 뒤 BE를 구현한다 (FE → DB → API)
+- FE에서 API 응답을 **대폭 변환해야 한다면** API(Router) 설계를 재검토한다
+- BE 복잡도가 **FE 가치 대비 과도**하면 FE 설계 변경을 제안하거나 Phase를 분리하여 GitHub Issue로 등록한다
+
 ## 체크리스트
 
 ### 컴포넌트 작성
