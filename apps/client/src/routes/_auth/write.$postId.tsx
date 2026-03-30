@@ -1,14 +1,10 @@
-import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { createFileRoute } from '@tanstack/react-router';
-import { ClassicEditor } from 'ckeditor5';
 import { ArrowLeft } from 'lucide-react';
 import { ChangeEvent, useEffect, useState } from 'react';
 import SnappyModal from 'react-snappy-modal';
 import tw from 'tailwind-styled-components';
 
-import 'ckeditor5/ckeditor5.css';
-
-import { editorConfig } from '@/components/posts/create/FormEditorSection';
+import { BlockEditor } from '@/components/posts/create/editor/BlockEditor';
 import { trpc } from '@/shared';
 import { AlertModal } from '@/shared/modal/AlertModal';
 
@@ -121,11 +117,11 @@ function WritePage() {
         />
 
         <EditorWrapper>
-          <CKEditor
-            editor={ClassicEditor}
-            config={editorConfig}
-            data={content}
-            onChange={(_event, editor) => setContent(editor.getData())}
+          <BlockEditor
+            key={postId}
+            value={content}
+            onChange={setContent}
+            placeholder="내용을 작성하세요"
           />
         </EditorWrapper>
       </EditorArea>
