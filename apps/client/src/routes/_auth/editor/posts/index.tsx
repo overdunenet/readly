@@ -77,7 +77,7 @@ function PostsPage() {
   }, [posts, statusFilter, searchQuery]);
 
   const handleEdit = (postId: string) => {
-    navigate({ to: '/editor/posts/$postId/edit', params: { postId } });
+    navigate({ to: '/write/$postId', params: { postId } });
   };
 
   const handlePublish = (postId: string) => {

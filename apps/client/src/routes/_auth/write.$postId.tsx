@@ -24,6 +24,7 @@ function WritePage() {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (post) {
@@ -33,6 +34,10 @@ function WritePage() {
   }, [post]);
 
   const updateMutation = trpc.post.update.useMutation({
+    onSuccess: () => {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    },
     onError: (error) => {
       SnappyModal.show(
         <AlertModal title="저장 실패" message={error.message} />,
@@ -40,7 +45,11 @@ function WritePage() {
     },
   });
 
-  const deleteMutation = trpc.post.delete.useMutation();
+  const deleteMutation = trpc.post.delete.useMutation({
+    onError: (error) => {
+      console.error('Draft 삭제 실패:', error.message);
+    },
+  });
 
   const handleSave = () => {
     updateMutation.mutate({
@@ -50,8 +59,12 @@ function WritePage() {
   };
 
   const handleBack = () => {
-    const isEmptyDraft =
-      !title && (!content || content === '<p>&nbsp;</p>' || content === '');
+    const stripHtml = (html: string) =>
+      html
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .trim();
+    const isEmptyDraft = !title.trim() && !stripHtml(content);
     if (isEmptyDraft) {
       deleteMutation.mutate(
         { postId },
@@ -63,6 +76,12 @@ function WritePage() {
       navigate({ to: '/editor/posts' });
     }
   };
+
+  const saveButtonText = saved
+    ? '저장됨'
+    : updateMutation.isPending
+      ? '저장 중...'
+      : '저장';
 
   if (isLoading) {
     return (
@@ -84,8 +103,11 @@ function WritePage() {
         <BackButton onClick={handleBack}>
           <ArrowLeft size={24} />
         </BackButton>
-        <SaveButton onClick={handleSave} disabled={updateMutation.isPending}>
-          {updateMutation.isPending ? '저장 중...' : '저장'}
+        <SaveButton
+          onClick={handleSave}
+          disabled={updateMutation.isPending || saved}
+        >
+          {saveButtonText}
         </SaveButton>
       </Header>
 
