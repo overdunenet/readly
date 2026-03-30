@@ -63,16 +63,12 @@ export class PostRouter extends BaseTrpcRouter {
    */
   @UseMiddlewares(UserAuthMiddleware)
   @Mutation({
-    input: editPostInputSchema.required({ title: true, content: true }),
+    input: editPostInputSchema,
     output: postResponseSchema,
   })
   async create(
     @Ctx() ctx: UserAuthorizedContext,
-    @Input()
-    input: z.infer<typeof editPostInputSchema> & {
-      title: string;
-      content: string;
-    }
+    @Input() input: z.infer<typeof editPostInputSchema>
   ) {
     const result = await this.microserviceClient.send('post.create', {
       authorId: ctx.user.sub,

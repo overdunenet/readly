@@ -134,6 +134,19 @@ async findOne(@Param('id') id: number) {
 
 <rules>
 
+### Router(BFF)와 Service 역할 구분
+
+> 이 프로젝트는 tRPC 기반이므로 REST Controller 대신 **Router**가 클라이언트 대면 레이어 역할을 한다.
+
+| 레이어      | 역할                                           | 클라이언트 종속성 |
+| ----------- | ---------------------------------------------- | ----------------- |
+| **Router**  | FE 요구사항에 맞춘 데이터 조합/변환 (BFF 역할) | 종속 (FE 전용)    |
+| **Service** | 도메인 비즈니스 로직, 오케스트레이션           | 독립 (재사용)     |
+
+- Router는 여러 Service를 호출하여 FE 페이지에 맞는 응답을 조합한다
+- Service는 특정 FE 화면을 모르며, 순수 도메인 로직만 수행한다
+- FE에서 API 응답을 대폭 변환해야 한다면 Router 설계를 재검토한다
+
 ### @Transactional 패턴
 
 - mutation query는 Controller에서 `@Transactional` 데코레이터 사용

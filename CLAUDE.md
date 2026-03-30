@@ -16,6 +16,12 @@
 - **Frontend**: React + Vite + Tailwind CSS
 - **Database**: PostgreSQL + TypeORM
 
+## 아키텍처 원칙 (BFF)
+
+- **FE-first 설계**: FE가 원하는 데이터 구조에 맞춰 DB/API를 설계 (FE → DB → API 순서)
+- **Router = BFF 레이어**: tRPC Router는 FE 페이지에 최적화된 응답을 조합하여 제공
+- **복잡도 가드레일**: DB/API 복잡도가 FE 가치 대비 과도하면 FE 변경 제안 또는 Phase 분리
+
 ## 서비스 구성
 
 - **Web App**: 팔로워 + 에디터 통합 React 앱 (콘텐츠 소비/생산)

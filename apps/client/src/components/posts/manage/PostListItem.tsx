@@ -55,7 +55,7 @@ const PostListItem = ({
       </ThumbnailContainer>
 
       <ContentArea>
-        <Title>{post.title}</Title>
+        <Title>{post.title || '(제목 없음)'}</Title>
         <Excerpt>{post.excerpt || '내용 없음'}</Excerpt>
 
         <MetaRow>

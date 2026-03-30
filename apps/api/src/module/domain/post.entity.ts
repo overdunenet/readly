@@ -23,10 +23,10 @@ export const POST_STATUS = {
 
 @Entity('posts')
 export class PostEntity extends BaseEntity {
-  @Column({ type: 'varchar', comment: '포스트 제목' })
+  @Column({ type: 'varchar', default: '', comment: '포스트 제목' })
   title: string;
 
-  @Column({ type: 'text', comment: '포스트 본문 내용' })
+  @Column({ type: 'text', default: '', comment: '포스트 본문 내용' })
   content: string;
 
   @Column({
@@ -93,8 +93,8 @@ export class PostEntity extends BaseEntity {
 
   // DDD 패턴 - Static Factory Method
   static create(input: {
-    title: string;
-    content: string;
+    title?: string;
+    content?: string;
     excerpt?: string;
     thumbnail?: string;
     accessLevel?: PostAccessLevel;
@@ -105,6 +105,8 @@ export class PostEntity extends BaseEntity {
     const { authorId, bookstoreId, ...postEditInput } = input;
 
     const post = new PostEntity();
+    post.title = '';
+    post.content = '';
     post.status = POST_STATUS.DRAFT;
     post.authorId = authorId;
     post.bookstoreId = bookstoreId ?? null;
@@ -202,8 +204,8 @@ export const getPostRepository = (
     .getRepository(PostEntity)
     .extend({
       async createPost(input: {
-        title: string;
-        content: string;
+        title?: string;
+        content?: string;
         excerpt?: string;
         thumbnail?: string;
         accessLevel?: PostAccessLevel;

@@ -1,9 +1,9 @@
 import { Controller, Control, FieldErrors } from 'react-hook-form';
 import tw from 'tailwind-styled-components';
 
-import { ACCESS_LEVEL_OPTIONS } from '@/shared/constants/access-level';
-
 import { CreatePostForm } from './types';
+
+import { ACCESS_LEVEL_OPTIONS } from '@/shared/constants/access-level';
 
 interface PermissionPriceSectionProps {
   control: Control<CreatePostForm>;

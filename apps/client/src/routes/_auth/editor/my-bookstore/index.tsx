@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import tw from 'tailwind-styled-components';
-
 import { useState } from 'react';
+import tw from 'tailwind-styled-components';
 
 import {
   BookstoreForm,
