@@ -5,13 +5,14 @@ import {
   BasicTextStyleButton,
   BlockTypeSelect,
   CreateLinkButton,
-  FileReplaceButton,
   FormattingToolbar,
   FormattingToolbarController,
   SuggestionMenuController,
   TextAlignButton,
   getDefaultReactSlashMenuItems,
+  useBlockNoteEditor,
   useCreateBlockNote,
+  useSelectedBlocks,
 } from '@blocknote/react';
 import { memo, useCallback, useEffect, useRef } from 'react';
 
@@ -40,6 +41,49 @@ const ALLOWED_SLASH_ITEMS = new Set([
   'Image',
 ]);
 
+function DirectFileReplaceButton() {
+  const editor = useBlockNoteEditor();
+  const selectedBlocks = useSelectedBlocks(editor);
+
+  const isFileBlock =
+    selectedBlocks.length === 1 && selectedBlocks[0].type === 'image';
+
+  if (!isFileBlock) return null;
+
+  const handleClick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      const dataUrl = await uploadFile(file);
+      editor.updateBlock(selectedBlocks[0].id, {
+        props: { url: dataUrl, name: file.name } as Record<string, string>,
+      });
+    };
+    input.click();
+  };
+
+  return (
+    <button
+      className="bn-button"
+      onClick={handleClick}
+      title="이미지 교체"
+      style={{
+        padding: '4px 8px',
+        fontSize: '0.8rem',
+        cursor: 'pointer',
+        background: 'none',
+        border: 'none',
+        color: '#374151',
+      }}
+    >
+      교체
+    </button>
+  );
+}
+
 function CustomFormattingToolbar() {
   return (
     <FormattingToolbar>
@@ -52,7 +96,7 @@ function CustomFormattingToolbar() {
       <TextAlignButton textAlignment="left" />
       <TextAlignButton textAlignment="center" />
       <TextAlignButton textAlignment="right" />
-      <FileReplaceButton />
+      <DirectFileReplaceButton />
     </FormattingToolbar>
   );
 }
