@@ -91,7 +91,6 @@ const TitleInput = tw.input<{ hasError?: boolean }>`
 const EditorWrapper = tw.div<{ hasError?: boolean }>`
   ${(p) => (p.hasError ? 'border border-red-300' : 'border border-gray-300')}
   rounded-lg
-  overflow-hidden
   focus-within:ring-2
   focus-within:ring-blue-500
   focus-within:border-transparent

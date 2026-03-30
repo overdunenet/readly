@@ -5,6 +5,19 @@
   min-height: 300px;
 }
 
+/* 슬래시 메뉴 배경 */
+.bn-suggestion-menu {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* 이미지 캡션 숨김 */
+[data-file-block] .bn-file-caption {
+  display: none;
+}
+
 /* Snappy Modal Customization */
 .snappy-modal-backdrop {
   background-color: rgba(0, 0, 0, 0.5);

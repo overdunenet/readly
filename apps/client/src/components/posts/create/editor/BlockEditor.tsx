@@ -2,6 +2,14 @@ import { filterSuggestionItems } from '@blocknote/core';
 import { BlockNoteView } from '@blocknote/shadcn';
 import '@blocknote/shadcn/style.css';
 import {
+  BasicTextStyleButton,
+  BlockTypeSelect,
+  CreateLinkButton,
+  FilePanelController,
+  FilePanel,
+  FileReplaceButton,
+  FormattingToolbar,
+  FormattingToolbarController,
   SuggestionMenuController,
   getDefaultReactSlashMenuItems,
   useCreateBlockNote,
@@ -32,6 +40,26 @@ const ALLOWED_SLASH_ITEMS = new Set([
   'Heading 3',
   'Image',
 ]);
+
+function UploadOnlyFilePanel(props: { blockId: string }) {
+  return (
+    <FilePanel {...props} tabs={[{ name: 'upload', tabPanel: undefined }]} />
+  );
+}
+
+function CustomFormattingToolbar() {
+  return (
+    <FormattingToolbar>
+      <BlockTypeSelect />
+      <BasicTextStyleButton basicTextStyle="bold" />
+      <BasicTextStyleButton basicTextStyle="italic" />
+      <BasicTextStyleButton basicTextStyle="underline" />
+      <BasicTextStyleButton basicTextStyle="strike" />
+      <CreateLinkButton />
+      <FileReplaceButton />
+    </FormattingToolbar>
+  );
+}
 
 function BlockEditorInner({ value, onChange, placeholder }: BlockEditorProps) {
   const initialLoadedRef = useRef(false);
@@ -78,11 +106,21 @@ function BlockEditorInner({ value, onChange, placeholder }: BlockEditorProps) {
   );
 
   return (
-    <BlockNoteView editor={editor} onChange={handleChange} slashMenu={false}>
+    <BlockNoteView
+      editor={editor}
+      onChange={handleChange}
+      slashMenu={false}
+      filePanel={false}
+      formattingToolbar={false}
+    >
+      <FormattingToolbarController
+        formattingToolbar={CustomFormattingToolbar}
+      />
       <SuggestionMenuController
         triggerCharacter="/"
         getItems={getSlashMenuItems}
       />
+      <FilePanelController filePanel={UploadOnlyFilePanel} />
     </BlockNoteView>
   );
 }
