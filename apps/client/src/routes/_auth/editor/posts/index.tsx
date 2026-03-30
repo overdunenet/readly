@@ -22,6 +22,20 @@ function PostsPage() {
   const { data: posts, isLoading } = trpc.post.getMy.useQuery();
   const utils = trpc.useUtils();
 
+  const createDraftMutation = trpc.post.create.useMutation({
+    onSuccess: (post) => {
+      navigate({ to: '/write/$postId', params: { postId: post.id } });
+    },
+    onError: (error) => {
+      SnappyModal.show(
+        <AlertModal
+          title="글 작성을 시작할 수 없습니다"
+          message={error.message}
+        />,
+      );
+    },
+  });
+
   const publishMutation = trpc.post.publish.useMutation({
     onSuccess: () => utils.post.getMy.invalidate(),
     onError: (error) => {
@@ -63,7 +77,7 @@ function PostsPage() {
   }, [posts, statusFilter, searchQuery]);
 
   const handleEdit = (postId: string) => {
-    navigate({ to: '/editor/posts/$postId/edit', params: { postId } });
+    navigate({ to: '/write/$postId', params: { postId } });
   };
 
   const handlePublish = (postId: string) => {
@@ -84,8 +98,12 @@ function PostsPage() {
     <Container>
       <Header>
         <PageTitle>포스트 관리</PageTitle>
-        <CreateButton onClick={() => navigate({ to: '/editor/posts/create' })}>
-          <Plus size={20} />새 포스트
+        <CreateButton
+          onClick={() => createDraftMutation.mutate({})}
+          disabled={createDraftMutation.isPending}
+        >
+          <Plus size={20} />
+          {createDraftMutation.isPending ? '생성 중...' : '새 포스트'}
         </CreateButton>
       </Header>
 

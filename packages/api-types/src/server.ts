@@ -297,7 +297,7 @@ bookstore: t.router({
             'private',
           ]).optional(),
           price: z.number().int().min(0).optional(),
-        }).required({ title: true, content: true })).output(z.object({
+        })).output(z.object({
           id: z.string(),
           title: z.string(),
           content: z.string(),

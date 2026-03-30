@@ -7,8 +7,8 @@ import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { PostEntity, PostAccessLevel } from '../domain/post.entity';
 
 export interface CreatePostInput {
-  title: string;
-  content: string;
+  title?: string;
+  content?: string;
   excerpt?: string;
   thumbnail?: string;
   accessLevel?: PostAccessLevel;

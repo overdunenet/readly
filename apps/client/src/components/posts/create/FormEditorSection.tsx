@@ -72,7 +72,7 @@ export function FormEditorSection({ control, errors }: FormEditorSectionProps) {
 }
 
 // CKEditor configuration
-const editorConfig: EditorConfig = {
+export const editorConfig: EditorConfig = {
   licenseKey: 'GPL',
   plugins: [
     Essentials,
