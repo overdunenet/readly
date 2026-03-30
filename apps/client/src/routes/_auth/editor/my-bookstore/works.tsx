@@ -48,7 +48,7 @@ function WorkListContent({
   });
 
   const handleEdit = (postId: string) => {
-    navigate({ to: '/editor/posts/$postId/edit', params: { postId } });
+    navigate({ to: '/write/$postId', params: { postId } });
   };
 
   if (works.length === 0) {
