@@ -1,25 +1,7 @@
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import {
-  ClassicEditor,
-  Essentials,
-  Paragraph,
-  Heading,
-  Bold,
-  Italic,
-  Underline,
-  Strikethrough,
-  List,
-  BlockQuote,
-  CodeBlock,
-  Link,
-  Image,
-  ImageInsert,
-  Base64UploadAdapter,
-  RemoveFormat,
-  EditorConfig,
-} from 'ckeditor5';
 import { Controller, Control, FieldErrors } from 'react-hook-form';
 import tw from 'tailwind-styled-components';
+
+import { BlockEditor } from './editor/BlockEditor';
 
 import { CreatePostForm } from './types';
 
@@ -54,11 +36,10 @@ export function FormEditorSection({ control, errors }: FormEditorSectionProps) {
           control={control}
           render={({ field }) => (
             <EditorWrapper hasError={!!errors.content}>
-              <CKEditor
-                editor={ClassicEditor}
-                config={editorConfig}
-                data={field.value}
-                onChange={(_event, editor) => field.onChange(editor.getData())}
+              <BlockEditor
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="포스트 내용을 작성하세요"
               />
             </EditorWrapper>
           )}
@@ -70,48 +51,6 @@ export function FormEditorSection({ control, errors }: FormEditorSectionProps) {
     </FormSection>
   );
 }
-
-// CKEditor configuration
-const editorConfig: EditorConfig = {
-  licenseKey: 'GPL',
-  plugins: [
-    Essentials,
-    Paragraph,
-    Heading,
-    Bold,
-    Italic,
-    Underline,
-    Strikethrough,
-    List,
-    BlockQuote,
-    CodeBlock,
-    Link,
-    Image,
-    ImageInsert,
-    Base64UploadAdapter,
-    RemoveFormat,
-  ],
-  toolbar: [
-    'heading',
-    '|',
-    'bold',
-    'italic',
-    'underline',
-    'strikethrough',
-    '|',
-    'numberedList',
-    'bulletedList',
-    '|',
-    'blockQuote',
-    'codeBlock',
-    '|',
-    'link',
-    'insertImage',
-    '|',
-    'removeFormat',
-  ],
-  placeholder: '포스트 내용을 작성하세요',
-};
 
 // Styled Components
 const FormSection = tw.div`

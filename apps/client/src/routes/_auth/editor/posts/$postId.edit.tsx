@@ -146,7 +146,11 @@ function EditPostPage() {
       />
 
       <Form>
-        <FormEditorSection control={control} errors={errors} />
+        <FormEditorSection
+          key={postData?.id}
+          control={control}
+          errors={errors}
+        />
 
         <PermissionPriceSection
           control={control}
