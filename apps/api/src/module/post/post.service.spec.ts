@@ -175,50 +175,84 @@ describe('PostEntity.canAccessPaidContent', () => {
     return post;
   };
 
-  it('작성자는 항상 유료 본문에 접근할 수 있다', () => {
-    const post = createPost({});
-    expect(post.canAccessPaidContent('author-1')).toBe(true);
+  describe('Given 작성자가 요청할 때', () => {
+    it('When 발행된 포스트이면 Then 접근 가능하다', () => {
+      const post = createPost({});
+      expect(post.canAccessPaidContent('author-1')).toBe(true);
+    });
+
+    it('When 미발행(draft) 포스트이면 Then 접근 가능하다', () => {
+      const post = createPost({ status: POST_STATUS.DRAFT });
+      expect(post.canAccessPaidContent('author-1')).toBe(true);
+    });
+
+    it('When private 포스트이면 Then 접근 가능하다', () => {
+      const post = createPost({ accessLevel: 'private' });
+      expect(post.canAccessPaidContent('author-1')).toBe(true);
+    });
   });
 
-  it('미발행 포스트는 작성자만 접근 가능하다', () => {
-    const post = createPost({ status: POST_STATUS.DRAFT });
-    expect(post.canAccessPaidContent('author-1')).toBe(true);
-    expect(post.canAccessPaidContent('other-user')).toBe(false);
-    expect(post.canAccessPaidContent(null)).toBe(false);
+  describe('Given 비작성자가 요청할 때', () => {
+    describe('When 발행된 public 포스트이면', () => {
+      it('Then 접근 가능하다', () => {
+        const post = createPost({ accessLevel: 'public' });
+        expect(post.canAccessPaidContent('other-user')).toBe(true);
+      });
+    });
+
+    describe('When 발행된 private 포스트이면', () => {
+      it('Then 접근 불가하다', () => {
+        const post = createPost({ accessLevel: 'private' });
+        expect(post.canAccessPaidContent('other-user')).toBe(false);
+      });
+    });
+
+    describe('When 발행된 subscriber 포스트이면', () => {
+      it('Then 접근 불가하다 (구독 로직 추후 구현)', () => {
+        const post = createPost({ accessLevel: 'subscriber' });
+        expect(post.canAccessPaidContent('other-user')).toBe(false);
+      });
+    });
+
+    describe('When 발행된 purchaser 포스트이면', () => {
+      it('Then 접근 불가하다 (구매 로직 추후 구현)', () => {
+        const post = createPost({ accessLevel: 'purchaser' });
+        expect(post.canAccessPaidContent('other-user')).toBe(false);
+      });
+    });
+
+    describe('When 미발행(draft) 포스트이면', () => {
+      it('Then 접근 불가하다', () => {
+        const post = createPost({ status: POST_STATUS.DRAFT });
+        expect(post.canAccessPaidContent('other-user')).toBe(false);
+      });
+    });
   });
 
-  it('발행된 public 포스트는 누구나 접근 가능하다', () => {
-    const post = createPost({ accessLevel: 'public' });
-    expect(post.canAccessPaidContent('other-user')).toBe(true);
-    expect(post.canAccessPaidContent(null)).toBe(true);
-  });
+  describe('Given 비로그인 사용자(null)가 요청할 때', () => {
+    it('When public 포스트이면 Then 접근 가능하다', () => {
+      const post = createPost({ accessLevel: 'public' });
+      expect(post.canAccessPaidContent(null)).toBe(true);
+    });
 
-  it('발행된 private 포스트는 작성자만 접근 가능하다', () => {
-    const post = createPost({ accessLevel: 'private' });
-    expect(post.canAccessPaidContent('other-user')).toBe(false);
-    expect(post.canAccessPaidContent(null)).toBe(false);
-  });
+    it('When subscriber 포스트이면 Then 접근 불가하다', () => {
+      const post = createPost({ accessLevel: 'subscriber' });
+      expect(post.canAccessPaidContent(null)).toBe(false);
+    });
 
-  it('subscriber/purchaser 포스트는 현재 작성자만 접근 가능하다 (추후 구현)', () => {
-    const subscriberPost = createPost({ accessLevel: 'subscriber' });
-    expect(subscriberPost.canAccessPaidContent('other-user')).toBe(false);
+    it('When purchaser 포스트이면 Then 접근 불가하다', () => {
+      const post = createPost({ accessLevel: 'purchaser' });
+      expect(post.canAccessPaidContent(null)).toBe(false);
+    });
 
-    const purchaserPost = createPost({ accessLevel: 'purchaser' });
-    expect(purchaserPost.canAccessPaidContent('other-user')).toBe(false);
-  });
+    it('When private 포스트이면 Then 접근 불가하다', () => {
+      const post = createPost({ accessLevel: 'private' });
+      expect(post.canAccessPaidContent(null)).toBe(false);
+    });
 
-  it('비로그인 사용자(null)는 public만 접근 가능하다', () => {
-    expect(
-      createPost({ accessLevel: 'public' }).canAccessPaidContent(null)
-    ).toBe(true);
-    expect(
-      createPost({ accessLevel: 'subscriber' }).canAccessPaidContent(null)
-    ).toBe(false);
-    expect(
-      createPost({ accessLevel: 'purchaser' }).canAccessPaidContent(null)
-    ).toBe(false);
-    expect(
-      createPost({ accessLevel: 'private' }).canAccessPaidContent(null)
-    ).toBe(false);
+    it('When 미발행 포스트이면 Then 접근 불가하다', () => {
+      const post = createPost({ status: POST_STATUS.DRAFT });
+      expect(post.canAccessPaidContent(null)).toBe(false);
+    });
   });
 });
