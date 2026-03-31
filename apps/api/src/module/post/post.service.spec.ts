@@ -158,3 +158,67 @@ describe('PostService - getAccessiblePosts', () => {
     expect(result).toEqual([]);
   });
 });
+
+describe('PostEntity.canAccessPaidContent', () => {
+  const { PostEntity, POST_STATUS } = require('../domain/post.entity');
+
+  const createPost = (overrides: {
+    authorId?: string;
+    status?: string;
+    accessLevel?: string;
+  }) => {
+    const post = new PostEntity();
+    post.authorId = overrides.authorId ?? 'author-1';
+    post.status = overrides.status ?? POST_STATUS.PUBLISHED;
+    post.accessLevel = overrides.accessLevel ?? 'public';
+    post.paidContent = '유료 콘텐츠';
+    return post;
+  };
+
+  it('작성자는 항상 유료 본문에 접근할 수 있다', () => {
+    const post = createPost({});
+    expect(post.canAccessPaidContent('author-1')).toBe(true);
+  });
+
+  it('미발행 포스트는 작성자만 접근 가능하다', () => {
+    const post = createPost({ status: POST_STATUS.DRAFT });
+    expect(post.canAccessPaidContent('author-1')).toBe(true);
+    expect(post.canAccessPaidContent('other-user')).toBe(false);
+    expect(post.canAccessPaidContent(null)).toBe(false);
+  });
+
+  it('발행된 public 포스트는 누구나 접근 가능하다', () => {
+    const post = createPost({ accessLevel: 'public' });
+    expect(post.canAccessPaidContent('other-user')).toBe(true);
+    expect(post.canAccessPaidContent(null)).toBe(true);
+  });
+
+  it('발행된 private 포스트는 작성자만 접근 가능하다', () => {
+    const post = createPost({ accessLevel: 'private' });
+    expect(post.canAccessPaidContent('other-user')).toBe(false);
+    expect(post.canAccessPaidContent(null)).toBe(false);
+  });
+
+  it('subscriber/purchaser 포스트는 현재 작성자만 접근 가능하다 (추후 구현)', () => {
+    const subscriberPost = createPost({ accessLevel: 'subscriber' });
+    expect(subscriberPost.canAccessPaidContent('other-user')).toBe(false);
+
+    const purchaserPost = createPost({ accessLevel: 'purchaser' });
+    expect(purchaserPost.canAccessPaidContent('other-user')).toBe(false);
+  });
+
+  it('비로그인 사용자(null)는 public만 접근 가능하다', () => {
+    expect(
+      createPost({ accessLevel: 'public' }).canAccessPaidContent(null)
+    ).toBe(true);
+    expect(
+      createPost({ accessLevel: 'subscriber' }).canAccessPaidContent(null)
+    ).toBe(false);
+    expect(
+      createPost({ accessLevel: 'purchaser' }).canAccessPaidContent(null)
+    ).toBe(false);
+    expect(
+      createPost({ accessLevel: 'private' }).canAccessPaidContent(null)
+    ).toBe(false);
+  });
+});
