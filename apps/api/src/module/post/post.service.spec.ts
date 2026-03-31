@@ -43,14 +43,14 @@ describe('PostService - getAccessiblePosts', () => {
     authorId: string,
     overrides?: Partial<{
       title: string;
-      content: string;
+      freeContent: string;
       accessLevel: PostAccessLevel;
       publish: boolean;
     }>
   ) => {
     const post = await service.createPost(authorId, {
       title: overrides?.title ?? '테스트 포스트',
-      content: overrides?.content ?? '테스트 내용입니다.',
+      freeContent: overrides?.freeContent ?? '테스트 내용입니다.',
       accessLevel: overrides?.accessLevel ?? 'public',
     });
 
@@ -156,5 +156,103 @@ describe('PostService - getAccessiblePosts', () => {
     const result = await service.getAccessiblePosts();
 
     expect(result).toEqual([]);
+  });
+});
+
+describe('PostEntity.canAccessPaidContent', () => {
+  const { PostEntity, POST_STATUS } = require('../domain/post.entity');
+
+  const createPost = (overrides: {
+    authorId?: string;
+    status?: string;
+    accessLevel?: string;
+  }) => {
+    const post = new PostEntity();
+    post.authorId = overrides.authorId ?? 'author-1';
+    post.status = overrides.status ?? POST_STATUS.PUBLISHED;
+    post.accessLevel = overrides.accessLevel ?? 'public';
+    post.paidContent = '유료 콘텐츠';
+    return post;
+  };
+
+  describe('Given 작성자가 요청할 때', () => {
+    it('When 발행된 포스트이면 Then 접근 가능하다', () => {
+      const post = createPost({});
+      expect(post.canAccessPaidContent('author-1')).toBe(true);
+    });
+
+    it('When 미발행(draft) 포스트이면 Then 접근 가능하다', () => {
+      const post = createPost({ status: POST_STATUS.DRAFT });
+      expect(post.canAccessPaidContent('author-1')).toBe(true);
+    });
+
+    it('When private 포스트이면 Then 접근 가능하다', () => {
+      const post = createPost({ accessLevel: 'private' });
+      expect(post.canAccessPaidContent('author-1')).toBe(true);
+    });
+  });
+
+  describe('Given 비작성자가 요청할 때', () => {
+    describe('When 발행된 public 포스트이면', () => {
+      it('Then 접근 가능하다', () => {
+        const post = createPost({ accessLevel: 'public' });
+        expect(post.canAccessPaidContent('other-user')).toBe(true);
+      });
+    });
+
+    describe('When 발행된 private 포스트이면', () => {
+      it('Then 접근 불가하다', () => {
+        const post = createPost({ accessLevel: 'private' });
+        expect(post.canAccessPaidContent('other-user')).toBe(false);
+      });
+    });
+
+    describe('When 발행된 subscriber 포스트이면', () => {
+      it('Then 접근 불가하다 (구독 로직 추후 구현)', () => {
+        const post = createPost({ accessLevel: 'subscriber' });
+        expect(post.canAccessPaidContent('other-user')).toBe(false);
+      });
+    });
+
+    describe('When 발행된 purchaser 포스트이면', () => {
+      it('Then 접근 불가하다 (구매 로직 추후 구현)', () => {
+        const post = createPost({ accessLevel: 'purchaser' });
+        expect(post.canAccessPaidContent('other-user')).toBe(false);
+      });
+    });
+
+    describe('When 미발행(draft) 포스트이면', () => {
+      it('Then 접근 불가하다', () => {
+        const post = createPost({ status: POST_STATUS.DRAFT });
+        expect(post.canAccessPaidContent('other-user')).toBe(false);
+      });
+    });
+  });
+
+  describe('Given 비로그인 사용자(null)가 요청할 때', () => {
+    it('When public 포스트이면 Then 접근 가능하다', () => {
+      const post = createPost({ accessLevel: 'public' });
+      expect(post.canAccessPaidContent(null)).toBe(true);
+    });
+
+    it('When subscriber 포스트이면 Then 접근 불가하다', () => {
+      const post = createPost({ accessLevel: 'subscriber' });
+      expect(post.canAccessPaidContent(null)).toBe(false);
+    });
+
+    it('When purchaser 포스트이면 Then 접근 불가하다', () => {
+      const post = createPost({ accessLevel: 'purchaser' });
+      expect(post.canAccessPaidContent(null)).toBe(false);
+    });
+
+    it('When private 포스트이면 Then 접근 불가하다', () => {
+      const post = createPost({ accessLevel: 'private' });
+      expect(post.canAccessPaidContent(null)).toBe(false);
+    });
+
+    it('When 미발행 포스트이면 Then 접근 불가하다', () => {
+      const post = createPost({ status: POST_STATUS.DRAFT });
+      expect(post.canAccessPaidContent(null)).toBe(false);
+    });
   });
 });

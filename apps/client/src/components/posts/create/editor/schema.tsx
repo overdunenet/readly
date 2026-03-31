@@ -4,8 +4,39 @@ import {
   insertOrUpdateBlockForSlashMenu,
 } from '@blocknote/core';
 import { createReactBlockSpec } from '@blocknote/react';
+import { Lock } from 'lucide-react';
 
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
+
+const PaywallDividerBlock = createReactBlockSpec(
+  {
+    type: 'paywallDivider' as const,
+    propSchema: {},
+    content: 'none',
+  },
+  {
+    render: () => (
+      <div className="flex items-center gap-3 my-4 px-2 py-3 bg-amber-50 rounded-lg select-none">
+        <div className="flex-1 border-t border-dashed border-amber-400" />
+        <div className="flex items-center gap-1.5 text-amber-600 text-sm font-medium whitespace-nowrap">
+          <Lock size={14} />
+          <span>여기부터 유료 구간입니다</span>
+        </div>
+        <div className="flex-1 border-t border-dashed border-amber-400" />
+      </div>
+    ),
+    toExternalHTML: () => <div data-paywall-divider="true" />,
+    parse: (element) => {
+      if (
+        element instanceof HTMLElement &&
+        element.dataset.paywallDivider === 'true'
+      ) {
+        return {};
+      }
+      return undefined;
+    },
+  },
+);
 
 const DividerBlock = createReactBlockSpec(
   {
@@ -39,6 +70,7 @@ export const schema = BlockNoteSchema.create({
   blockSpecs: {
     ...remainingBlockSpecs,
     divider: DividerBlock(),
+    paywallDivider: PaywallDividerBlock(),
   },
 });
 

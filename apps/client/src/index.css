@@ -16,6 +16,12 @@
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
+/* PaywallDivider 블록 사이드 메뉴 세로 중앙 정렬 */
+[data-block-type="paywallDivider"] .bn-block-content {
+  display: flex;
+  align-items: center;
+}
+
 /* 이미지 캡션 숨김 */
 [data-file-block] .bn-file-caption {
   display: none;

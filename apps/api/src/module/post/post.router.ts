@@ -24,7 +24,8 @@ const postAccessLevelSchema = z.enum([
 
 const editPostInputSchema = z.object({
   title: z.string().min(1).max(200).optional(),
-  content: z.string().min(1).optional(),
+  freeContent: z.string().optional(),
+  paidContent: z.string().nullable().optional(),
   excerpt: z.string().max(500).optional(),
   thumbnail: z.string().url().optional(),
   accessLevel: postAccessLevelSchema.optional(),
@@ -34,7 +35,8 @@ const editPostInputSchema = z.object({
 const postResponseSchema = z.object({
   id: z.string(),
   title: z.string(),
-  content: z.string(),
+  freeContent: z.string(),
+  paidContent: z.string().nullable(),
   excerpt: z.string().nullish(),
   thumbnail: z.string().nullish(),
   accessLevel: postAccessLevelSchema,

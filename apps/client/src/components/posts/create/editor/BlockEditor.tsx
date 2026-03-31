@@ -19,8 +19,9 @@ import { memo, useCallback, useEffect, useRef } from 'react';
 import { schema, insertDividerItem } from './schema';
 
 interface BlockEditorProps {
-  value: string;
-  onChange: (html: string) => void;
+  freeContent: string;
+  paidContent: string | null;
+  onChange: (freeContent: string, paidContent: string | null) => void;
   placeholder?: string;
 }
 
@@ -134,7 +135,12 @@ function useDirectFileUpload(
   }, [containerRef, handleClick]);
 }
 
-function BlockEditorInner({ value, onChange, placeholder }: BlockEditorProps) {
+function BlockEditorInner({
+  freeContent,
+  paidContent,
+  onChange,
+  placeholder,
+}: BlockEditorProps) {
   const initialLoadedRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -152,19 +158,59 @@ function BlockEditorInner({ value, onChange, placeholder }: BlockEditorProps) {
   useDirectFileUpload(editor, containerRef);
 
   useEffect(() => {
-    if (!initialLoadedRef.current && value) {
-      initialLoadedRef.current = true;
+    if (initialLoadedRef.current) return;
+    initialLoadedRef.current = true;
 
-      const blocks = editor.tryParseHTMLToBlocks(value);
-      if (blocks.length > 0) {
-        editor.replaceBlocks(editor.document, blocks);
-      }
-    }
-  }, [editor, value]);
+    const freeBlocks = freeContent
+      ? editor.tryParseHTMLToBlocks(freeContent)
+      : [];
+    const paywallDividerBlock = {
+      type: 'paywallDivider' as const,
+      props: {},
+    };
+    const paidBlocks = paidContent
+      ? editor.tryParseHTMLToBlocks(paidContent)
+      : [];
+
+    const allBlocks = [...freeBlocks, paywallDividerBlock, ...paidBlocks];
+    editor.replaceBlocks(editor.document, allBlocks);
+  }, [editor, freeContent, paidContent]);
 
   const handleChange = useCallback(() => {
-    const html = editor.blocksToHTMLLossy(editor.document);
-    onChange(html);
+    const doc = editor.document;
+
+    // 삭제 방지: paywallDivider가 없으면 마지막에 재삽입
+    const paywallIndices = doc.reduce<number[]>((acc, block, idx) => {
+      if (block.type === 'paywallDivider') acc.push(idx);
+      return acc;
+    }, []);
+
+    if (paywallIndices.length === 0) {
+      const lastBlock = doc[doc.length - 1];
+      editor.insertBlocks(
+        [{ type: 'paywallDivider' as const, props: {} }],
+        lastBlock.id,
+        'after',
+      );
+      return;
+    }
+
+    // paywallDivider가 2개 이상이면 첫 번째만 남기고 나머지 제거
+    if (paywallIndices.length > 1) {
+      const blocksToRemove = paywallIndices.slice(1).map((idx) => doc[idx].id);
+      editor.removeBlocks(blocksToRemove);
+      return;
+    }
+
+    const paywallIndex = paywallIndices[0];
+    const freeBlocks = doc.slice(0, paywallIndex);
+    const paidBlocks = doc.slice(paywallIndex + 1);
+
+    const freeHtml = editor.blocksToHTMLLossy(freeBlocks);
+    const paidHtml =
+      paidBlocks.length > 0 ? editor.blocksToHTMLLossy(paidBlocks) : null;
+
+    onChange(freeHtml, paidHtml);
   }, [editor, onChange]);
 
   const getSlashMenuItems = useCallback(
