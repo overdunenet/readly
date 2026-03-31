@@ -158,25 +158,22 @@ function BlockEditorInner({
   useDirectFileUpload(editor, containerRef);
 
   useEffect(() => {
-    if (!initialLoadedRef.current && (freeContent || paidContent)) {
-      initialLoadedRef.current = true;
+    if (initialLoadedRef.current) return;
+    initialLoadedRef.current = true;
 
-      const freeBlocks = freeContent
-        ? editor.tryParseHTMLToBlocks(freeContent)
-        : [];
-      const paywallDividerBlock = {
-        type: 'paywallDivider' as const,
-        props: {},
-      };
-      const paidBlocks = paidContent
-        ? editor.tryParseHTMLToBlocks(paidContent)
-        : [];
+    const freeBlocks = freeContent
+      ? editor.tryParseHTMLToBlocks(freeContent)
+      : [];
+    const paywallDividerBlock = {
+      type: 'paywallDivider' as const,
+      props: {},
+    };
+    const paidBlocks = paidContent
+      ? editor.tryParseHTMLToBlocks(paidContent)
+      : [];
 
-      const allBlocks = [...freeBlocks, paywallDividerBlock, ...paidBlocks];
-      if (allBlocks.length > 0) {
-        editor.replaceBlocks(editor.document, allBlocks);
-      }
-    }
+    const allBlocks = [...freeBlocks, paywallDividerBlock, ...paidBlocks];
+    editor.replaceBlocks(editor.document, allBlocks);
   }, [editor, freeContent, paidContent]);
 
   const handleChange = useCallback(() => {

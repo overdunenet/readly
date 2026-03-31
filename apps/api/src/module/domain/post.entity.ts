@@ -149,7 +149,8 @@ export class PostEntity extends BaseEntity {
       this.freeContent = input.freeContent;
     }
     if (input.paidContent !== undefined) {
-      this.paidContent = input.paidContent || null;
+      this.paidContent =
+        input.paidContent === '' ? null : (input.paidContent ?? null);
     }
     if (input.excerpt !== undefined) {
       this.excerpt = input.excerpt || null;
@@ -166,9 +167,9 @@ export class PostEntity extends BaseEntity {
   }
 
   // 유료 본문 접근 권한 검증
-  canAccessPaidContent(user: UserEntity | null): boolean {
+  canAccessPaidContent(userId: string | null): boolean {
     // 작성자는 항상 접근 가능
-    if (user && user.id === this.authorId) {
+    if (userId && userId === this.authorId) {
       return true;
     }
 

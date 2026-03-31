@@ -132,10 +132,8 @@ export class PostService {
       });
 
     // 유료 본문 접근 권한이 없으면 paidContent를 null로 마스킹
-    const user = userId
-      ? ({ id: userId } as import('../domain/user.entity').UserEntity)
-      : null;
-    if (!post.canAccessPaidContent(user)) {
+    // findOneByIdForRead가 author 관계를 로드하므로, 작성자 본인인지는 authorId로 판단
+    if (!post.canAccessPaidContent(userId ?? null)) {
       post.paidContent = null;
     }
 
