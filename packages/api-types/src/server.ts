@@ -1,6 +1,18 @@
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
 
+enum UserStatus {
+  PENDING_PHONE = 'PENDING_PHONE',
+  PENDING_PROFILE = 'PENDING_PROFILE',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+}
+
+enum Language {
+  KO = 'ko',
+  EN = 'en',
+}
+
 const t = initTRPC.create();
 const publicProcedure = t.procedure;
 
@@ -17,12 +29,7 @@ const appRouter = t.router({
         email: z.string(),
         nickname: z.string(),
         profileImage: z.string().nullable(),
-        status: z.nativeEnum(export enum UserStatus {
-        PENDING_PHONE = 'PENDING_PHONE',
-        PENDING_PROFILE = 'PENDING_PROFILE',
-        ACTIVE = 'ACTIVE',
-        INACTIVE = 'INACTIVE',
-      }),
+        status: z.nativeEnum(UserStatus),
       language: z.string(),
     }),
 })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
@@ -42,12 +49,7 @@ const appRouter = t.router({
         email: z.string(),
         nickname: z.string(),
         profileImage: z.string().nullable(),
-        status: z.nativeEnum(export enum UserStatus {
-        PENDING_PHONE = 'PENDING_PHONE',
-        PENDING_PROFILE = 'PENDING_PROFILE',
-        ACTIVE = 'ACTIVE',
-        INACTIVE = 'INACTIVE',
-      }),
+        status: z.nativeEnum(UserStatus),
       language: z.string(),
     }),
     })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any) }),
@@ -74,10 +76,7 @@ bookstore: t.router({
     bio: z.string().nullable(),
     profileImage: z.string().nullable(),
     coverImage: z.string().nullable(),
-    language: z.nativeEnum(export enum Language {
-    KO = 'ko',
-    EN = 'en',
-  }),
+    language: z.nativeEnum(Language),
     isActive: z.boolean(),
     termsAgreedAt: z.date().nullable(),
     createdAt: z.date(),
@@ -92,10 +91,7 @@ bookstore: t.router({
       bio: z.string().nullable(),
       profileImage: z.string().nullable(),
       coverImage: z.string().nullable(),
-      language: z.nativeEnum(export enum Language {
-      KO = 'ko',
-      EN = 'en',
-    }),
+      language: z.nativeEnum(Language),
       isActive: z.boolean(),
       termsAgreedAt: z.date().nullable(),
       createdAt: z.date(),
@@ -127,10 +123,7 @@ bookstore: t.router({
     bio: z.string().nullable(),
     profileImage: z.string().nullable(),
     coverImage: z.string().nullable(),
-    language: z.nativeEnum(export enum Language {
-    KO = 'ko',
-    EN = 'en',
-  }),
+    language: z.nativeEnum(Language),
     isActive: z.boolean(),
     termsAgreedAt: z.date().nullable(),
     createdAt: z.date(),
@@ -146,10 +139,7 @@ bookstore: t.router({
     bio: z.string().nullable(),
     profileImage: z.string().nullable(),
     coverImage: z.string().nullable(),
-    language: z.nativeEnum(export enum Language {
-    KO = 'ko',
-    EN = 'en',
-  }),
+    language: z.nativeEnum(Language),
     isActive: z.boolean(),
     termsAgreedAt: z.date().nullable(),
     createdAt: z.date(),
@@ -502,12 +492,7 @@ cash: t.router({
             email: z.string().email(),
             nickname: z.string(),
             profileImage: z.string().nullable(),
-            status: z.nativeEnum(export enum UserStatus {
-            PENDING_PHONE = 'PENDING_PHONE',
-            PENDING_PROFILE = 'PENDING_PROFILE',
-            ACTIVE = 'ACTIVE',
-            INACTIVE = 'INACTIVE',
-          }),
+            status: z.nativeEnum(UserStatus),
           language: z.string(),
         }),
 })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
@@ -517,12 +502,7 @@ cash: t.router({
       email: z.string().email(),
       nickname: z.string(),
       profileImage: z.string().nullable(),
-      status: z.nativeEnum(export enum UserStatus {
-      PENDING_PHONE = 'PENDING_PHONE',
-      PENDING_PROFILE = 'PENDING_PROFILE',
-      ACTIVE = 'ACTIVE',
-      INACTIVE = 'INACTIVE',
-    }),
+      status: z.nativeEnum(UserStatus),
       language: z.string(),
 })).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
   updateProfile: publicProcedure.input(z
@@ -543,12 +523,7 @@ cash: t.router({
       email: z.string().email(),
       nickname: z.string(),
       profileImage: z.string().nullable(),
-      status: z.nativeEnum(export enum UserStatus {
-      PENDING_PHONE = 'PENDING_PHONE',
-      PENDING_PROFILE = 'PENDING_PROFILE',
-      ACTIVE = 'ACTIVE',
-      INACTIVE = 'INACTIVE',
-    }),
+      status: z.nativeEnum(UserStatus),
       language: z.string(),
 })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any) })});
 export type AppRouter = typeof appRouter;
