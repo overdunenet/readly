@@ -238,8 +238,9 @@ export class PostEntity extends BaseEntity {
       return true;
     }
 
-    // 구독자/구매자 전용: freeContent는 볼 수 있으므로 접근 허용
+    // subscriber/purchaser: freeContent는 모든 사용자(비로그인 포함)에게 공개
     // paidContent 접근은 canAccessPaidContent()로 별도 제어
+    // TODO: 구독/구매 검증 추가 시 비로그인(user === null)은 freeContent만 허용해야 함
     return true;
   }
 }
