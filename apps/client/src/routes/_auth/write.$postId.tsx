@@ -19,13 +19,15 @@ function WritePage() {
   const { data: post, isLoading } = trpc.post.getOne.useQuery({ postId });
 
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [freeContent, setFreeContent] = useState('');
+  const [paidContent, setPaidContent] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (post) {
       setTitle(post.title);
-      setContent(post.content);
+      setFreeContent(post.freeContent);
+      setPaidContent(post.paidContent);
     }
   }, [post]);
 
@@ -50,7 +52,7 @@ function WritePage() {
   const handleSave = () => {
     updateMutation.mutate({
       postId,
-      data: { title, content },
+      data: { title, freeContent, paidContent },
     });
   };
 
@@ -60,7 +62,8 @@ function WritePage() {
         .replace(/<[^>]*>/g, '')
         .replace(/&nbsp;/g, ' ')
         .trim();
-    const isEmptyDraft = !title.trim() && !stripHtml(content);
+    const isEmptyDraft =
+      !title.trim() && !stripHtml(freeContent) && !paidContent;
     if (isEmptyDraft) {
       deleteMutation.mutate(
         { postId },
@@ -119,8 +122,12 @@ function WritePage() {
         <EditorWrapper>
           <BlockEditor
             key={postId}
-            value={content}
-            onChange={setContent}
+            freeContent={freeContent}
+            paidContent={paidContent}
+            onChange={(free, paid) => {
+              setFreeContent(free);
+              setPaidContent(paid);
+            }}
             placeholder="내용을 작성하세요"
           />
         </EditorWrapper>

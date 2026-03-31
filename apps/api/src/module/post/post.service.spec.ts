@@ -43,14 +43,14 @@ describe('PostService - getAccessiblePosts', () => {
     authorId: string,
     overrides?: Partial<{
       title: string;
-      content: string;
+      freeContent: string;
       accessLevel: PostAccessLevel;
       publish: boolean;
     }>
   ) => {
     const post = await service.createPost(authorId, {
       title: overrides?.title ?? '테스트 포스트',
-      content: overrides?.content ?? '테스트 내용입니다.',
+      freeContent: overrides?.freeContent ?? '테스트 내용입니다.',
       accessLevel: overrides?.accessLevel ?? 'public',
     });
 

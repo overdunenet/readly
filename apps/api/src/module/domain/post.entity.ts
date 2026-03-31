@@ -26,8 +26,21 @@ export class PostEntity extends BaseEntity {
   @Column({ type: 'varchar', default: '', comment: '포스트 제목' })
   title: string;
 
-  @Column({ type: 'text', default: '', comment: '포스트 본문 내용' })
-  content: string;
+  @Column({
+    name: 'free_content',
+    type: 'text',
+    default: '',
+    comment: '포스트 무료 본문 내용',
+  })
+  freeContent: string;
+
+  @Column({
+    name: 'paid_content',
+    type: 'text',
+    nullable: true,
+    comment: '포스트 유료 본문 내용',
+  })
+  paidContent: string | null;
 
   @Column({
     type: 'text',
@@ -94,7 +107,8 @@ export class PostEntity extends BaseEntity {
   // DDD 패턴 - Static Factory Method
   static create(input: {
     title?: string;
-    content?: string;
+    freeContent?: string;
+    paidContent?: string | null;
     excerpt?: string;
     thumbnail?: string;
     accessLevel?: PostAccessLevel;
@@ -106,7 +120,8 @@ export class PostEntity extends BaseEntity {
 
     const post = new PostEntity();
     post.title = '';
-    post.content = '';
+    post.freeContent = '';
+    post.paidContent = null;
     post.status = POST_STATUS.DRAFT;
     post.authorId = authorId;
     post.bookstoreId = bookstoreId ?? null;
@@ -120,7 +135,8 @@ export class PostEntity extends BaseEntity {
   // 포스트 수정
   edit(input: {
     title?: string;
-    content?: string;
+    freeContent?: string;
+    paidContent?: string | null;
     excerpt?: string;
     thumbnail?: string;
     accessLevel?: PostAccessLevel;
@@ -129,8 +145,11 @@ export class PostEntity extends BaseEntity {
     if (input.title !== undefined) {
       this.title = input.title;
     }
-    if (input.content !== undefined) {
-      this.content = input.content;
+    if (input.freeContent !== undefined) {
+      this.freeContent = input.freeContent;
+    }
+    if (input.paidContent !== undefined) {
+      this.paidContent = input.paidContent || null;
     }
     if (input.excerpt !== undefined) {
       this.excerpt = input.excerpt || null;
@@ -144,6 +163,33 @@ export class PostEntity extends BaseEntity {
     if (input.price !== undefined) {
       this.price = input.price || 0;
     }
+  }
+
+  // 유료 본문 접근 권한 검증
+  canAccessPaidContent(user: UserEntity | null): boolean {
+    // 작성자는 항상 접근 가능
+    if (user && user.id === this.authorId) {
+      return true;
+    }
+
+    // 발행되지 않은 포스트는 작성자만 접근 가능
+    if (this.status !== POST_STATUS.PUBLISHED) {
+      return false;
+    }
+
+    // 공개 포스트는 누구나 유료 본문 접근 가능
+    if (this.accessLevel === 'public') {
+      return true;
+    }
+
+    // 비공개 포스트는 작성자만 접근 가능
+    if (this.accessLevel === 'private') {
+      return false;
+    }
+
+    // 구독자 전용, 구매자 전용은 추후 구현
+    // TODO: 구독/구매 로직 구현 후 업데이트
+    return false;
   }
 
   // 포스트 즉시 발행
@@ -191,9 +237,9 @@ export class PostEntity extends BaseEntity {
       return true;
     }
 
-    // 구독자 전용, 구매자 전용은 추후 구현
-    // TODO: 구독/구매 로직 구현 후 업데이트
-    return false;
+    // 구독자/구매자 전용: freeContent는 볼 수 있으므로 접근 허용
+    // paidContent 접근은 canAccessPaidContent()로 별도 제어
+    return true;
   }
 }
 
@@ -205,7 +251,8 @@ export const getPostRepository = (
     .extend({
       async createPost(input: {
         title?: string;
-        content?: string;
+        freeContent?: string;
+        paidContent?: string | null;
         excerpt?: string;
         thumbnail?: string;
         accessLevel?: PostAccessLevel;
