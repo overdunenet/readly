@@ -27,6 +27,7 @@ estimated_tokens: ~150
 | [post-manage-ui.md](./post-manage-ui.md)                 | 에디터 포스트 목록 관리 UI (필터, 검색, 액션)                          |
 | [otp-phone-verification.md](./otp-phone-verification.md) | OTP 전화번호 인증 모듈 (Entity, SMS 인증 플로우)                       |
 | [bookstore-module.md](./bookstore-module.md)             | Bookstore 모듈 (서점 오픈/프로필/설정, PublishDefault Embedded Entity) |
+| [gpm-configuration.md](./gpm-configuration.md)           | GPM 설정 및 GitHub Project V2 태스크 관리 도구 구성                    |
 
 ## 빠른 참조
 

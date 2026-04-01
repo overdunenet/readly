@@ -18,7 +18,7 @@ estimated_tokens: ~150
 | [access-control.md](./access-control.md)                            | 접근 권한 시스템 (무료/유료 구간 구분)                     |
 | [payment.md](./payment.md)                                          | 결제 수단, 유형, 환불 정책                                 |
 | [seo-strategy.md](./seo-strategy.md)                                | SEO 전략 목적 및 빌드 타임 프리렌더링 채택 배경            |
-| [developer-experience.md](./developer-experience.md)                | Claude Code 사용 경험 최적화                               |
+| [developer-experience.md](./developer-experience.md)                | Claude Code 사용 경험 최적화 및 태스크 관리                |
 | [user-follow.md](./user-follow.md)                                  | 사용자 팔로우 기능 (에디터-팔로워 관계)                    |
 | [social-authentication.md](./social-authentication.md)              | 소셜 로그인 정책 (네이버/카카오 OAuth, 계정 연결 전략)     |
 
@@ -43,3 +43,4 @@ estimated_tokens: ~150
 - `codebase/post-manage-ui.md`: 포스트 관리 UI 구현
 - `codebase/social-login.md`: 소셜 로그인 구현
 - `codebase/bookstore-module.md`: Bookstore 모듈 구현
+- `codebase/gpm-configuration.md`: GPM 설정 구현
