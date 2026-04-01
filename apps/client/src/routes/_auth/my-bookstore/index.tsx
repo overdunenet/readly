@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import tw from 'tailwind-styled-components';
 
-export const Route = createFileRoute('/_auth/editor/')({
+export const Route = createFileRoute('/_auth/my-bookstore/')({
   component: Dashboard,
 });
 

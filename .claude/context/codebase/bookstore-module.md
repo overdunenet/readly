@@ -80,14 +80,14 @@ export class BookstoreEntity extends BaseEntity {
 
 ## FE 라우터 구조
 
-경로: `/editor/my-bookstore/*` (인증 필요)
+경로: `/my-bookstore/*` (인증 필요)
 
-| 라우트                          | 파일                                           | 설명                                            |
-| ------------------------------- | ---------------------------------------------- | ----------------------------------------------- |
-| `/editor/my-bookstore/`         | routes/\_auth/editor/my-bookstore/index.tsx    | 서점 메인 (미보유 시 오픈 폼, 보유 시 대시보드) |
-| `/editor/my-bookstore/profile`  | routes/\_auth/editor/my-bookstore/profile.tsx  | 프로필 편집                                     |
-| `/editor/my-bookstore/works`    | routes/\_auth/editor/my-bookstore/works.tsx    | 내 작품 목록                                    |
-| `/editor/my-bookstore/settings` | routes/\_auth/editor/my-bookstore/settings.tsx | 발행 기본값 설정                                |
+| 라우트                   | 파일                                    | 설명                                            |
+| ------------------------ | --------------------------------------- | ----------------------------------------------- |
+| `/my-bookstore/`         | routes/\_auth/my-bookstore/index.tsx    | 서점 메인 (미보유 시 오픈 폼, 보유 시 대시보드) |
+| `/my-bookstore/settings` | routes/\_auth/my-bookstore/settings.tsx | 서점 프로필 편집 (BookstoreForm mode="edit")     |
+
+> 개인 프로필 편집은 `/my/profile`로 분리됨 → [user-profile-ui.md](./user-profile-ui.md)
 
 ### 서점 오픈 분기 로직
 

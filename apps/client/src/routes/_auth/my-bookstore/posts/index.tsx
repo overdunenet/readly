@@ -8,7 +8,7 @@ import PostListItem from '@/components/posts/manage/PostListItem';
 import { trpc } from '@/shared';
 import { AlertModal } from '@/shared/modal/AlertModal';
 
-export const Route = createFileRoute('/_auth/editor/posts/')({
+export const Route = createFileRoute('/_auth/my-bookstore/posts/')({
   component: PostsPage,
 });
 
@@ -24,7 +24,10 @@ function PostsPage() {
 
   const createDraftMutation = trpc.post.create.useMutation({
     onSuccess: (post) => {
-      navigate({ to: '/write/$postId', params: { postId: post.id } });
+      navigate({
+        to: '/my-bookstore/posts/$postId/edit',
+        params: { postId: post.id },
+      });
     },
     onError: (error) => {
       SnappyModal.show(
@@ -77,7 +80,7 @@ function PostsPage() {
   }, [posts, statusFilter, searchQuery]);
 
   const handleEdit = (postId: string) => {
-    navigate({ to: '/write/$postId', params: { postId } });
+    navigate({ to: '/my-bookstore/posts/$postId/edit', params: { postId } });
   };
 
   const handlePublish = (postId: string) => {

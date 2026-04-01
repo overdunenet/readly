@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { FileText, LogOut, Settings, SquarePen, Wallet } from 'lucide-react';
+import { LogOut, Store, UserCircle, Wallet } from 'lucide-react';
 import tw from 'tailwind-styled-components';
 
 import type { User } from '../../stores/auth';
@@ -27,22 +27,18 @@ const UserMenu = ({ user, isOpen, onToggle, onClose, onLogout }: Props) => (
             <UserEmail>{user?.email}</UserEmail>
           </UserInfo>
           <MenuDivider />
-          <MenuLinkItem to="/editor" onClick={onClose}>
-            <SquarePen size={16} />
-            글쓰기
+          <MenuLinkItem to="/my-bookstore" onClick={onClose}>
+            <Store size={16} />내 서점 관리
           </MenuLinkItem>
-          <MenuLinkItem to="/editor/posts" onClick={onClose}>
-            <FileText size={16} />내 포스트
-          </MenuLinkItem>
+          <MenuDivider />
           <MenuLinkItem to="/my/cash" onClick={onClose}>
             <Wallet size={16} />
             캐시 관리
           </MenuLinkItem>
-          <MenuDivider />
-          <MenuLinkItem to="/editor/settings" onClick={onClose}>
-            <Settings size={16} />
-            설정
+          <MenuLinkItem to="/my/profile" onClick={onClose}>
+            <UserCircle size={16} />내 프로필
           </MenuLinkItem>
+          <MenuDivider />
           <MenuItem onClick={onLogout}>
             <LogOut size={16} />
             로그아웃
