@@ -98,11 +98,26 @@ jobs:
             --distribution-id ${{ vars.CF_DISTRIBUTION_DEV }} \
             --paths "/*"
 
+      # --- AUTO DEPLOY TO PRODUCTION (start) ---
+      # 현재 운영 환경을 사용하지 않아 dev 배포 후 자동으로 production에도 배포.
+      # 운영 전환 시 이 블록(start~end)을 삭제하면 수동 배포(workflow_dispatch)로 원복됨.
+      - name: Deploy to production (auto)
+        run: |
+          aws s3 rm s3://${{ env.S3_BUCKET }}/production/ --recursive
+          aws s3 cp s3://${{ env.S3_BUCKET }}/build/${{ steps.hash.outputs.short }}/ s3://${{ env.S3_BUCKET }}/production/ --recursive
+
+      - name: Invalidate CloudFront cache (production)
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ vars.CF_DISTRIBUTION_PROD }} \
+            --paths "/*"
+      # --- AUTO DEPLOY TO PRODUCTION (end) ---
       - name: Summary
         run: |
-          echo "### Deploy Client (Dev) :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "### Deploy Client :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "- **Build**: \`${{ steps.hash.outputs.short }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **S3**: \`s3://${{ env.S3_BUCKET }}/develop/\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dev**: \`s3://${{ env.S3_BUCKET }}/develop/\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Production**: \`s3://${{ env.S3_BUCKET }}/production/\` (auto)" >> $GITHUB_STEP_SUMMARY
 
   deploy-production:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy-production'
