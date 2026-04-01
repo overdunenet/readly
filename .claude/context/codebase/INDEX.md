@@ -27,6 +27,7 @@ estimated_tokens: ~150
 | [post-manage-ui.md](./post-manage-ui.md)                 | 에디터 포스트 목록 관리 UI (필터, 검색, 액션)                          |
 | [otp-phone-verification.md](./otp-phone-verification.md) | OTP 전화번호 인증 모듈 (Entity, SMS 인증 플로우)                       |
 | [bookstore-module.md](./bookstore-module.md)             | Bookstore 모듈 (서점 오픈/프로필/설정, PublishDefault Embedded Entity) |
+| [user-profile-ui.md](./user-profile-ui.md)               | 개인 프로필 편집 UI (/my/profile, 닉네임/아바타)                       |
 
 ## 빠른 참조
 
