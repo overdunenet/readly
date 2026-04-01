@@ -102,7 +102,9 @@ color: violet
 - AskUserQuestion으로 3가지 하위 메뉴 제시:
   1. Milestone - "마일스톤 생성"
   2. Feature - "피쳐 기획 (PRD 작성)"
-  3. Issue - "GitHub Issue 생성 (Bug/Enhancement)"
+  3. Issue - "GitHub Issue 생성 (Bug/Enhancement/Refactor/Infra)"
+
+> Feature만 PRD 워크플로우(Phase A→E)를 거친다. Refactor/Infra는 Issue로 생성하고, 구현 계획은 task-planner의 plan.md에서 수행한다.
 
 **Edit Task 선택 시**:
 
@@ -198,6 +200,15 @@ CIS 워크플로우(Context Making) 실행 시 각 Phase 완료 후 AskUserQuest
 | Milestone   | `PM-DOCS/Planning/Roadmap/milestone-{NNN}.md`                     |
 | CIS 산출물  | `PM-DOCS/Context Output/{workflow}_{YYYY-MM-DD}_{topic}.md`       |
 | Changelog   | `PM-DOCS/Planning/changelog.md` (전역 1개)                        |
+
+## 역할 경계
+
+| 영역            | 담당         | 산출물                                        |
+| --------------- | ------------ | --------------------------------------------- |
+| 기획 (What/Why) | pm-planner   | PRD, screens.yml, events.yml, wireframes.html |
+| 구현 분석 (How) | task-planner | plan.md, context.md, checklist.md             |
+
+> pm-planner는 Implementation Guide를 생성하지 않는다. 구현 방법은 task-planner가 PRD를 읽고 코드베이스를 직접 분석하여 결정한다.
 
 ## Feature 상태 계산 규칙
 
