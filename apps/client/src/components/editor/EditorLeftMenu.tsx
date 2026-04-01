@@ -1,6 +1,5 @@
 import { Link, useLocation } from '@tanstack/react-router';
 import {
-  BarChart3,
   ChevronLeft,
   DollarSign,
   FileText,
@@ -37,11 +36,6 @@ const menuItems = [
     name: '발행 설정',
     path: '/my-bookstore/publish-settings',
     icon: <Settings size={20} />,
-  },
-  {
-    name: '통계',
-    path: '/my-bookstore/analytics',
-    icon: <BarChart3 size={20} />,
   },
   {
     name: '수익 관리',
