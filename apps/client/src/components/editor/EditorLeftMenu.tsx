@@ -42,11 +42,6 @@ const menuItems = [
     path: '/my-bookstore/revenue',
     icon: <DollarSign size={20} />,
   },
-  {
-    name: '내 프로필',
-    path: '/my/profile',
-    icon: <Settings size={20} />,
-  },
 ];
 
 export default function EditorLeftMenu({
