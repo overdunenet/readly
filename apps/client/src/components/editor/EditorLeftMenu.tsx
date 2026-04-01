@@ -34,11 +34,6 @@ const menuItems = [
     icon: <Store size={20} />,
   },
   {
-    name: '작품 관리',
-    path: '/my-bookstore/works',
-    icon: <FileText size={20} />,
-  },
-  {
     name: '발행 설정',
     path: '/my-bookstore/publish-settings',
     icon: <Settings size={20} />,

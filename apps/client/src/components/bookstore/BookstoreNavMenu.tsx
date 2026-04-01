@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { User, BookOpen, Settings } from 'lucide-react';
+import { User, FileText, Settings } from 'lucide-react';
 import tw from 'tailwind-styled-components';
 
 interface BookstoreNavMenuProps {
@@ -14,9 +14,9 @@ const MENU_ITEMS = [
     badge: null,
   },
   {
-    label: '작품 관리',
-    to: '/my-bookstore/works',
-    icon: BookOpen,
+    label: '포스트 관리',
+    to: '/my-bookstore/posts',
+    icon: FileText,
     badge: null,
   },
   {
