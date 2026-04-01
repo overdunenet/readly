@@ -28,8 +28,8 @@ const menuItems = [
     icon: <FileText size={20} />,
   },
   {
-    name: '프로필 편집',
-    path: '/my-bookstore/profile',
+    name: '서점 프로필 편집',
+    path: '/my-bookstore/settings',
     icon: <Store size={20} />,
   },
   {
@@ -43,8 +43,8 @@ const menuItems = [
     icon: <DollarSign size={20} />,
   },
   {
-    name: '설정',
-    path: '/my-bookstore/settings',
+    name: '내 프로필',
+    path: '/my/profile',
     icon: <Settings size={20} />,
   },
 ];

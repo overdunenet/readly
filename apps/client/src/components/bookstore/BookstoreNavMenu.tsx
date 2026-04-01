@@ -8,8 +8,8 @@ interface BookstoreNavMenuProps {
 
 const MENU_ITEMS = [
   {
-    label: '프로필 편집',
-    to: '/my-bookstore/profile',
+    label: '서점 프로필 편집',
+    to: '/my-bookstore/settings',
     icon: User,
     badge: null,
   },
