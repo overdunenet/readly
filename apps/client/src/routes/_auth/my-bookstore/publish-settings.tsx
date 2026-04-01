@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { trpc } from '@/shared';
 import { PUBLISH_ACCESS_LEVEL_OPTIONS } from '@/shared/constants/access-level';
 
-export const Route = createFileRoute('/_auth/editor/my-bookstore/settings')({
+export const Route = createFileRoute('/_auth/my-bookstore/publish-settings')({
   component: SettingsPage,
 });
 

@@ -9,7 +9,7 @@ import StatusFilter, {
 import WorkListItem from '@/components/bookstore/WorkListItem';
 import { trpc } from '@/shared';
 
-export const Route = createFileRoute('/_auth/editor/my-bookstore/works')({
+export const Route = createFileRoute('/_auth/my-bookstore/works')({
   component: WorksPage,
 });
 
@@ -48,7 +48,7 @@ function WorkListContent({
   });
 
   const handleEdit = (postId: string) => {
-    navigate({ to: '/write/$postId', params: { postId } });
+    navigate({ to: '/my-bookstore/posts/$postId/edit', params: { postId } });
   };
 
   if (works.length === 0) {

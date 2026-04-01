@@ -9,19 +9,19 @@ interface BookstoreNavMenuProps {
 const MENU_ITEMS = [
   {
     label: '프로필 편집',
-    to: '/editor/my-bookstore/profile',
+    to: '/my-bookstore/profile',
     icon: User,
     badge: null,
   },
   {
     label: '작품 관리',
-    to: '/editor/my-bookstore/works',
+    to: '/my-bookstore/works',
     icon: BookOpen,
     badge: null,
   },
   {
     label: '발행 설정',
-    to: '/editor/my-bookstore/settings',
+    to: '/my-bookstore/publish-settings',
     icon: Settings,
     badge: 'Growth',
   },

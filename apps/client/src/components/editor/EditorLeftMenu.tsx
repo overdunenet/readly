@@ -20,33 +20,43 @@ interface EditorLeftMenuProps {
 const menuItems = [
   {
     name: '대시보드',
-    path: '/editor',
+    path: '/my-bookstore',
     icon: <LayoutGrid size={20} />,
   },
   {
     name: '포스트 관리',
-    path: '/editor/posts',
+    path: '/my-bookstore/posts',
     icon: <FileText size={20} />,
   },
   {
+    name: '프로필 편집',
+    path: '/my-bookstore/profile',
+    icon: <Store size={20} />,
+  },
+  {
+    name: '작품 관리',
+    path: '/my-bookstore/works',
+    icon: <FileText size={20} />,
+  },
+  {
+    name: '발행 설정',
+    path: '/my-bookstore/publish-settings',
+    icon: <Settings size={20} />,
+  },
+  {
     name: '통계',
-    path: '/editor/analytics',
+    path: '/my-bookstore/analytics',
     icon: <BarChart3 size={20} />,
   },
   {
     name: '수익 관리',
-    path: '/editor/revenue',
+    path: '/my-bookstore/revenue',
     icon: <DollarSign size={20} />,
   },
   {
     name: '설정',
-    path: '/editor/settings',
+    path: '/my-bookstore/settings',
     icon: <Settings size={20} />,
-  },
-  {
-    name: '내 서점',
-    path: '/editor/my-bookstore',
-    icon: <Store size={20} />,
   },
 ];
 

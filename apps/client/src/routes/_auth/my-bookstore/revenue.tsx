@@ -1,16 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router';
 import tw from 'tailwind-styled-components';
 
-export const Route = createFileRoute('/_auth/editor/analytics')({
-  component: AnalyticsPage,
+export const Route = createFileRoute('/_auth/my-bookstore/revenue')({
+  component: RevenuePage,
 });
 
-function AnalyticsPage() {
+function RevenuePage() {
   return (
     <Container>
       <Header>
-        <Title>통계</Title>
-        <Period>최근 30일</Period>
+        <Title>수익 관리</Title>
       </Header>
 
       <ComingSoon>
@@ -23,14 +22,13 @@ function AnalyticsPage() {
             stroke="currentColor"
             strokeWidth="1.5"
           >
-            <line x1="18" y1="20" x2="18" y2="10" />
-            <line x1="12" y1="20" x2="12" y2="4" />
-            <line x1="6" y1="20" x2="6" y2="14" />
+            <line x1="12" y1="1" x2="12" y2="23" />
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
           </svg>
         </ComingSoonIcon>
-        <ComingSoonText>통계 기능 준비 중</ComingSoonText>
+        <ComingSoonText>수익 관리 기능 준비 중</ComingSoonText>
         <ComingSoonSubtext>
-          곧 상세한 분석 데이터를 확인하실 수 있습니다
+          구독료와 포스트 판매 수익을 관리할 수 있습니다
         </ComingSoonSubtext>
       </ComingSoon>
     </Container>
@@ -46,9 +44,6 @@ const Container = tw.div`
 `;
 
 const Header = tw.div`
-  flex
-  items-center
-  justify-between
   mb-8
 `;
 
@@ -56,15 +51,6 @@ const Title = tw.h1`
   text-3xl
   font-bold
   text-gray-900
-`;
-
-const Period = tw.span`
-  text-sm
-  text-gray-600
-  px-3
-  py-1
-  bg-gray-100
-  rounded-full
 `;
 
 const ComingSoon = tw.div`

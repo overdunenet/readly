@@ -152,7 +152,7 @@ function SettingsPage() {
 }
 
 // Route 정의
-export const Route = createFileRoute('/_auth/editor/settings')({
+export const Route = createFileRoute('/_auth/my-bookstore/settings')({
   component: SettingsPage,
 });
 

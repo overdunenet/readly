@@ -27,11 +27,11 @@ const UserMenu = ({ user, isOpen, onToggle, onClose, onLogout }: Props) => (
             <UserEmail>{user?.email}</UserEmail>
           </UserInfo>
           <MenuDivider />
-          <MenuLinkItem to="/editor" onClick={onClose}>
+          <MenuLinkItem to="/my-bookstore" onClick={onClose}>
             <SquarePen size={16} />
             글쓰기
           </MenuLinkItem>
-          <MenuLinkItem to="/editor/posts" onClick={onClose}>
+          <MenuLinkItem to="/my-bookstore/posts" onClick={onClose}>
             <FileText size={16} />내 포스트
           </MenuLinkItem>
           <MenuLinkItem to="/my/cash" onClick={onClose}>
@@ -39,7 +39,7 @@ const UserMenu = ({ user, isOpen, onToggle, onClose, onLogout }: Props) => (
             캐시 관리
           </MenuLinkItem>
           <MenuDivider />
-          <MenuLinkItem to="/editor/settings" onClick={onClose}>
+          <MenuLinkItem to="/my-bookstore/settings" onClick={onClose}>
             <Settings size={16} />
             설정
           </MenuLinkItem>
