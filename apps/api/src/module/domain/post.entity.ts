@@ -2,6 +2,8 @@ import {
   Column,
   Entity,
   ManyToOne,
+  OneToOne,
+  OneToMany,
   JoinColumn,
   DeleteDateColumn,
   EntityManager,
@@ -9,6 +11,7 @@ import {
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { UserEntity } from './user.entity';
 import { BookstoreEntity } from './bookstore.entity';
+import { PostVersionEntity } from './post-version.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
@@ -23,39 +26,6 @@ export const POST_STATUS = {
 
 @Entity('posts')
 export class PostEntity extends BaseEntity {
-  @Column({ type: 'varchar', default: '', comment: '포스트 제목' })
-  title: string;
-
-  @Column({
-    name: 'free_content',
-    type: 'text',
-    default: '',
-    comment: '포스트 무료 본문 내용',
-  })
-  freeContent: string;
-
-  @Column({
-    name: 'paid_content',
-    type: 'text',
-    nullable: true,
-    comment: '포스트 유료 본문 내용',
-  })
-  paidContent: string | null;
-
-  @Column({
-    type: 'text',
-    nullable: true,
-    comment: '포스트 요약/미리보기 텍스트',
-  })
-  excerpt: string | null;
-
-  @Column({
-    type: 'varchar',
-    nullable: true,
-    comment: '포스트 썸네일 이미지 URL',
-  })
-  thumbnail: string | null;
-
   @Column({
     type: 'varchar',
     default: 'public',
@@ -95,6 +65,21 @@ export class PostEntity extends BaseEntity {
   bookstore: BookstoreEntity;
 
   @Column({
+    name: 'published_version_id',
+    type: 'uuid',
+    nullable: true,
+    comment: '발행된 버전 ID',
+  })
+  publishedVersionId: string | null;
+
+  @OneToOne(() => PostVersionEntity)
+  @JoinColumn({ name: 'published_version_id' })
+  publishedVersion: PostVersionEntity | null;
+
+  @OneToMany(() => PostVersionEntity, version => version.post)
+  versions: PostVersionEntity[];
+
+  @Column({
     type: 'integer',
     nullable: true,
     comment: '서점 내 정렬 순서',
@@ -106,58 +91,28 @@ export class PostEntity extends BaseEntity {
 
   // DDD 패턴 - Static Factory Method
   static create(input: {
-    title?: string;
-    freeContent?: string;
-    paidContent?: string | null;
-    excerpt?: string;
-    thumbnail?: string;
-    accessLevel?: PostAccessLevel;
-    price?: number;
     authorId: string;
     bookstoreId?: string;
+    accessLevel?: PostAccessLevel;
+    price?: number;
   }): PostEntity {
-    const { authorId, bookstoreId, ...postEditInput } = input;
-
     const post = new PostEntity();
-    post.title = '';
-    post.freeContent = '';
-    post.paidContent = null;
     post.status = POST_STATUS.DRAFT;
-    post.authorId = authorId;
-    post.bookstoreId = bookstoreId ?? null;
+    post.authorId = input.authorId;
+    post.bookstoreId = input.bookstoreId ?? null;
+    post.publishedVersionId = null;
 
-    // edit 메서드를 활용하여 나머지 필드 설정
-    post.edit(postEditInput);
+    // edit 메서드를 활용하여 메타데이터 설정
+    post.edit({
+      accessLevel: input.accessLevel,
+      price: input.price,
+    });
 
     return post;
   }
 
-  // 포스트 수정
-  edit(input: {
-    title?: string;
-    freeContent?: string;
-    paidContent?: string | null;
-    excerpt?: string;
-    thumbnail?: string;
-    accessLevel?: PostAccessLevel;
-    price?: number;
-  }): void {
-    if (input.title !== undefined) {
-      this.title = input.title;
-    }
-    if (input.freeContent !== undefined) {
-      this.freeContent = input.freeContent;
-    }
-    if (input.paidContent !== undefined) {
-      this.paidContent =
-        input.paidContent === '' ? null : (input.paidContent ?? null);
-    }
-    if (input.excerpt !== undefined) {
-      this.excerpt = input.excerpt || null;
-    }
-    if (input.thumbnail !== undefined) {
-      this.thumbnail = input.thumbnail || null;
-    }
+  // 포스트 메타데이터 수정
+  edit(input: { accessLevel?: PostAccessLevel; price?: number }): void {
     if (input.accessLevel !== undefined) {
       this.accessLevel = input.accessLevel || 'public';
     }
@@ -193,13 +148,11 @@ export class PostEntity extends BaseEntity {
     return false;
   }
 
-  // 포스트 즉시 발행
-  publish(): void {
-    if (this.status === POST_STATUS.PUBLISHED) {
-      throw new Error('Post is already published');
-    }
+  // 포스트 발행 (최초 발행 및 재발행)
+  publish(latestVersionId: string): void {
+    this.publishedVersionId = latestVersionId;
     this.status = POST_STATUS.PUBLISHED;
-    this.publishedAt = new Date();
+    this.publishedAt = this.publishedAt ?? new Date();
   }
 
   // 포스트 임시저장으로 변경
@@ -207,6 +160,7 @@ export class PostEntity extends BaseEntity {
     if (this.status === POST_STATUS.DRAFT) {
       throw new Error('Post is already draft');
     }
+    this.publishedVersionId = null;
     this.status = POST_STATUS.DRAFT;
     this.publishedAt = null;
   }
@@ -252,15 +206,10 @@ export const getPostRepository = (
     .getRepository(PostEntity)
     .extend({
       async createPost(input: {
-        title?: string;
-        freeContent?: string;
-        paidContent?: string | null;
-        excerpt?: string;
-        thumbnail?: string;
-        accessLevel?: PostAccessLevel;
-        price?: number;
         authorId: string;
         bookstoreId?: string;
+        accessLevel?: PostAccessLevel;
+        price?: number;
       }): Promise<PostEntity> {
         const post = PostEntity.create(input);
         return this.save(post);

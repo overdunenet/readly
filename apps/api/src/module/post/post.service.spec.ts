@@ -8,11 +8,18 @@ import { TestingModule } from '@nestjs/testing';
 import { PostService } from './post.service';
 import { EntityManager } from 'typeorm';
 import { UserEntity } from '../domain/user.entity';
-import { PostAccessLevel } from '../domain/post.entity';
+import {
+  PostAccessLevel,
+  POST_STATUS,
+  PostEntity,
+} from '../domain/post.entity';
+import { SAVE_TYPE } from '../domain/post-version.entity';
 import { BookstoreEntity } from '../domain/bookstore.entity';
 import { Language } from '../domain/enums';
 
-describe('PostService - getAccessiblePosts', () => {
+// --- Integration Tests ---
+
+describe('PostService - getAccessiblePosts (Integration)', () => {
   let app: TestingModule;
   let service: PostService;
   let entityManager: EntityManager;
@@ -106,13 +113,11 @@ describe('PostService - getAccessiblePosts', () => {
     await createTestBookstore(user.id);
 
     await createTestPost(user.id, { title: '먼저 작성' });
-    // 약간의 시간차를 위해 publishedAt을 직접 설정
     await createTestPost(user.id, { title: '나중에 작성' });
 
     const result = await service.getAccessiblePosts();
 
     expect(result.length).toBeGreaterThanOrEqual(2);
-    // 최신 포스트가 먼저
     const titles = result.map(p => p.title);
     expect(titles.indexOf('나중에 작성')).toBeLessThan(
       titles.indexOf('먼저 작성')
@@ -159,9 +164,9 @@ describe('PostService - getAccessiblePosts', () => {
   });
 });
 
-describe('PostEntity.canAccessPaidContent', () => {
-  const { PostEntity, POST_STATUS } = require('../domain/post.entity');
+// --- Unit Tests ---
 
+describe('PostEntity.canAccessPaidContent', () => {
   const createPost = (overrides: {
     authorId?: string;
     status?: string;
@@ -169,9 +174,8 @@ describe('PostEntity.canAccessPaidContent', () => {
   }) => {
     const post = new PostEntity();
     post.authorId = overrides.authorId ?? 'author-1';
-    post.status = overrides.status ?? POST_STATUS.PUBLISHED;
-    post.accessLevel = overrides.accessLevel ?? 'public';
-    post.paidContent = '유료 콘텐츠';
+    post.status = (overrides.status ?? POST_STATUS.PUBLISHED) as any;
+    post.accessLevel = (overrides.accessLevel ?? 'public') as any;
     return post;
   };
 
@@ -253,6 +257,337 @@ describe('PostEntity.canAccessPaidContent', () => {
     it('When 미발행 포스트이면 Then 접근 불가하다', () => {
       const post = createPost({ status: POST_STATUS.DRAFT });
       expect(post.canAccessPaidContent(null)).toBe(false);
+    });
+  });
+});
+
+describe('PostService - saveDraft (Integration)', () => {
+  let app: TestingModule;
+  let service: PostService;
+  let entityManager: EntityManager;
+
+  const createTestUser = async () => {
+    const user = new UserEntity();
+    user.email = `test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@example.com`;
+    user.nickname = `user-${Math.random().toString(36).slice(2, 7)}`;
+    return testingRepositoryProvider.UserRepository.save(user);
+  };
+
+  const createTestBookstore = async (userId: string) => {
+    const bookstore = BookstoreEntity.create({
+      userId,
+      penName: '테스트필명',
+      storeName: '테스트서점',
+      language: Language.KO,
+    });
+    return testingRepositoryProvider.BookstoreRepository.save(bookstore);
+  };
+
+  beforeAll(async () => {
+    await DataSources.readly.initialize();
+    app = await getTestingModule();
+    service = app.get(PostService);
+  });
+
+  afterAll(async () => {
+    await app.close();
+    await DataSources.readly.destroy();
+  });
+
+  beforeEach(async () => {
+    entityManager = await getTestingEntityManager();
+  });
+
+  afterEach(async () => {
+    if (entityManager?.queryRunner?.isTransactionActive) {
+      await entityManager.queryRunner.rollbackTransaction();
+    }
+    if (entityManager?.queryRunner && !entityManager.queryRunner.isReleased) {
+      await entityManager.queryRunner.release();
+    }
+  });
+
+  describe('saveDraft', () => {
+    describe('Given: latest.saveType === auto && latest !== publishedVersion', () => {
+      it('should overwrite latest version and apply saveType', async () => {
+        // Given
+        const user = await createTestUser();
+        await createTestBookstore(user.id);
+        const created = await service.createPost(user.id, {
+          title: 'Original',
+          freeContent: 'Original content',
+        });
+
+        // 최초 버전을 auto로 저장하여 auto 버전 생성
+        await service.saveDraft(
+          created.id,
+          user.id,
+          { title: 'Auto saved' },
+          SAVE_TYPE.AUTO
+        );
+
+        // When: auto 버전 위에 다시 saveDraft(manual)
+        const result = await service.saveDraft(
+          created.id,
+          user.id,
+          { title: 'Updated Title', freeContent: 'Updated content' },
+          SAVE_TYPE.MANUAL
+        );
+
+        // Then
+        expect(result.title).toBe('Updated Title');
+        expect(result.freeContent).toBe('Updated content');
+      });
+    });
+
+    describe('Given: latest.saveType === manual', () => {
+      it('should create a new version and apply saveType', async () => {
+        // Given
+        const user = await createTestUser();
+        await createTestBookstore(user.id);
+        const created = await service.createPost(user.id, {
+          title: 'Original',
+          freeContent: 'Original content',
+        });
+
+        // When: manual 위에 auto saveDraft
+        const result = await service.saveDraft(
+          created.id,
+          user.id,
+          { title: 'Auto Draft' },
+          SAVE_TYPE.AUTO
+        );
+
+        // Then: 새 버전 생성됨 (title 변경, freeContent 기존 유지)
+        expect(result.title).toBe('Auto Draft');
+        expect(result.freeContent).toBe('Original content');
+
+        // 버전 수 확인
+        const versions =
+          await testingRepositoryProvider.PostVersionRepository.find({
+            where: { postId: created.id },
+            order: { versionNumber: 'ASC' },
+          });
+        expect(versions).toHaveLength(2);
+        expect(versions[1].saveType).toBe(SAVE_TYPE.AUTO);
+      });
+    });
+
+    describe('Given: latest === publishedVersion', () => {
+      it('should create a new version', async () => {
+        // Given
+        const user = await createTestUser();
+        await createTestBookstore(user.id);
+        const created = await service.createPost(user.id, {
+          title: 'Original',
+          freeContent: 'Original content',
+        });
+        await service.publishPost(created.id, user.id);
+
+        // When: published 상태에서 saveDraft
+        const result = await service.saveDraft(
+          created.id,
+          user.id,
+          { title: 'New Draft' },
+          SAVE_TYPE.AUTO
+        );
+
+        // Then: 새 버전 생성
+        expect(result.title).toBe('New Draft');
+
+        const versions =
+          await testingRepositoryProvider.PostVersionRepository.find({
+            where: { postId: created.id },
+            order: { versionNumber: 'ASC' },
+          });
+        expect(versions).toHaveLength(2);
+      });
+    });
+  });
+});
+
+describe('PostService - publishPost (Integration)', () => {
+  let app: TestingModule;
+  let service: PostService;
+  let entityManager: EntityManager;
+
+  const createTestUser = async () => {
+    const user = new UserEntity();
+    user.email = `test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@example.com`;
+    user.nickname = `user-${Math.random().toString(36).slice(2, 7)}`;
+    return testingRepositoryProvider.UserRepository.save(user);
+  };
+
+  const createTestBookstore = async (userId: string) => {
+    const bookstore = BookstoreEntity.create({
+      userId,
+      penName: '테스트필명',
+      storeName: '테스트서점',
+      language: Language.KO,
+    });
+    return testingRepositoryProvider.BookstoreRepository.save(bookstore);
+  };
+
+  beforeAll(async () => {
+    await DataSources.readly.initialize();
+    app = await getTestingModule();
+    service = app.get(PostService);
+  });
+
+  afterAll(async () => {
+    await app.close();
+    await DataSources.readly.destroy();
+  });
+
+  beforeEach(async () => {
+    entityManager = await getTestingEntityManager();
+  });
+
+  afterEach(async () => {
+    if (entityManager?.queryRunner?.isTransactionActive) {
+      await entityManager.queryRunner.rollbackTransaction();
+    }
+    if (entityManager?.queryRunner && !entityManager.queryRunner.isReleased) {
+      await entityManager.queryRunner.release();
+    }
+  });
+
+  describe('publishPost', () => {
+    it('should update publishedVersionId to latest version id', async () => {
+      // Given
+      const user = await createTestUser();
+      await createTestBookstore(user.id);
+      const created = await service.createPost(user.id, {
+        title: 'Publish Test',
+        freeContent: 'Content',
+      });
+
+      // When
+      const result = await service.publishPost(created.id, user.id);
+
+      // Then
+      expect(result.status).toBe('published');
+      expect(result.publishedAt).toBeDefined();
+
+      // publishedVersionId가 latest version의 id와 일치하는지 확인
+      const post = await testingRepositoryProvider.PostRepository.findOneBy({
+        id: created.id,
+      });
+      const latestVersion =
+        await testingRepositoryProvider.PostVersionRepository.findLatestByPostId(
+          created.id
+        );
+      expect(post!.publishedVersionId).toBe(latestVersion!.id);
+    });
+  });
+});
+
+describe('PostService - getPost (Integration)', () => {
+  let app: TestingModule;
+  let service: PostService;
+  let entityManager: EntityManager;
+
+  const createTestUser = async (
+    overrides?: Partial<{ email: string; nickname: string }>
+  ) => {
+    const user = new UserEntity();
+    user.email =
+      overrides?.email ??
+      `test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@example.com`;
+    user.nickname =
+      overrides?.nickname ?? `user-${Math.random().toString(36).slice(2, 7)}`;
+    return testingRepositoryProvider.UserRepository.save(user);
+  };
+
+  const createTestBookstore = async (userId: string) => {
+    const bookstore = BookstoreEntity.create({
+      userId,
+      penName: '테스트필명',
+      storeName: '테스트서점',
+      language: Language.KO,
+    });
+    return testingRepositoryProvider.BookstoreRepository.save(bookstore);
+  };
+
+  beforeAll(async () => {
+    await DataSources.readly.initialize();
+    app = await getTestingModule();
+    service = app.get(PostService);
+  });
+
+  afterAll(async () => {
+    await app.close();
+    await DataSources.readly.destroy();
+  });
+
+  beforeEach(async () => {
+    entityManager = await getTestingEntityManager();
+  });
+
+  afterEach(async () => {
+    if (entityManager?.queryRunner?.isTransactionActive) {
+      await entityManager.queryRunner.rollbackTransaction();
+    }
+    if (entityManager?.queryRunner && !entityManager.queryRunner.isReleased) {
+      await entityManager.queryRunner.release();
+    }
+  });
+
+  describe('getPost', () => {
+    describe('Given: 발행된 포스트에 추가 draft 버전이 있을 때', () => {
+      it('should return latest version when author requests', async () => {
+        // Given
+        const user = await createTestUser();
+        await createTestBookstore(user.id);
+        const created = await service.createPost(user.id, {
+          title: 'Published Title',
+          freeContent: 'Published Content',
+        });
+        await service.publishPost(created.id, user.id);
+
+        // 발행 후 새 draft 저장
+        await service.saveDraft(
+          created.id,
+          user.id,
+          { title: 'Draft Title', freeContent: 'Draft Content' },
+          SAVE_TYPE.MANUAL
+        );
+
+        // When: author가 조회
+        const result = await service.getPost(created.id, user.id);
+
+        // Then: latest version (draft) 반환
+        expect(result.title).toBe('Draft Title');
+        expect(result.freeContent).toBe('Draft Content');
+      });
+
+      it('should return published version when reader requests', async () => {
+        // Given
+        const author = await createTestUser();
+        await createTestBookstore(author.id);
+        const reader = await createTestUser();
+
+        const created = await service.createPost(author.id, {
+          title: 'Published Title',
+          freeContent: 'Published Content',
+        });
+        await service.publishPost(created.id, author.id);
+
+        // 발행 후 새 draft 저장
+        await service.saveDraft(
+          created.id,
+          author.id,
+          { title: 'Draft Title', freeContent: 'Draft Content' },
+          SAVE_TYPE.MANUAL
+        );
+
+        // When: reader가 조회
+        const result = await service.getPost(created.id, reader.id);
+
+        // Then: published version 반환
+        expect(result.title).toBe('Published Title');
+        expect(result.freeContent).toBe('Published Content');
+      });
     });
   });
 });

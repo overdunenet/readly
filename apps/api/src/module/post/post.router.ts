@@ -57,6 +57,14 @@ const postFeedItemSchema = postResponseSchema.extend({
   }),
 });
 
+const saveDraftDataSchema = z.object({
+  title: z.string().optional(),
+  freeContent: z.string().optional(),
+  paidContent: z.string().nullable().optional(),
+  excerpt: z.string().max(500).optional(),
+  thumbnail: z.string().optional(),
+});
+
 // Editor 페이지에서 포스트 관리를 위한 Router
 @Router({ alias: 'post' })
 export class PostRouter extends BaseTrpcRouter {
@@ -77,6 +85,32 @@ export class PostRouter extends BaseTrpcRouter {
       input,
     });
     return result;
+  }
+
+  /**
+   * 포스트 임시저장 (자동/수동)
+   */
+  @UseMiddlewares(UserAuthMiddleware)
+  @Mutation({
+    input: z.object({
+      postId: z.string().uuid(),
+      data: saveDraftDataSchema,
+      saveType: z.enum(['auto', 'manual']),
+    }),
+    output: postResponseSchema,
+  })
+  async saveDraft(
+    @Input('postId') postId: string,
+    @Input('data') data: z.infer<typeof saveDraftDataSchema>,
+    @Input('saveType') saveType: string,
+    @Ctx() ctx: UserAuthorizedContext
+  ) {
+    return this.microserviceClient.send('post.saveDraft', {
+      postId,
+      authorId: ctx.user.sub,
+      input: data,
+      saveType,
+    });
   }
 
   /**

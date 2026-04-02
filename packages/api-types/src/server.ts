@@ -326,6 +326,37 @@ cash: t.router({
         createdAt: z.date(),
         updatedAt: z.date(),
       })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+      saveDraft: publicProcedure.input(z.object({
+        postId: z.string().uuid(),
+        data: z.object({
+          title: z.string().optional(),
+          freeContent: z.string().optional(),
+          paidContent: z.string().nullable().optional(),
+          excerpt: z.string().max(500).optional(),
+          thumbnail: z.string().optional(),
+        }),
+        saveType: z.enum(['auto', 'manual']),
+      })).output(z.object({
+        id: z.string(),
+        title: z.string(),
+        freeContent: z.string(),
+        paidContent: z.string().nullable(),
+        excerpt: z.string().nullish(),
+        thumbnail: z.string().nullish(),
+        accessLevel: z.enum([
+          'public',
+          'subscriber',
+          'purchaser',
+          'private',
+        ]),
+        status: z.enum(['draft', 'published', 'scheduled']),
+        price: z.number(),
+        bookstoreId: z.string().uuid().nullable(),
+        publishedAt: z.date().nullish(),
+        scheduledAt: z.date().nullish(),
+        createdAt: z.date(),
+        updatedAt: z.date(),
+      })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
       update: publicProcedure.input(z.object({
         postId: z.string(),
         data: z.object({
