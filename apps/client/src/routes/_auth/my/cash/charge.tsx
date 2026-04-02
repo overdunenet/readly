@@ -3,7 +3,7 @@ import { useState } from 'react';
 import SnappyModal from 'react-snappy-modal';
 import tw from 'tailwind-styled-components';
 
-import SubLayout from '../../../../components/layout/SubLayout';
+import SubHeader from '../../../../components/layout/SubHeader';
 
 import { trpc } from '@/shared';
 import { AlertModal } from '@/shared/modal/AlertModal';
@@ -82,7 +82,8 @@ function CashChargePage() {
   };
 
   return (
-    <SubLayout title="캐시 충전">
+    <>
+      <SubHeader title="캐시 충전" />
       <PageContainer>
         {/* 현재 잔액 */}
         <BalanceSection>
@@ -163,7 +164,7 @@ function CashChargePage() {
               : '충전하기'}
         </ChargeButton>
       </PageContainer>
-    </SubLayout>
+    </>
   );
 }
 

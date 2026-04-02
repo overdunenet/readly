@@ -3,7 +3,7 @@ import { ArrowDownCircle, ArrowUpCircle, RotateCcw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import tw from 'tailwind-styled-components';
 
-import SubLayout from '../../../../components/layout/SubLayout';
+import SubHeader from '../../../../components/layout/SubHeader';
 
 import { formatAmount, getAmountColor, getIconBgColor } from './cash-utils';
 
@@ -47,7 +47,8 @@ function CashHistoryPage() {
   };
 
   return (
-    <SubLayout title="거래 내역">
+    <>
+      <SubHeader title="거래 내역" />
       <PageContainer>
         {historyQuery.isLoading && allItems.length === 0 ? (
           <LoadingText>불러오는 중...</LoadingText>
@@ -98,7 +99,7 @@ function CashHistoryPage() {
           </>
         )}
       </PageContainer>
-    </SubLayout>
+    </>
   );
 }
 

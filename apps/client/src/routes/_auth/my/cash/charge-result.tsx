@@ -7,7 +7,7 @@ import { CheckCircle, XCircle } from 'lucide-react';
 import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
-import SubLayout from '../../../../components/layout/SubLayout';
+import SubHeader from '../../../../components/layout/SubHeader';
 
 import { trpc } from '@/shared';
 
@@ -39,7 +39,8 @@ function ChargeResultPage() {
   };
 
   return (
-    <SubLayout title="충전 결과">
+    <>
+      <SubHeader title="충전 결과" />
       <PageContainer>
         <ResultCard>
           {isSuccess ? (
@@ -72,7 +73,7 @@ function ChargeResultPage() {
           </ActionButton>
         </ResultCard>
       </PageContainer>
-    </SubLayout>
+    </>
   );
 }
 
