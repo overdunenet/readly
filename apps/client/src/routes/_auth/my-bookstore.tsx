@@ -28,7 +28,7 @@ function BookstoreCreateSection() {
       utils.bookstore.hasBookstore.invalidate();
     },
     onError: (error) => {
-      if (error.message.includes('이미 서점을 보유')) {
+      if (error.data?.code === 'CONFLICT') {
         utils.bookstore.hasBookstore.invalidate();
         return;
       }
