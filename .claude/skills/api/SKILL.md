@@ -78,6 +78,14 @@ export class PostRouter extends BaseTrpcRouter {
 }
 ```
 
+## BFF Router 설계 체크리스트
+
+Router는 FE 페이지에 최적화된 응답을 제공하는 BFF 레이어입니다. 새 엔드포인트 작성 시 아래를 확인하세요:
+
+- [ ] 이 엔드포인트를 사용하는 FE 페이지/컴포넌트가 무엇인가?
+- [ ] FE가 추가 변환 없이 바로 사용할 수 있는 응답 형태인가?
+- [ ] DB/API 복잡도가 FE 가치 대비 적절한가? (과도하면 FE 변경 제안 또는 Phase 분리)
+
 ## 에러 처리 패턴
 
 ```typescript

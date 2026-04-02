@@ -8,7 +8,8 @@ import { PostEntity, PostAccessLevel } from '../domain/post.entity';
 
 export interface CreatePostInput {
   title?: string;
-  content?: string;
+  freeContent?: string;
+  paidContent?: string | null;
   excerpt?: string;
   thumbnail?: string;
   accessLevel?: PostAccessLevel;
@@ -17,7 +18,8 @@ export interface CreatePostInput {
 
 export interface UpdatePostInput {
   title?: string;
-  content?: string;
+  freeContent?: string;
+  paidContent?: string | null;
   excerpt?: string;
   thumbnail?: string;
   accessLevel?: PostAccessLevel;
@@ -119,14 +121,23 @@ export class PostService {
   }
 
   async getPost(postId: string, userId?: string): Promise<PostEntity> {
-    return this.repositoryProvider.PostRepository.findOneByIdForRead(
-      postId,
-      userId
-    ).catch(() => {
-      throw new NotFoundException(
-        'Post not found or you are not allowed to read this post'
-      );
-    });
+    const post =
+      await this.repositoryProvider.PostRepository.findOneByIdForRead(
+        postId,
+        userId
+      ).catch(() => {
+        throw new NotFoundException(
+          'Post not found or you are not allowed to read this post'
+        );
+      });
+
+    // 유료 본문 접근 권한이 없으면 paidContent를 null로 마스킹
+    // findOneByIdForRead가 author 관계를 로드하므로, 작성자 본인인지는 authorId로 판단
+    if (!post.canAccessPaidContent(userId ?? null)) {
+      post.paidContent = null;
+    }
+
+    return post;
   }
 
   async getMyPosts(authorId: string): Promise<PostEntity[]> {

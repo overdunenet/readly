@@ -63,7 +63,7 @@ function SettingsPage() {
   return (
     <Container>
       <Header>
-        <Title>설정</Title>
+        <Title>내 프로필</Title>
       </Header>
 
       <Section>
@@ -140,19 +140,12 @@ function SettingsPage() {
           )}
         </Form>
       </Section>
-
-      <Section>
-        <SectionTitle>내 서점 관리 설정</SectionTitle>
-        <ComingSoon>
-          <ComingSoonText>추가 설정 옵션 준비 중</ComingSoonText>
-        </ComingSoon>
-      </Section>
     </Container>
   );
 }
 
 // Route 정의
-export const Route = createFileRoute('/_auth/editor/settings')({
+export const Route = createFileRoute('/_auth/my/profile')({
   component: SettingsPage,
 });
 
@@ -187,6 +180,3 @@ const SuccessBox = tw.div`p-3 bg-green-50 border border-green-200 rounded-md tex
 const ButtonGroup = tw.div`flex justify-end gap-3 pt-2`;
 const CancelButton = tw.button`px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50`;
 const SaveButton = tw.button`px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors`;
-
-const ComingSoon = tw.div`text-center py-8`;
-const ComingSoonText = tw.p`text-gray-500`;

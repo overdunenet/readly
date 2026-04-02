@@ -1,0 +1,25 @@
+# ============================================
+# Readly 환경변수 (direnv)
+# 사용법: cp .envrc.sample .envrc && direnv allow
+# ============================================
+
+# === Common ===
+export NODE_ENV=localdev
+
+# === API: Payment ===
+export NICEPAY_CLIENT_KEY=
+export NICEPAY_SECRET=
+
+# === API: OAuth (localdev에서는 선택사항 — localdev.js가 대부분 하드코딩) ===
+# export NAVER_CLIENT_ID=
+# export NAVER_CLIENT_SECRET=
+# export KAKAO_CLIENT_ID=
+# export KAKAO_CLIENT_SECRET=
+
+# === Client: Vite (VITE_ 접두사 필수) ===
+export VITE_API_URL=http://localhost:3000
+export VITE_NAVER_CLIENT_ID=
+export VITE_KAKAO_CLIENT_ID=
+export VITE_NICEPAY_CLIENT_ID=
+# export VITE_NAVER_CALLBACK_URL=http://localhost:5173/auth/naver/callback
+# export VITE_KAKAO_CALLBACK_URL=http://localhost:5173/auth/kakao/callback

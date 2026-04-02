@@ -7,7 +7,7 @@ import type { BookstoreFormData } from '@/components/bookstore/BookstoreForm';
 import { trpc } from '@/shared';
 import { AlertModal } from '@/shared/modal/AlertModal';
 
-export const Route = createFileRoute('/_auth/editor/my-bookstore/profile')({
+export const Route = createFileRoute('/_auth/my-bookstore/settings')({
   component: ProfileEditPage,
 });
 

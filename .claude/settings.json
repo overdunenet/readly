@@ -22,6 +22,14 @@
             "command": ".claude/hooks/workflow-enforced.sh"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/gpm-session-briefing.sh"
+          }
+        ]
       }
     ],
     "SubagentStart": [
@@ -41,6 +49,27 @@
           {
             "type": "command",
             "command": ".claude/hooks/dangerous-command-blocker.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/gpm-commit-linker.sh"
+          }
+        ],
+        "matcher": "Bash"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/gpm-response-suggest.sh"
           }
         ]
       }

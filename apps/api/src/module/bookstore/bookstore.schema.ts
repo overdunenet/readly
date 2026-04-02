@@ -64,7 +64,8 @@ const postAccessLevelSchema = z.enum([
 export const postResponseSchema = z.object({
   id: z.string(),
   title: z.string(),
-  content: z.string(),
+  freeContent: z.string(),
+  paidContent: z.string().nullable(),
   excerpt: z.string().nullish(),
   thumbnail: z.string().nullish(),
   accessLevel: postAccessLevelSchema,

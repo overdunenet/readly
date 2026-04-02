@@ -1,90 +1,75 @@
 @import "tailwindcss";
-@import "ckeditor5/ckeditor5.css";
 
-/* Undo Tailwind Preflight inside CKEditor */
-.ck svg {
-  display: inline;
-}
-
-.ck button {
-  background-color: revert;
-  border-radius: revert;
-}
-
-.ck ol,
-.ck ul,
-.ck menu {
-  list-style: revert;
-}
-
-.ck h1,
-.ck h2,
-.ck h3,
-.ck h4,
-.ck h5,
-.ck h6 {
-  font-size: revert;
-  font-weight: revert;
-}
-
-/* CKEditor Customization - Readly Design System */
-
-/* 에디터 영역 */
-.ck-editor__editable_inline {
+/* BlockNote Editor */
+.bn-editor {
   min-height: 300px;
 }
 
-/* 전체 에디터 래퍼 - 포커스 시 Readly 입력 필드 스타일 */
-.ck.ck-editor__main > .ck-editor__editable {
-  border: none !important;
-  box-shadow: none !important;
+/* BlockNote 팝오버/메뉴 배경 공통 */
+.bn-suggestion-menu,
+.bn-side-menu [data-radix-popper-content-wrapper] > div,
+.bn-container [data-radix-popper-content-wrapper] > div,
+.bn-container [role="menu"] {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-.ck.ck-editor__editable:focus {
-  outline: none !important;
-  box-shadow: none !important;
+/* PaywallDivider 블록 사이드 메뉴 세로 중앙 정렬 */
+[data-block-type="paywallDivider"] .bn-block-content {
+  display: flex;
+  align-items: center;
 }
 
-/* 툴바 - 깔끔한 하단 구분선만 유지 */
-.ck.ck-toolbar {
-  background: white !important;
-  border: none !important;
-  border-bottom: 1px solid #e5e7eb !important; /* gray-200 */
-  padding: 4px 8px !important;
-  border-radius: 0 !important;
+/* 이미지 캡션 숨김 */
+[data-file-block] .bn-file-caption {
+  display: none;
 }
 
-/* 툴바 버튼 - 호버/액티브 시 Readly 색상 */
-.ck.ck-button.ck-on,
-.ck.ck-button.ck-on:not(.ck-disabled):hover {
-  background-color: #eff6ff !important; /* blue-50 */
-  color: #2563eb !important; /* blue-600 */
+/* 이미지 "Add image" 버튼 */
+[data-file-block] .bn-add-file-button {
+  background-color: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 0.5rem;
+  color: #6b7280;
+  padding: 24px 12px;
+  justify-content: center;
+  transition: background-color 0.15s, border-color 0.15s;
 }
 
-.ck.ck-button:not(.ck-disabled):hover {
-  background-color: #f3f4f6 !important; /* gray-100 */
+.bn-editor[contenteditable="true"] [data-file-block] .bn-add-file-button:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
 }
 
-/* 드롭다운 패널 - Readly 카드 스타일 */
-.ck.ck-dropdown__panel {
-  border: 1px solid #e5e7eb !important; /* gray-200 */
-  border-radius: 0.5rem !important; /* rounded-lg */
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important; /* shadow-lg */
+/* Add image 버튼 커서 */
+[data-file-block] .bn-add-file-button {
+  cursor: pointer;
 }
 
-/* 에디터 래퍼 포커스 링 - 부모 div에서 처리 */
-.ck.ck-editor {
-  border-radius: 0 !important;
+/* 포맷팅 툴바 (텍스트 선택/이미지 클릭 시 popover) */
+.bn-container .bn-formatting-toolbar {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 4px;
 }
 
-/* 툴바 구분선 */
-.ck.ck-toolbar .ck-toolbar__separator {
-  background-color: #e5e7eb !important; /* gray-200 */
+/* 이미지 교체 버튼 */
+.bn-file-replace-button {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: #374151;
+  border-radius: 0.25rem;
 }
 
-/* 스티키 패널 border 제거 */
-.ck.ck-sticky-panel__content {
-  border: 0 !important;
+.bn-file-replace-button:hover {
+  background-color: #f3f4f6;
 }
 
 /* Snappy Modal Customization */
