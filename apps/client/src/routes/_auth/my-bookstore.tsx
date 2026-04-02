@@ -3,10 +3,11 @@ import { Suspense, useState } from 'react';
 import SnappyModal from 'react-snappy-modal';
 import tw from 'tailwind-styled-components';
 
-import BookstoreForm, {
-  type BookstoreFormData,
-} from '@/components/bookstore/BookstoreForm';
-import CountryRestrictionNotice from '@/components/bookstore/CountryRestrictionNotice';
+import {
+  BookstoreForm,
+  CountryRestrictionNotice,
+} from '@/components/bookstore';
+import type { BookstoreFormData } from '@/components/bookstore/BookstoreForm';
 import { trpc } from '@/shared';
 import { AlertModal } from '@/shared/modal/AlertModal';
 
@@ -18,11 +19,8 @@ export const Route = createFileRoute('/_auth/my-bookstore')({
   component: MyBookstoreLayout,
 });
 
-function MyBookstoreLayout() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+function BookstoreCreateSection() {
   const user = useAuthStore((s) => s.user);
-  const { data: hasBookstore, isLoading } =
-    trpc.bookstore.hasBookstore.useQuery();
   const utils = trpc.useUtils();
 
   const createMutation = trpc.bookstore.createBookstore.useMutation({
@@ -40,7 +38,7 @@ function MyBookstoreLayout() {
     },
   });
 
-  const handleCreateSubmit = (data: BookstoreFormData) => {
+  const handleSubmit = (data: BookstoreFormData) => {
     createMutation.mutate({
       penName: data.penName,
       storeName: data.storeName,
@@ -48,31 +46,46 @@ function MyBookstoreLayout() {
     });
   };
 
+  if (user?.language !== 'ko') {
+    return <CountryRestrictionNotice />;
+  }
+
+  return (
+    <CreateContainer>
+      <CreateCard>
+        <CreateTitle>서점 오픈하기</CreateTitle>
+        <CreateSubtitle>
+          나만의 서점을 만들고 작품을 발행해보세요
+        </CreateSubtitle>
+        <BookstoreForm
+          mode="create"
+          onSubmit={handleSubmit}
+          isPending={createMutation.isPending}
+          error={createMutation.error?.message ?? null}
+        />
+      </CreateCard>
+    </CreateContainer>
+  );
+}
+
+function MyBookstoreLayout() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const {
+    data: hasBookstore,
+    isLoading,
+    isError,
+  } = trpc.bookstore.hasBookstore.useQuery();
+
   if (isLoading) {
     return <FullScreenLoading>로딩 중...</FullScreenLoading>;
   }
 
-  if (hasBookstore === false) {
-    if (user?.language !== 'ko') {
-      return <CountryRestrictionNotice />;
-    }
+  if (isError) {
+    return <FullScreenLoading>오류가 발생했습니다</FullScreenLoading>;
+  }
 
-    return (
-      <CreateContainer>
-        <CreateCard>
-          <CreateTitle>서점 오픈하기</CreateTitle>
-          <CreateSubtitle>
-            나만의 서점을 만들고 작품을 발행해보세요
-          </CreateSubtitle>
-          <BookstoreForm
-            mode="create"
-            onSubmit={handleCreateSubmit}
-            isPending={createMutation.isPending}
-            error={createMutation.error?.message ?? null}
-          />
-        </CreateCard>
-      </CreateContainer>
-    );
+  if (!hasBookstore) {
+    return <BookstoreCreateSection />;
   }
 
   return (
