@@ -62,6 +62,9 @@ export const useAutoSave = ({
     },
   });
 
+  const saveDraftMutationRef = useRef(saveDraftMutation);
+  saveDraftMutationRef.current = saveDraftMutation;
+
   const isDirty = useCallback((): boolean => {
     const prev = prevRef.current;
     return (
@@ -84,21 +87,13 @@ export const useAutoSave = ({
 
       clearTimer();
       setSaveStatus('saving');
-      saveDraftMutation.mutate({
+      saveDraftMutationRef.current.mutate({
         postId,
         data: { title, freeContent, paidContent },
         saveType,
       });
     },
-    [
-      postId,
-      title,
-      freeContent,
-      paidContent,
-      isDirty,
-      clearTimer,
-      saveDraftMutation,
-    ],
+    [postId, title, freeContent, paidContent, isDirty, clearTimer],
   );
 
   const saveNow = useCallback(() => {

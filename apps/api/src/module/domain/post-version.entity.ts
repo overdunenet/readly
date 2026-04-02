@@ -1,8 +1,29 @@
 import { Column, Entity, ManyToOne, JoinColumn, EntityManager } from 'typeorm';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
-import { PostEntity } from './post.entity';
+import { PostEntity, PostAccessLevel, PostStatus } from './post.entity';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
+
+export interface FlattenedPost {
+  id: string;
+  title: string;
+  freeContent: string;
+  paidContent: string | null;
+  excerpt: string | null;
+  thumbnail: string | null;
+  accessLevel: PostAccessLevel;
+  status: PostStatus;
+  price: number;
+  bookstoreId: string | null;
+  publishedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  author?: {
+    id: string;
+    nickname: string;
+    profileImage: string | null;
+  };
+}
 
 export type SaveType = 'auto' | 'manual';
 
@@ -138,6 +159,34 @@ export class PostVersionEntity extends BaseEntity {
   promoteToManual(): void {
     this.saveType = SAVE_TYPE.MANUAL;
   }
+}
+
+export function flattenPostWithVersion(
+  post: PostEntity,
+  version: PostVersionEntity
+): FlattenedPost {
+  return {
+    id: post.id,
+    title: version.title,
+    freeContent: version.freeContent,
+    paidContent: version.paidContent,
+    excerpt: version.excerpt,
+    thumbnail: version.thumbnail,
+    accessLevel: post.accessLevel,
+    status: post.status,
+    price: post.price,
+    bookstoreId: post.bookstoreId,
+    publishedAt: post.publishedAt,
+    createdAt: post.createdAt,
+    updatedAt: post.updatedAt,
+    ...(post.author && {
+      author: {
+        id: post.author.id,
+        nickname: post.author.nickname,
+        profileImage: post.author.profileImage,
+      },
+    }),
+  };
 }
 
 export const getPostVersionRepository = (

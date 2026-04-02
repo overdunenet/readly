@@ -11,7 +11,7 @@ import {
 } from './bookstore.service';
 import { BookstoreEntity } from '../domain/bookstore.entity';
 import { PostStatus } from '../domain/post.entity';
-import { FlattenedPost } from '../post/post.service';
+import { FlattenedPost } from '../domain/post-version.entity';
 import { PublishDefaultEntity } from '../domain/publish-default.entity';
 
 @Controller()

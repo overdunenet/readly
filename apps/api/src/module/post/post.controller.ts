@@ -7,9 +7,8 @@ import {
   CreatePostInput,
   UpdatePostInput,
   SaveDraftInput,
-  FlattenedPost,
 } from './post.service';
-import { SaveType } from '../domain/post-version.entity';
+import { SaveType, FlattenedPost } from '../domain/post-version.entity';
 
 @Controller()
 export class PostController {

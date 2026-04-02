@@ -9,7 +9,7 @@ import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { stripHtml } from '../shared/utils/sanitize';
 import { BookstoreEntity } from '../domain/bookstore.entity';
 import { PostEntity, PostStatus, POST_STATUS } from '../domain/post.entity';
-import { PostVersionEntity } from '../domain/post-version.entity';
+import { flattenPostWithVersion } from '../domain/post-version.entity';
 import { PublishDefaultEntity } from '../domain/publish-default.entity';
 import { PublishAccessLevel, AgeRating, Language } from '../domain/enums';
 
@@ -42,31 +42,6 @@ export interface UpdateSettingsInput {
 @Injectable()
 export class BookstoreService {
   constructor(private readonly repositoryProvider: RepositoryProvider) {}
-
-  private flattenPostWithVersion(post: PostEntity, version: PostVersionEntity) {
-    return {
-      id: post.id,
-      title: version.title,
-      freeContent: version.freeContent,
-      paidContent: version.paidContent,
-      excerpt: version.excerpt,
-      thumbnail: version.thumbnail,
-      accessLevel: post.accessLevel,
-      status: post.status,
-      price: post.price,
-      bookstoreId: post.bookstoreId,
-      publishedAt: post.publishedAt,
-      createdAt: post.createdAt,
-      updatedAt: post.updatedAt,
-      ...(post.author && {
-        author: {
-          id: post.author.id,
-          nickname: post.author.nickname,
-          profileImage: post.author.profileImage,
-        },
-      }),
-    };
-  }
 
   private getBookstoreByUserId(userId: string): Promise<BookstoreEntity> {
     return this.repositoryProvider.BookstoreRepository.findOneByOrFail({
@@ -192,10 +167,7 @@ export class BookstoreService {
           versionMap.has(post.publishedVersionId)
       )
       .map(post =>
-        this.flattenPostWithVersion(
-          post,
-          versionMap.get(post.publishedVersionId!)!
-        )
+        flattenPostWithVersion(post, versionMap.get(post.publishedVersionId!)!)
       );
 
     return { posts: flattenedPosts, total };
@@ -244,7 +216,7 @@ export class BookstoreService {
 
     return posts
       .filter(post => versionMap.has(post.id))
-      .map(post => this.flattenPostWithVersion(post, versionMap.get(post.id)!));
+      .map(post => flattenPostWithVersion(post, versionMap.get(post.id)!));
   }
 
   async getSettings(userId: string): Promise<PublishDefaultEntity> {
@@ -311,10 +283,7 @@ export class BookstoreService {
           versionMap.has(post.publishedVersionId)
       )
       .map(post =>
-        this.flattenPostWithVersion(
-          post,
-          versionMap.get(post.publishedVersionId!)!
-        )
+        flattenPostWithVersion(post, versionMap.get(post.publishedVersionId!)!)
       );
   }
 }

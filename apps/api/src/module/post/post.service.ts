@@ -10,6 +10,7 @@ import {
   PostVersionEntity,
   SaveType,
   SAVE_TYPE,
+  flattenPostWithVersion,
 } from '../domain/post-version.entity';
 
 export interface CreatePostInput {
@@ -44,58 +45,9 @@ export interface SchedulePostInput {
   scheduledAt: Date;
 }
 
-export interface FlattenedPost {
-  id: string;
-  title: string;
-  freeContent: string;
-  paidContent: string | null;
-  excerpt: string | null;
-  thumbnail: string | null;
-  accessLevel: PostAccessLevel;
-  status: string;
-  price: number;
-  bookstoreId: string | null;
-  publishedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-  author?: {
-    id: string;
-    nickname: string;
-    profileImage: string | null;
-  };
-}
-
 @Injectable()
 export class PostService {
   constructor(private readonly repositoryProvider: RepositoryProvider) {}
-
-  private flattenPostWithVersion(
-    post: PostEntity,
-    version: PostVersionEntity
-  ): FlattenedPost {
-    return {
-      id: post.id,
-      title: version.title,
-      freeContent: version.freeContent,
-      paidContent: version.paidContent,
-      excerpt: version.excerpt,
-      thumbnail: version.thumbnail,
-      accessLevel: post.accessLevel,
-      status: post.status,
-      price: post.price,
-      bookstoreId: post.bookstoreId,
-      publishedAt: post.publishedAt,
-      createdAt: post.createdAt,
-      updatedAt: post.updatedAt,
-      ...(post.author && {
-        author: {
-          id: post.author.id,
-          nickname: post.author.nickname,
-          profileImage: post.author.profileImage,
-        },
-      }),
-    };
-  }
 
   async createPost(authorId: string, input: CreatePostInput) {
     const bookstore =
@@ -124,24 +76,15 @@ export class PostService {
     const savedVersion =
       await this.repositoryProvider.PostVersionRepository.save(version);
 
-    return this.flattenPostWithVersion(post, savedVersion);
+    return flattenPostWithVersion(post, savedVersion);
   }
 
-  async saveDraft(
-    postId: string,
-    authorId: string,
+  private async saveDraftInternal(
+    post: PostEntity,
     input: SaveDraftInput,
     saveType: SaveType
   ) {
-    const post =
-      await this.repositoryProvider.PostRepository.findOneByIdForEdit(
-        postId,
-        authorId
-      ).catch(() => {
-        throw new ForbiddenException(
-          'Post not found or you are not allowed to edit this post'
-        );
-      });
+    const postId = post.id;
 
     const latest =
       await this.repositoryProvider.PostVersionRepository.findLatestByPostId(
@@ -161,7 +104,7 @@ export class PostService {
       latest.saveType = saveType;
       const savedVersion =
         await this.repositoryProvider.PostVersionRepository.save(latest);
-      return this.flattenPostWithVersion(post, savedVersion);
+      return flattenPostWithVersion(post, savedVersion);
     }
 
     // manual 또는 published 버전인 경우 새 버전 생성
@@ -183,10 +126,49 @@ export class PostService {
       saveType,
       mergedInput
     );
-    const savedVersion =
-      await this.repositoryProvider.PostVersionRepository.save(version);
 
-    return this.flattenPostWithVersion(post, savedVersion);
+    // 새 버전 생성 시 unique constraint 위반 가능 -> 1회 retry
+    try {
+      const savedVersion =
+        await this.repositoryProvider.PostVersionRepository.save(version);
+      return flattenPostWithVersion(post, savedVersion);
+    } catch (error) {
+      // unique constraint 위반 시 latest를 다시 조회하여 retry
+      const retryLatest =
+        await this.repositoryProvider.PostVersionRepository.findLatestByPostId(
+          postId
+        );
+      if (!retryLatest) throw error;
+
+      const retryVersion = PostVersionEntity.createNext(
+        postId,
+        retryLatest.versionNumber + 1,
+        saveType,
+        mergedInput
+      );
+      const savedVersion =
+        await this.repositoryProvider.PostVersionRepository.save(retryVersion);
+      return flattenPostWithVersion(post, savedVersion);
+    }
+  }
+
+  async saveDraft(
+    postId: string,
+    authorId: string,
+    input: SaveDraftInput,
+    saveType: SaveType
+  ) {
+    const post =
+      await this.repositoryProvider.PostRepository.findOneByIdForEdit(
+        postId,
+        authorId
+      ).catch(() => {
+        throw new ForbiddenException(
+          'Post not found or you are not allowed to edit this post'
+        );
+      });
+
+    return this.saveDraftInternal(post, input, saveType);
   }
 
   async updatePost(postId: string, authorId: string, input: UpdatePostInput) {
@@ -204,7 +186,7 @@ export class PostService {
     post.edit({ accessLevel: input.accessLevel, price: input.price });
     await this.repositoryProvider.PostRepository.save(post);
 
-    // 콘텐츠 변경이 있으면 saveDraft로 버전 저장
+    // 콘텐츠 변경이 있으면 saveDraftInternal로 버전 저장 (이미 검증된 post 전달)
     const hasContentChanges = [
       input.title,
       input.freeContent,
@@ -214,9 +196,8 @@ export class PostService {
     ].some(v => v !== undefined);
 
     if (hasContentChanges) {
-      return this.saveDraft(
-        postId,
-        authorId,
+      return this.saveDraftInternal(
+        post,
         {
           title: input.title,
           freeContent: input.freeContent,
@@ -236,7 +217,7 @@ export class PostService {
     if (!latest) {
       throw new NotFoundException('No version found for this post');
     }
-    return this.flattenPostWithVersion(post, latest);
+    return flattenPostWithVersion(post, latest);
   }
 
   async publishPost(postId: string, authorId: string) {
@@ -262,7 +243,7 @@ export class PostService {
     post.publish(latest.id);
     await this.repositoryProvider.PostRepository.save(post);
 
-    return this.flattenPostWithVersion(post, latest);
+    return flattenPostWithVersion(post, latest);
   }
 
   async unpublishPost(postId: string, authorId: string) {
@@ -288,7 +269,7 @@ export class PostService {
       throw new NotFoundException('No version found for this post');
     }
 
-    return this.flattenPostWithVersion(post, latest);
+    return flattenPostWithVersion(post, latest);
   }
 
   async deletePost(postId: string, authorId: string): Promise<void> {
@@ -318,13 +299,20 @@ export class PostService {
 
     const isAuthor = userId != null && userId === post.authorId;
 
-    const version = isAuthor
-      ? await this.repositoryProvider.PostVersionRepository.findLatestByPostId(
+    let version: PostVersionEntity | null;
+    if (isAuthor) {
+      version =
+        await this.repositoryProvider.PostVersionRepository.findLatestByPostId(
           postId
-        )
-      : await this.repositoryProvider.PostVersionRepository.findOne({
-          where: { id: post.publishedVersionId! },
-        });
+        );
+    } else {
+      if (!post.publishedVersionId) {
+        throw new NotFoundException('This post has not been published yet');
+      }
+      version = await this.repositoryProvider.PostVersionRepository.findOne({
+        where: { id: post.publishedVersionId },
+      });
+    }
 
     if (!version) {
       throw new NotFoundException('No version found for this post');
@@ -335,7 +323,7 @@ export class PostService {
       version.paidContent = null;
     }
 
-    return this.flattenPostWithVersion(post, version);
+    return flattenPostWithVersion(post, version);
   }
 
   async getMyPosts(authorId: string) {
@@ -375,7 +363,7 @@ export class PostService {
 
     return posts
       .filter(post => versionMap.has(post.id))
-      .map(post => this.flattenPostWithVersion(post, versionMap.get(post.id)!));
+      .map(post => flattenPostWithVersion(post, versionMap.get(post.id)!));
   }
 
   async getAccessiblePosts() {
@@ -406,10 +394,7 @@ export class PostService {
           versionMap.has(post.publishedVersionId)
       )
       .map(post =>
-        this.flattenPostWithVersion(
-          post,
-          versionMap.get(post.publishedVersionId!)!
-        )
+        flattenPostWithVersion(post, versionMap.get(post.publishedVersionId!)!)
       );
   }
 }

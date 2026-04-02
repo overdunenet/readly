@@ -13,47 +13,9 @@ import {
   POST_STATUS,
   PostEntity,
 } from '../domain/post.entity';
-import { PostVersionEntity, SAVE_TYPE } from '../domain/post-version.entity';
+import { SAVE_TYPE } from '../domain/post-version.entity';
 import { BookstoreEntity } from '../domain/bookstore.entity';
 import { Language } from '../domain/enums';
-
-// --- Mock Data Factories ---
-
-function createMockPost(overrides: Partial<PostEntity> = {}): PostEntity {
-  const post = new PostEntity();
-  post.id = 'post-1';
-  post.status = POST_STATUS.DRAFT;
-  post.accessLevel = 'public';
-  post.price = 0;
-  post.bookstoreId = 'bookstore-1';
-  post.publishedAt = null;
-  post.publishedVersionId = null;
-  post.authorId = 'user-1';
-  post.createdAt = new Date('2025-01-01');
-  post.updatedAt = new Date('2025-01-01');
-  post.author = { id: 'user-1', nickname: 'test', profileImage: null } as any;
-  Object.assign(post, overrides);
-  return post;
-}
-
-function createMockVersion(
-  overrides: Partial<PostVersionEntity> = {}
-): PostVersionEntity {
-  const version = new PostVersionEntity();
-  version.id = 'version-1';
-  version.postId = 'post-1';
-  version.versionNumber = 1;
-  version.title = 'Test Title';
-  version.freeContent = 'Free content';
-  version.paidContent = 'Paid content';
-  version.excerpt = 'Excerpt';
-  version.thumbnail = null;
-  version.saveType = SAVE_TYPE.MANUAL;
-  version.createdAt = new Date('2025-01-01');
-  version.updatedAt = new Date('2025-01-01');
-  Object.assign(version, overrides);
-  return version;
-}
 
 // --- Integration Tests ---
 
