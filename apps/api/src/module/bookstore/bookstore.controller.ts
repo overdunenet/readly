@@ -10,7 +10,8 @@ import {
   UpdateSettingsInput,
 } from './bookstore.service';
 import { BookstoreEntity } from '../domain/bookstore.entity';
-import { PostEntity, PostStatus } from '../domain/post.entity';
+import { PostStatus } from '../domain/post.entity';
+import { FlattenedPost } from '../post/post.service';
 import { PublishDefaultEntity } from '../domain/publish-default.entity';
 
 @Controller()
@@ -58,14 +59,14 @@ export class BookstoreController {
   @MessagePattern('bookstore.getPosts')
   async getPosts(
     @Payload() data: { bookstoreId: string; options: GetPostsOptions }
-  ): Promise<{ posts: PostEntity[]; total: number }> {
+  ): Promise<{ posts: FlattenedPost[]; total: number }> {
     return this.bookstoreService.getPosts(data.bookstoreId, data.options);
   }
 
   @MessagePattern('bookstore.getMyPosts')
   async getMyPosts(
     @Payload() data: { userId: string; status?: PostStatus }
-  ): Promise<PostEntity[]> {
+  ): Promise<FlattenedPost[]> {
     return this.bookstoreService.getMyPosts(data.userId, data.status);
   }
 
@@ -87,7 +88,7 @@ export class BookstoreController {
   @MessagePattern('bookstore.getPopularPosts')
   async getPopularPosts(
     @Payload() data: { bookstoreId: string; limit?: number }
-  ): Promise<PostEntity[]> {
+  ): Promise<FlattenedPost[]> {
     return this.bookstoreService.getPopularPosts(data.bookstoreId, data.limit);
   }
 }

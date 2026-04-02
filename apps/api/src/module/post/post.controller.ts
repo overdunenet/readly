@@ -1,17 +1,48 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { PostService, CreatePostInput, UpdatePostInput } from './post.service';
-import { PostEntity } from '../domain/post.entity';
+import { Transactional } from '../shared/transaction/transaction.decorator';
+import { TransactionService } from '../shared/transaction/transaction.service';
+import {
+  PostService,
+  CreatePostInput,
+  UpdatePostInput,
+  SaveDraftInput,
+  FlattenedPost,
+} from './post.service';
+import { SaveType } from '../domain/post-version.entity';
 
 @Controller()
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly postService: PostService,
+    private readonly transactionService: TransactionService
+  ) {}
 
   @MessagePattern('post.create')
+  @Transactional
   async createPost(
     @Payload() data: { authorId: string; input: CreatePostInput }
-  ): Promise<PostEntity> {
+  ): Promise<FlattenedPost> {
     return this.postService.createPost(data.authorId, data.input);
+  }
+
+  @MessagePattern('post.saveDraft')
+  @Transactional
+  async saveDraft(
+    @Payload()
+    data: {
+      postId: string;
+      authorId: string;
+      input: SaveDraftInput;
+      saveType: SaveType;
+    }
+  ) {
+    return this.postService.saveDraft(
+      data.postId,
+      data.authorId,
+      data.input,
+      data.saveType
+    );
   }
 
   @MessagePattern('post.update')
@@ -22,21 +53,21 @@ export class PostController {
       authorId: string;
       input: UpdatePostInput;
     }
-  ): Promise<PostEntity> {
+  ): Promise<FlattenedPost> {
     return this.postService.updatePost(data.postId, data.authorId, data.input);
   }
 
   @MessagePattern('post.publish')
   async publishPost(
     @Payload() data: { postId: string; authorId: string }
-  ): Promise<PostEntity> {
+  ): Promise<FlattenedPost> {
     return this.postService.publishPost(data.postId, data.authorId);
   }
 
   @MessagePattern('post.unpublish')
   async unpublishPost(
     @Payload() data: { postId: string; authorId: string }
-  ): Promise<PostEntity> {
+  ): Promise<FlattenedPost> {
     return this.postService.unpublishPost(data.postId, data.authorId);
   }
 
@@ -50,19 +81,19 @@ export class PostController {
   @MessagePattern('post.getOne')
   async getPost(
     @Payload() data: { postId: string; userId?: string }
-  ): Promise<PostEntity> {
+  ): Promise<FlattenedPost> {
     return this.postService.getPost(data.postId, data.userId);
   }
 
   @MessagePattern('post.getMy')
   async getMyPosts(
     @Payload() data: { authorId: string }
-  ): Promise<PostEntity[]> {
+  ): Promise<FlattenedPost[]> {
     return this.postService.getMyPosts(data.authorId);
   }
 
   @MessagePattern('post.getAccessible')
-  async getAccessiblePosts(): Promise<PostEntity[]> {
+  async getAccessiblePosts(): Promise<FlattenedPost[]> {
     return this.postService.getAccessiblePosts();
   }
 }

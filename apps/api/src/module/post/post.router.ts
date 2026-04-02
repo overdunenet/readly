@@ -80,6 +80,38 @@ export class PostRouter extends BaseTrpcRouter {
   }
 
   /**
+   * 포스트 임시저장 (자동/수동)
+   */
+  @UseMiddlewares(UserAuthMiddleware)
+  @Mutation({
+    input: z.object({
+      postId: z.string().uuid(),
+      data: z.object({
+        title: z.string().optional(),
+        freeContent: z.string().optional(),
+        paidContent: z.string().nullable().optional(),
+        excerpt: z.string().max(500).optional(),
+        thumbnail: z.string().optional(),
+      }),
+      saveType: z.enum(['auto', 'manual']),
+    }),
+    output: postResponseSchema,
+  })
+  async saveDraft(
+    @Input('postId') postId: string,
+    @Input('data') data: any,
+    @Input('saveType') saveType: string,
+    @Ctx() ctx: UserAuthorizedContext
+  ) {
+    return this.microserviceClient.send('post.saveDraft', {
+      postId,
+      authorId: ctx.user.sub,
+      input: data,
+      saveType,
+    });
+  }
+
+  /**
    * 포스트 수정
    */
   @UseMiddlewares(UserAuthMiddleware)

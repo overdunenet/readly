@@ -4,11 +4,12 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
-import { FindOptionsWhere } from 'typeorm';
+import { FindOptionsWhere, In } from 'typeorm';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { stripHtml } from '../shared/utils/sanitize';
 import { BookstoreEntity } from '../domain/bookstore.entity';
 import { PostEntity, PostStatus, POST_STATUS } from '../domain/post.entity';
+import { PostVersionEntity } from '../domain/post-version.entity';
 import { PublishDefaultEntity } from '../domain/publish-default.entity';
 import { PublishAccessLevel, AgeRating, Language } from '../domain/enums';
 
@@ -41,6 +42,31 @@ export interface UpdateSettingsInput {
 @Injectable()
 export class BookstoreService {
   constructor(private readonly repositoryProvider: RepositoryProvider) {}
+
+  private flattenPostWithVersion(post: PostEntity, version: PostVersionEntity) {
+    return {
+      id: post.id,
+      title: version.title,
+      freeContent: version.freeContent,
+      paidContent: version.paidContent,
+      excerpt: version.excerpt,
+      thumbnail: version.thumbnail,
+      accessLevel: post.accessLevel,
+      status: post.status,
+      price: post.price,
+      bookstoreId: post.bookstoreId,
+      publishedAt: post.publishedAt,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      ...(post.author && {
+        author: {
+          id: post.author.id,
+          nickname: post.author.nickname,
+          profileImage: post.author.profileImage,
+        },
+      }),
+    };
+  }
 
   private getBookstoreByUserId(userId: string): Promise<BookstoreEntity> {
     return this.repositoryProvider.BookstoreRepository.findOneByOrFail({
@@ -128,10 +154,7 @@ export class BookstoreService {
     });
   }
 
-  async getPosts(
-    bookstoreId: string,
-    options: GetPostsOptions
-  ): Promise<{ posts: PostEntity[]; total: number }> {
+  async getPosts(bookstoreId: string, options: GetPostsOptions) {
     const page = options.page ?? 1;
     const limit = options.limit ?? 20;
     const skip = (page - 1) * limit;
@@ -148,10 +171,37 @@ export class BookstoreService {
         take: limit,
       });
 
-    return { posts, total };
+    if (posts.length === 0) {
+      return { posts: [], total };
+    }
+
+    const publishedVersionIds = posts
+      .map(p => p.publishedVersionId)
+      .filter((id): id is string => id != null);
+
+    const versions = await this.repositoryProvider.PostVersionRepository.find({
+      where: { id: In(publishedVersionIds) },
+    });
+
+    const versionMap = new Map(versions.map(v => [v.id, v]));
+
+    const flattenedPosts = posts
+      .filter(
+        post =>
+          post.publishedVersionId != null &&
+          versionMap.has(post.publishedVersionId)
+      )
+      .map(post =>
+        this.flattenPostWithVersion(
+          post,
+          versionMap.get(post.publishedVersionId!)!
+        )
+      );
+
+    return { posts: flattenedPosts, total };
   }
 
-  async getMyPosts(userId: string, status?: PostStatus): Promise<PostEntity[]> {
+  async getMyPosts(userId: string, status?: PostStatus) {
     const bookstore = await this.getBookstoreByUserId(userId);
 
     const where: FindOptionsWhere<PostEntity> = { bookstoreId: bookstore.id };
@@ -159,11 +209,42 @@ export class BookstoreService {
       where.status = status;
     }
 
-    return this.repositoryProvider.PostRepository.find({
+    const posts = await this.repositoryProvider.PostRepository.find({
       where,
       relations: ['author'],
       order: { updatedAt: 'DESC' },
     });
+
+    if (posts.length === 0) {
+      return [];
+    }
+
+    const postIds = posts.map(p => p.id);
+
+    const latestVersionRows =
+      await this.repositoryProvider.PostVersionRepository.createQueryBuilder(
+        'pv'
+      )
+        .select('DISTINCT ON (pv.post_id) pv.id', 'id')
+        .where('pv.post_id IN (:...postIds)', { postIds })
+        .orderBy('pv.post_id')
+        .addOrderBy('pv.version_number', 'DESC')
+        .getRawMany<{ id: string }>();
+
+    const latestVersionIds = latestVersionRows.map(r => r.id);
+
+    const versions =
+      latestVersionIds.length > 0
+        ? await this.repositoryProvider.PostVersionRepository.find({
+            where: { id: In(latestVersionIds) },
+          })
+        : [];
+
+    const versionMap = new Map(versions.map(v => [v.postId, v]));
+
+    return posts
+      .filter(post => versionMap.has(post.id))
+      .map(post => this.flattenPostWithVersion(post, versionMap.get(post.id)!));
   }
 
   async getSettings(userId: string): Promise<PublishDefaultEntity> {
@@ -197,12 +278,9 @@ export class BookstoreService {
     return saved.publishDefault;
   }
 
-  async getPopularPosts(
-    bookstoreId: string,
-    limit: number = 5
-  ): Promise<PostEntity[]> {
+  async getPopularPosts(bookstoreId: string, limit: number = 5) {
     // viewCount가 아직 없으므로 최신순 + published 필터로 대체
-    return this.repositoryProvider.PostRepository.find({
+    const posts = await this.repositoryProvider.PostRepository.find({
       where: {
         bookstoreId,
         status: POST_STATUS.PUBLISHED,
@@ -211,5 +289,32 @@ export class BookstoreService {
       order: { createdAt: 'DESC' },
       take: limit,
     });
+
+    if (posts.length === 0) {
+      return [];
+    }
+
+    const publishedVersionIds = posts
+      .map(p => p.publishedVersionId)
+      .filter((id): id is string => id != null);
+
+    const versions = await this.repositoryProvider.PostVersionRepository.find({
+      where: { id: In(publishedVersionIds) },
+    });
+
+    const versionMap = new Map(versions.map(v => [v.id, v]));
+
+    return posts
+      .filter(
+        post =>
+          post.publishedVersionId != null &&
+          versionMap.has(post.publishedVersionId)
+      )
+      .map(post =>
+        this.flattenPostWithVersion(
+          post,
+          versionMap.get(post.publishedVersionId!)!
+        )
+      );
   }
 }

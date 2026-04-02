@@ -1,12 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { ArrowLeft } from 'lucide-react';
 import { ChangeEvent, useEffect, useState } from 'react';
-import SnappyModal from 'react-snappy-modal';
 import tw from 'tailwind-styled-components';
 
 import { BlockEditor } from '@/components/posts/create/editor/BlockEditor';
+import { useAutoSave } from '@/hooks/useAutoSave';
 import { trpc } from '@/shared';
-import { AlertModal } from '@/shared/modal/AlertModal';
 
 export const Route = createFileRoute('/_auth/my-bookstore/posts/$postId/edit')({
   component: WritePage,
@@ -21,7 +20,6 @@ function WritePage() {
   const [title, setTitle] = useState('');
   const [freeContent, setFreeContent] = useState('');
   const [paidContent, setPaidContent] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (post) {
@@ -31,16 +29,11 @@ function WritePage() {
     }
   }, [post]);
 
-  const updateMutation = trpc.post.update.useMutation({
-    onSuccess: () => {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    },
-    onError: (error) => {
-      SnappyModal.show(
-        <AlertModal title="저장 실패" message={error.message} />,
-      );
-    },
+  const { saveStatus, lastSavedAt, saveNow } = useAutoSave({
+    postId,
+    title,
+    freeContent,
+    paidContent,
   });
 
   const deleteMutation = trpc.post.delete.useMutation({
@@ -48,13 +41,6 @@ function WritePage() {
       console.error('Draft 삭제 실패:', error.message);
     },
   });
-
-  const handleSave = () => {
-    updateMutation.mutate({
-      postId,
-      data: { title, freeContent, paidContent },
-    });
-  };
 
   const handleBack = () => {
     const stripHtml = (html: string) =>
@@ -76,12 +62,6 @@ function WritePage() {
     }
   };
 
-  const saveButtonText = saved
-    ? '저장됨'
-    : updateMutation.isPending
-      ? '저장 중...'
-      : '저장';
-
   if (isLoading) {
     return <LoadingArea>로딩 중...</LoadingArea>;
   }
@@ -93,12 +73,24 @@ function WritePage() {
           <ArrowLeft size={20} />
           <span>목록으로</span>
         </BackButton>
-        <SaveButton
-          onClick={handleSave}
-          disabled={updateMutation.isPending || saved}
-        >
-          {saveButtonText}
-        </SaveButton>
+        <SaveArea>
+          {saveStatus === 'saving' && (
+            <SaveStatusText>저장 중...</SaveStatusText>
+          )}
+          {saveStatus === 'saved' && lastSavedAt && (
+            <SaveStatusText>
+              자동저장됨{' '}
+              {lastSavedAt.toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </SaveStatusText>
+          )}
+          {saveStatus === 'error' && <SaveErrorText>저장 실패</SaveErrorText>}
+          <SaveButton onClick={saveNow} disabled={saveStatus === 'saving'}>
+            저장
+          </SaveButton>
+        </SaveArea>
       </Toolbar>
 
       <TitleInput
@@ -148,6 +140,22 @@ const BackButton = tw.button`
   text-gray-600
   hover:text-gray-900
   transition-colors
+`;
+
+const SaveArea = tw.div`
+  flex
+  items-center
+  gap-3
+`;
+
+const SaveStatusText = tw.span`
+  text-gray-400
+  text-sm
+`;
+
+const SaveErrorText = tw.span`
+  text-red-500
+  text-sm
 `;
 
 const SaveButton = tw.button`

@@ -3,6 +3,7 @@ import { AppModule } from '@src/app.module';
 import { DataSources } from '@src/database/datasources';
 import { getUserRepository } from '@src/module/domain/user.entity';
 import { getPostRepository } from '@src/module/domain/post.entity';
+import { getPostVersionRepository } from '@src/module/domain/post-version.entity';
 import { getCashRepository } from '@src/module/domain/cash.entity';
 import { getCashBalanceRepository } from '@src/module/domain/cash-balance.entity';
 import { getCashHistoryRepository } from '@src/module/domain/cash-history.entity';
@@ -33,6 +34,7 @@ export const mockJestRepository = (entityManager?: EntityManager) => {
   const mockedRepository = {
     UserRepository: getUserRepository(entityManager),
     PostRepository: getPostRepository(entityManager),
+    PostVersionRepository: getPostVersionRepository(entityManager),
     CashRepository: getCashRepository(entityManager),
     CashBalanceRepository: getCashBalanceRepository(entityManager),
     CashHistoryRepository: getCashHistoryRepository(entityManager),
