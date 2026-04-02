@@ -39,6 +39,17 @@ readly/
 └── docker/           # Docker 설정
 ```
 
+## 환경 설정
+
+프로젝트 루트의 `.envrc.sample`로 API + Client 환경변수를 통합 관리합니다.
+
+```bash
+cp .envrc.sample .envrc   # 샘플 복사 후 필요한 값 채우기
+direnv allow              # direnv 사용 시
+# 또는
+source .envrc             # direnv 미설치 시 (터미널 세션마다 재실행 필요)
+```
+
 ## 주요 명령어
 
 ```bash
