@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import tw from 'tailwind-styled-components';
 import { z } from 'zod';
 
+import SubHeader from '../../../components/layout/SubHeader';
 import { nicknameSchema as nicknameFieldSchema } from '../../../shared/schemas';
 import { useAuthStore } from '../../../stores/auth';
 
@@ -61,86 +62,87 @@ function SettingsPage() {
   const avatarLetter = user?.nickname?.charAt(0)?.toUpperCase() || '?';
 
   return (
-    <Container>
-      <Header>
-        <Title>내 프로필</Title>
-      </Header>
-
-      <Section>
-        <SectionHeader>
-          <SectionTitle>프로필 정보</SectionTitle>
-          {!isEditing && (
-            <EditButton type="button" onClick={handleEdit}>
-              편집
-            </EditButton>
-          )}
-        </SectionHeader>
-
-        {updateProfile.isSuccess && !isEditing && (
-          <SuccessBox>프로필이 수정되었습니다</SuccessBox>
-        )}
-
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          {/* 아바타 영역 */}
-          <AvatarSection>
-            {user?.profileImage && !imageError ? (
-              <AvatarImage
-                src={user.profileImage}
-                alt={user.nickname}
-                onError={() => setImageError(true)}
-              />
-            ) : (
-              <AvatarFallback>{avatarLetter}</AvatarFallback>
+    <>
+      <SubHeader title="내 프로필" />
+      <PageContainer>
+        <Section>
+          <SectionHeader>
+            <SectionTitle>프로필 정보</SectionTitle>
+            {!isEditing && (
+              <EditButton type="button" onClick={handleEdit}>
+                편집
+              </EditButton>
             )}
-            {isEditing && <AvatarHint>이미지 변경은 준비 중입니다</AvatarHint>}
-          </AvatarSection>
+          </SectionHeader>
 
-          {/* 닉네임 */}
-          <FormGroup>
-            <Label>닉네임</Label>
-            {isEditing ? (
-              <>
-                <EditableInput
-                  {...register('nickname')}
-                  placeholder="닉네임을 입력해주세요"
-                  maxLength={30}
+          {updateProfile.isSuccess && !isEditing && (
+            <SuccessBox>프로필이 수정되었습니다</SuccessBox>
+          )}
+
+          <Form onSubmit={handleSubmit(onSubmit)}>
+            {/* 아바타 영역 */}
+            <AvatarSection>
+              {user?.profileImage && !imageError ? (
+                <AvatarImage
+                  src={user.profileImage}
+                  alt={user.nickname}
+                  onError={() => setImageError(true)}
                 />
-                {errors.nickname && (
-                  <ErrorMessage>{errors.nickname.message}</ErrorMessage>
-                )}
-              </>
-            ) : (
-              <ReadOnlyValue>{user?.nickname || ''}</ReadOnlyValue>
+              ) : (
+                <AvatarFallback>{avatarLetter}</AvatarFallback>
+              )}
+              {isEditing && (
+                <AvatarHint>이미지 변경은 준비 중입니다</AvatarHint>
+              )}
+            </AvatarSection>
+
+            {/* 닉네임 */}
+            <FormGroup>
+              <Label>닉네임</Label>
+              {isEditing ? (
+                <>
+                  <EditableInput
+                    {...register('nickname')}
+                    placeholder="닉네임을 입력해주세요"
+                    maxLength={30}
+                  />
+                  {errors.nickname && (
+                    <ErrorMessage>{errors.nickname.message}</ErrorMessage>
+                  )}
+                </>
+              ) : (
+                <ReadOnlyValue>{user?.nickname || ''}</ReadOnlyValue>
+              )}
+            </FormGroup>
+
+            {/* 이메일 (항상 읽기 전용) */}
+            <FormGroup>
+              <Label>이메일</Label>
+              <ReadOnlyValue>{user?.email || ''}</ReadOnlyValue>
+            </FormGroup>
+
+            {updateProfile.isError && (
+              <AlertBox>{updateProfile.error?.message}</AlertBox>
             )}
-          </FormGroup>
 
-          {/* 이메일 (항상 읽기 전용) */}
-          <FormGroup>
-            <Label>이메일</Label>
-            <ReadOnlyValue>{user?.email || ''}</ReadOnlyValue>
-          </FormGroup>
-
-          {updateProfile.isError && (
-            <AlertBox>{updateProfile.error?.message}</AlertBox>
-          )}
-
-          {/* 편집 모드 버튼 */}
-          {isEditing && (
-            <ButtonGroup>
-              <CancelButton type="button" onClick={handleCancel}>
-                취소
-              </CancelButton>
-              <SaveButton
-                type="submit"
-                disabled={!isDirty || !isValid || updateProfile.isPending}
-              >
-                {updateProfile.isPending ? '저장 중...' : '저장'}
-              </SaveButton>
-            </ButtonGroup>
-          )}
-        </Form>
-      </Section>
-    </Container>
+            {/* 편집 모드 버튼 */}
+            {isEditing && (
+              <ButtonGroup>
+                <CancelButton type="button" onClick={handleCancel}>
+                  취소
+                </CancelButton>
+                <SaveButton
+                  type="submit"
+                  disabled={!isDirty || !isValid || updateProfile.isPending}
+                >
+                  {updateProfile.isPending ? '저장 중...' : '저장'}
+                </SaveButton>
+              </ButtonGroup>
+            )}
+          </Form>
+        </Section>
+      </PageContainer>
+    </>
   );
 }
 
@@ -150,9 +152,7 @@ export const Route = createFileRoute('/_auth/my/profile')({
 });
 
 // Styled Components
-const Container = tw.div`p-6 lg:p-8 max-w-4xl mx-auto`;
-const Header = tw.div`mb-8`;
-const Title = tw.h1`text-3xl font-bold text-gray-900`;
+const PageContainer = tw.div`px-4 py-6`;
 
 const Section = tw.section`bg-white rounded-lg shadow p-6 mb-6`;
 const SectionHeader = tw.div`flex items-center justify-between mb-4`;

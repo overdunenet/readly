@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import tw from 'tailwind-styled-components';
 
-import SubLayout from '../../../../components/layout/SubLayout';
+import SubHeader from '../../../../components/layout/SubHeader';
 
 import { formatAmount, getAmountColor } from './cash-utils';
 
@@ -18,7 +18,8 @@ function CashHubPage() {
   const items = historyQuery.data?.items ?? [];
 
   return (
-    <SubLayout title="캐시 관리">
+    <>
+      <SubHeader title="캐시 관리" />
       <PageContainer>
         {/* 현재 잔액 */}
         <BalanceSection>
@@ -67,7 +68,7 @@ function CashHubPage() {
           )}
         </Section>
       </PageContainer>
-    </SubLayout>
+    </>
   );
 }
 
