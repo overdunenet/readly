@@ -10,5 +10,6 @@ export interface PostItem {
   status: PostStatus;
   price: number;
   publishedAt?: Date | string | null;
+  updatedAt: Date | string;
   createdAt: Date | string;
 }
