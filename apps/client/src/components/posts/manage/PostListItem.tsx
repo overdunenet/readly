@@ -44,10 +44,22 @@ const PostListItem = ({
       : post.updatedAt || post.createdAt;
   const dateLabel = post.status === 'published' ? '발행' : '저장';
 
+  const isDraft = post.status === 'draft';
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onEdit(post.id);
+    }
+  };
+
   return (
     <Card
-      $clickable={post.status === 'draft'}
-      onClick={post.status === 'draft' ? () => onEdit(post.id) : undefined}
+      $clickable={isDraft}
+      onClick={isDraft ? () => onEdit(post.id) : undefined}
+      role={isDraft ? 'button' : undefined}
+      tabIndex={isDraft ? 0 : undefined}
+      onKeyDown={isDraft ? handleKeyDown : undefined}
     >
       <ThumbnailContainer>
         {post.thumbnail ? (
@@ -103,7 +115,7 @@ const Card = tw.article<{ $clickable: boolean }>`
   flex
   items-center
   gap-4
-  ${({ $clickable }) => $clickable && 'cursor-pointer hover:border-gray-300'}
+  ${({ $clickable }) => ($clickable ? 'cursor-pointer hover:border-gray-300 transition-colors' : '')}
 `;
 
 const ThumbnailContainer = tw.div`
