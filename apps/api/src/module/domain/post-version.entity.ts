@@ -1,6 +1,7 @@
 import { Column, Entity, ManyToOne, JoinColumn, EntityManager } from 'typeorm';
 import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { PostEntity, PostAccessLevel, PostStatus } from './post.entity';
+import { AgeRating } from './enums';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
@@ -14,6 +15,7 @@ export interface FlattenedPost {
   accessLevel: PostAccessLevel;
   status: PostStatus;
   price: number;
+  ageRating: AgeRating;
   bookstoreId: string | null;
   publishedAt: Date | null;
   createdAt: Date;
@@ -175,6 +177,7 @@ export function flattenPostWithVersion(
     accessLevel: post.accessLevel,
     status: post.status,
     price: post.price,
+    ageRating: post.ageRating,
     bookstoreId: post.bookstoreId,
     publishedAt: post.publishedAt,
     createdAt: post.createdAt,

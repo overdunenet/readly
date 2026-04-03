@@ -22,6 +22,8 @@ const postAccessLevelSchema = z.enum([
   'private',
 ]);
 
+const ageRatingSchema = z.enum(['all', 'adult']);
+
 const editPostInputSchema = z.object({
   title: z.string().min(1).max(200).optional(),
   freeContent: z.string().optional(),
@@ -42,6 +44,7 @@ const postResponseSchema = z.object({
   accessLevel: postAccessLevelSchema,
   status: z.enum(['draft', 'published', 'scheduled']),
   price: z.number(),
+  ageRating: ageRatingSchema,
   bookstoreId: z.string().uuid().nullable(),
   publishedAt: z.date().nullish(),
   scheduledAt: z.date().nullish(),
@@ -143,16 +146,25 @@ export class PostRouter extends BaseTrpcRouter {
   @Mutation({
     input: z.object({
       postId: z.string(),
+      accessLevel: postAccessLevelSchema.exclude(['private']).optional(),
+      price: z.number().int().min(0).max(100000).optional(),
+      ageRating: ageRatingSchema.optional(),
     }),
     output: postResponseSchema,
   })
   async publish(
     @Ctx() ctx: UserAuthorizedContext,
-    @Input('postId') postId: string
+    @Input('postId') postId: string,
+    @Input('accessLevel') accessLevel?: string,
+    @Input('price') price?: number,
+    @Input('ageRating') ageRating?: string
   ) {
     return await this.microserviceClient.send('post.publish', {
       postId,
       authorId: ctx.user.sub,
+      accessLevel,
+      price,
+      ageRating,
     });
   }
 

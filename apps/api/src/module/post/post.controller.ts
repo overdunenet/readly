@@ -58,9 +58,20 @@ export class PostController {
 
   @MessagePattern('post.publish')
   async publishPost(
-    @Payload() data: { postId: string; authorId: string }
+    @Payload()
+    data: {
+      postId: string;
+      authorId: string;
+      accessLevel?: string;
+      price?: number;
+      ageRating?: string;
+    }
   ): Promise<FlattenedPost> {
-    return this.postService.publishPost(data.postId, data.authorId);
+    return this.postService.publishPost(data.postId, data.authorId, {
+      accessLevel: data.accessLevel,
+      price: data.price,
+      ageRating: data.ageRating,
+    });
   }
 
   @MessagePattern('post.unpublish')

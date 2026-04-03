@@ -6,6 +6,7 @@ import {
 import { In } from 'typeorm';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
 import { PostEntity, PostAccessLevel } from '../domain/post.entity';
+import { AgeRating } from '../domain/enums';
 import {
   PostVersionEntity,
   SaveType,
@@ -220,7 +221,15 @@ export class PostService {
     return flattenPostWithVersion(post, latest);
   }
 
-  async publishPost(postId: string, authorId: string) {
+  async publishPost(
+    postId: string,
+    authorId: string,
+    options?: {
+      accessLevel?: string;
+      price?: number;
+      ageRating?: string;
+    }
+  ) {
     const post =
       await this.repositoryProvider.PostRepository.findOneByIdForEdit(
         postId,
@@ -238,6 +247,15 @@ export class PostService {
 
     if (!latest) {
       throw new NotFoundException('No version found for this post');
+    }
+
+    // 발행 시 메타데이터 업데이트
+    if (options) {
+      post.edit({
+        accessLevel: options.accessLevel as PostAccessLevel | undefined,
+        price: options.price,
+        ageRating: options.ageRating as AgeRating | undefined,
+      });
     }
 
     post.publish(latest.id);
