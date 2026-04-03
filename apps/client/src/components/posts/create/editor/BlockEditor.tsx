@@ -14,12 +14,9 @@ import {
   useCreateBlockNote,
   useSelectedBlocks,
 } from '@blocknote/react';
-import { createTRPCClient, httpLink } from '@trpc/client';
 import { memo, useCallback, useEffect, useRef } from 'react';
 
-import type { AppRouter } from '@readly/api-types/src/server';
-
-import { useAuthStore } from '@/stores/auth';
+import { uploadFile, createUploadKey } from '@/lib/upload';
 
 import { schema, insertDividerItem } from './schema';
 
@@ -28,53 +25,12 @@ interface BlockEditorProps {
   paidContent: string | null;
   onChange: (freeContent: string, paidContent: string | null) => void;
   placeholder?: string;
+  keyPrefix: string;
 }
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-const uploadClient = createTRPCClient<AppRouter>({
-  links: [
-    httpLink({
-      url: `${apiUrl}/trpc`,
-      headers() {
-        const token = useAuthStore.getState().accessToken;
-        return token ? { Authorization: `Bearer ${token}` } : {};
-      },
-    }),
-  ],
-});
-
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-
-async function uploadFile(file: File): Promise<string> {
-  if (file.size > MAX_FILE_SIZE) {
-    throw new Error('파일 크기는 50MB를 초과할 수 없습니다');
-  }
-  if (!file.type.startsWith('image/')) {
-    throw new Error('이미지 파일만 업로드할 수 있습니다');
-  }
-
-  const ext = file.name.split('.').pop() || 'jpg';
-  const key = `post/${crypto.randomUUID()}.${ext}`;
-
-  const { presignedUrl, cdnUrl } =
-    await uploadClient.upload.getPresignedUrl.mutate({
-      key,
-      contentType: file.type,
-    });
-
-  const response = await fetch(presignedUrl, {
-    method: 'PUT',
-    body: file,
-    headers: { 'Content-Type': file.type },
-  });
-
-  if (!response.ok) {
-    throw new Error('이미지 업로드에 실패했습니다');
-  }
-
-  return cdnUrl;
-}
+// 모듈 레벨 ref — BlockEditorInner에서 설정, DirectFileReplaceButton/useDirectFileUpload에서 사용
+let _uploadWithKey: (file: File) => Promise<string> = () =>
+  Promise.reject(new Error('Upload not initialized'));
 
 function pickImageFile(): Promise<File | null> {
   return new Promise((resolve) => {
@@ -106,9 +62,9 @@ function DirectFileReplaceButton() {
   const handleClick = async () => {
     const file = await pickImageFile();
     if (!file) return;
-    const dataUrl = await uploadFile(file);
+    const url = await _uploadWithKey(file);
     editor.updateBlock(selectedBlocks[0].id, {
-      props: { url: dataUrl, name: file.name } as Record<string, string>,
+      props: { url, name: file.name } as Record<string, string>,
     });
   };
 
@@ -160,9 +116,9 @@ function useDirectFileUpload(
       const file = await pickImageFile();
       if (!file) return;
 
-      const dataUrl = await uploadFile(file);
+      const url = await _uploadWithKey(file);
       editor.updateBlock(blockId, {
-        props: { url: dataUrl, name: file.name } as Record<string, string>,
+        props: { url, name: file.name } as Record<string, string>,
       });
     },
     [editor],
@@ -182,14 +138,21 @@ function BlockEditorInner({
   paidContent,
   onChange,
   placeholder,
+  keyPrefix,
 }: BlockEditorProps) {
   const initialLoadedRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // keyPrefix를 포함한 upload 함수 설정
+  _uploadWithKey = (file: File) => {
+    const key = createUploadKey(keyPrefix, file);
+    return uploadFile(file, key);
+  };
+
   const editor = useCreateBlockNote(
     {
       schema,
-      uploadFile,
+      uploadFile: _uploadWithKey,
       placeholders: {
         default: placeholder ?? '내용을 입력하세요',
       },

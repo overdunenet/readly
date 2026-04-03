@@ -104,6 +104,7 @@ function WritePage() {
       <EditorWrapper>
         <BlockEditor
           key={postId}
+          keyPrefix={`post/${postId}`}
           freeContent={freeContent}
           paidContent={paidContent}
           onChange={(free, paid) => {

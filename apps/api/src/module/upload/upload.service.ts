@@ -19,7 +19,7 @@ export class UploadService {
     this.cdnUrl = ConfigProvider.s3.cdnUrl;
   }
 
-  async getPresignedUploadUrl(
+  getPresignedUploadUrl(
     key: string,
     contentType: string
   ): Promise<{ presignedUrl: string; cdnUrl: string }> {
@@ -32,17 +32,29 @@ export class UploadService {
       ContentType: contentType,
     });
 
-    const presignedUrl = await getSignedUrl(this.s3Client, command, {
+    return getSignedUrl(this.s3Client, command, {
       expiresIn: PRESIGNED_URL_EXPIRES_IN,
-    });
-
-    return {
-      presignedUrl,
-      cdnUrl: `${this.cdnUrl}/${key}`,
-    };
+    })
+      .then(presignedUrl => ({
+        presignedUrl,
+        cdnUrl: `${this.cdnUrl}/${key}`,
+      }))
+      .catch(() => {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to generate presigned URL',
+        });
+      });
   }
 
   private validateKey(key: string): void {
+    if (key.includes('..')) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Invalid key: path traversal is not allowed',
+      });
+    }
+
     const hasValidPrefix = ALLOWED_PREFIXES.some(prefix =>
       key.startsWith(prefix)
     );
