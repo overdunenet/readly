@@ -79,21 +79,23 @@ argument-hint: '[PR-number]'
 
 <fields>
 
-| 필드              | 타입         | 기본값    | 설명                                            |
-| ----------------- | ------------ | --------- | ----------------------------------------------- |
-| `name`            | string       | **필수**  | Agent 이름. 소문자+하이픈                       |
-| `description`     | string       | **필수**  | 위임 판단 기준. 언제 이 Agent를 사용하는지 명시 |
-| `keywords`        | array        | -         | 검색/매칭용 키워드. 영문+한글 혼용 권장         |
-| `disallowedTools` | array        | -         | 명시적 거부 도구 목록                           |
-| `model`           | string       | `inherit` | `sonnet`, `opus`, `haiku`, 모델 ID              |
-| `permissionMode`  | string       | `default` | 권한 모드                                       |
-| `maxTurns`        | number       | -         | 최대 턴 수. 초과 시 결과 반환 후 종료           |
-| `skills`          | array        | -         | 시작 시 사전 로드할 Skill 목록                  |
-| `mcpServers`      | object/array | -         | 사용 가능 MCP 서버                              |
-| `hooks`           | object       | -         | Agent 라이프사이클 훅                           |
-| `memory`          | string       | -         | 영속 메모리 스코프: `user`, `project`, `local`  |
-| `background`      | boolean      | `false`   | `true` -> 백그라운드 작업으로 실행              |
-| `isolation`       | string       | -         | `worktree` -> 임시 git worktree에서 격리 실행   |
+| 필드              | 타입         | 기본값    | 설명                                                                                                      |
+| ----------------- | ------------ | --------- | --------------------------------------------------------------------------------------------------------- |
+| `name`            | string       | **필수**  | Agent 이름. 소문자+하이픈                                                                                 |
+| `description`     | string       | **필수**  | 위임 판단 기준. 언제 이 Agent를 사용하는지 명시                                                           |
+| `whenToUse`       | string       | -         | Agent 자동 선택 매칭 기준. 이 Agent를 선택해야 하는 구체적 상황과 유사 Agent와의 구분점을 명시. 10~5000자 |
+| `keywords`        | array        | -         | 검색/매칭용 키워드. 영문+한글 혼용 권장                                                                   |
+| `disallowedTools` | array        | -         | 명시적 거부 도구 목록                                                                                     |
+| `model`           | string       | `inherit` | `sonnet`, `opus`, `haiku`, 모델 ID                                                                        |
+| `permissionMode`  | string       | `default` | 권한 모드                                                                                                 |
+| `maxTurns`        | number       | -         | 최대 턴 수. 초과 시 결과 반환 후 종료                                                                     |
+| `skills`          | array        | -         | 시작 시 사전 로드할 Skill 목록                                                                            |
+| `mcpServers`      | object/array | -         | 사용 가능 MCP 서버                                                                                        |
+| `hooks`           | object       | -         | Agent 라이프사이클 훅                                                                                     |
+| `memory`          | string       | -         | 영속 메모리 스코프: `user`, `project`, `local`                                                            |
+| `background`      | boolean      | `false`   | `true` -> 백그라운드 작업으로 실행                                                                        |
+| `isolation`       | string       | -         | `worktree` -> 임시 git worktree에서 격리 실행                                                             |
+| `coordinatorMode` | boolean      | `false`   | `true` → Coordinator Mode에서 worker로 실행 가능. 소스 분석 기반 추정, 동작 미보장 (experimental, 미검증) |
 
 </fields>
 
@@ -106,6 +108,12 @@ argument-hint: '[PR-number]'
 | `acceptEdits`       | 파일 수정 자동 승인     | code-writer, simple-code-writer |
 | `dontAsk`           | 권한 프롬프트 자동 거부 | -                               |
 | `bypassPermissions` | 모든 권한 검사 건너뜀   | 주의 필요                       |
+
+### Coordinator Mode (Experimental)
+
+`CLAUDE_CODE_COORDINATOR_MODE=true` 환경변수로 활성화.
+Coordinator는 Agent, SendMessage, TaskStop, SyntheticOutput만 사용 가능.
+상세: `advanced-modes.md` 참조
 
 ### skills preload
 
