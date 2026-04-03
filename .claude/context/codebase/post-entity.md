@@ -9,6 +9,7 @@ keywords:
     accessLevel,
     canAccessPaidContent,
     PostRouter,
+    ageRating,
   ]
 estimated_tokens: ~800
 related_contexts:
@@ -66,6 +67,14 @@ export class PostEntity extends BaseEntity {
 
   @Column({ type: 'int', default: 0 })
   price: number;
+
+  @Column({
+    name: 'age_rating',
+    type: 'varchar',
+    default: AgeRating.ALL,
+    comment: '연령 등급 (전체/성인)',
+  })
+  ageRating: AgeRating;
 
   @Column({ type: 'uuid', nullable: true, comment: '서점 ID' })
   bookstoreId: string | null;
@@ -142,6 +151,16 @@ static create(input: {
   return post;
 }
 ```
+
+## edit() 메서드
+
+`edit()` 메서드는 발행 시 메타데이터(접근권한, 가격, 연령등급)를 업데이트합니다.
+
+- `PostEntity.edit()` 참조: `apps/api/src/module/domain/post.entity.ts`
+- 비즈니스 규칙: `accessLevel`이 `public`이면 `price`를 0으로 강제 보정
+- `PostAccessLevel`, `AgeRating` 타입을 직접 사용 (string 캐스팅 제거)
+
+> **핵심 비즈니스 규칙**: 전체공개(public) 포스트는 서버에서 price를 0으로 강제합니다. 클라이언트 검증과 무관하게 서버에서 보장됩니다.
 
 ## 발행/취소 메서드
 
@@ -260,6 +279,11 @@ export const getPostRepository = (source?) =>
 | --------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | apps/api/src/module/post/post.service.ts      | Post 비즈니스 로직      | createPost(), updatePost(), publishPost(), unpublishPost(), deletePost(), getPost(), getMyPosts(), getAccessiblePosts() |
 | apps/api/src/module/post/post.service.spec.ts | PostService 통합 테스트 | getAccessiblePosts() 시나리오 5건                                                                                       |
+
+### publishPost() 타입 안전성
+
+- `PostController.publishPost()`, `PostService.publishPost()`의 options 파라미터가 `string` 타입에서 `PostAccessLevel`, `AgeRating` enum 타입으로 강화됨
+- 타입 캐스팅(`as`) 제거 — Controller/Service 전체에서 enum 직접 사용
 
 ### getAccessiblePosts()
 

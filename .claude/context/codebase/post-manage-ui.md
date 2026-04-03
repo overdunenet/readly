@@ -1,7 +1,7 @@
 ---
 name: post-manage-ui
 description: 에디터 포스트 목록 관리 UI - 필터링, 검색, 발행/삭제 액션
-keywords: [포스트관리, 에디터, PostListItem, 필터, 발행, 삭제]
+keywords: [포스트관리, 에디터, PostListItem, PublishSheet, 필터, 발행, 삭제, 가격검증]
 estimated_tokens: ~300
 ---
 
@@ -18,6 +18,8 @@ estimated_tokens: ~300
 | apps/client/src/components/posts/manage/PostStatusBadge.tsx | 상태 뱃지 | PostStatusBadge (draft/published/scheduled) |
 | apps/client/src/components/posts/manage/PostAccessBadge.tsx | 접근레벨 뱃지 | PostAccessBadge (public/subscriber/purchaser/private) |
 | apps/client/src/components/posts/manage/PostActions.tsx | 액션 드롭다운 | PostActions (수정/발행/삭제) |
+| apps/client/src/components/posts/manage/PublishSheet.tsx | 발행 시트 (접근권한/가격/연령등급) | PublishSheet, publishSheetSchema (Zod) |
+| apps/client/src/components/posts/manage/types.ts | 포스트 타입 정의 | PostItem (ageRating 포함) |
 
 ## 핵심 흐름
 
@@ -36,13 +38,14 @@ PostsPage
     └── PostListItem[]
         ├── PostStatusBadge
         ├── PostAccessBadge
-        └── PostActions → ConfirmModal (삭제 확인)
+        ├── PostActions → ConfirmModal (삭제 확인)
+        └── PublishSheet (접근권한/가격/연령등급 설정 시트)
 ```
 
 ## tRPC 연동
 
 - **Query**: `post.getMy` (내 포스트 목록)
-- **Mutations**: `post.publish`, `post.unpublish`, `post.delete`
+- **Mutations**: `post.publish` (accessLevel/price/ageRating 옵션 포함), `post.unpublish`, `post.delete`
 - 성공 시 `utils.post.getMy.invalidate()`로 캐시 무효화
 - 실패 시 `AlertModal`로 에러 메시지 표시
 
