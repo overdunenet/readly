@@ -32,6 +32,12 @@ type NicepayConfigType = {
   secret: string;
 };
 
+type S3ConfigType = {
+  bucket: string;
+  region: string;
+  cdnUrl: string;
+};
+
 type CorsConfigType = {
   origin: boolean | string | string[];
   credentials: boolean;
@@ -66,5 +72,6 @@ export const ConfigProvider = {
   client: {
     url: config.get<string>('client.url'),
   },
+  s3: config.get<S3ConfigType>('s3'),
   cors: config.get<CorsConfigType>('cors'),
 } as const;

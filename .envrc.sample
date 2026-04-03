@@ -23,3 +23,8 @@ export VITE_KAKAO_CLIENT_ID=
 export VITE_NICEPAY_CLIENT_ID=
 # export VITE_NAVER_CALLBACK_URL=http://localhost:5173/auth/naver/callback
 # export VITE_KAKAO_CALLBACK_URL=http://localhost:5173/auth/kakao/callback
+
+# === API: S3/CDN ===
+export AWS_REGION=ap-northeast-2
+export S3_BUCKET_NAME=cdn-readly
+export CDN_URL=https://cdn.readly.co.kr

@@ -14,7 +14,12 @@ import {
   useCreateBlockNote,
   useSelectedBlocks,
 } from '@blocknote/react';
+import { createTRPCClient, httpLink } from '@trpc/client';
 import { memo, useCallback, useEffect, useRef } from 'react';
+
+import type { AppRouter } from '@readly/api-types/src/server';
+
+import { useAuthStore } from '@/stores/auth';
 
 import { schema, insertDividerItem } from './schema';
 
@@ -25,13 +30,50 @@ interface BlockEditorProps {
   placeholder?: string;
 }
 
-function uploadFile(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+const uploadClient = createTRPCClient<AppRouter>({
+  links: [
+    httpLink({
+      url: `${apiUrl}/trpc`,
+      headers() {
+        const token = useAuthStore.getState().accessToken;
+        return token ? { Authorization: `Bearer ${token}` } : {};
+      },
+    }),
+  ],
+});
+
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+
+async function uploadFile(file: File): Promise<string> {
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error('파일 크기는 50MB를 초과할 수 없습니다');
+  }
+  if (!file.type.startsWith('image/')) {
+    throw new Error('이미지 파일만 업로드할 수 있습니다');
+  }
+
+  const ext = file.name.split('.').pop() || 'jpg';
+  const key = `post/${crypto.randomUUID()}.${ext}`;
+
+  const { presignedUrl, cdnUrl } =
+    await uploadClient.upload.getPresignedUrl.mutate({
+      key,
+      contentType: file.type,
+    });
+
+  const response = await fetch(presignedUrl, {
+    method: 'PUT',
+    body: file,
+    headers: { 'Content-Type': file.type },
   });
+
+  if (!response.ok) {
+    throw new Error('이미지 업로드에 실패했습니다');
+  }
+
+  return cdnUrl;
 }
 
 function pickImageFile(): Promise<File | null> {
