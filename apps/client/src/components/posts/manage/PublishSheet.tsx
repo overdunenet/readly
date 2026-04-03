@@ -25,7 +25,10 @@ const publishSheetSchema = z.object({
     .number()
     .int()
     .min(0, '0 이상 입력해주세요')
-    .max(100000, '100,000원 이하로 입력해주세요'),
+    .max(100000, '100,000원 이하로 입력해주세요')
+    .refine((v) => v === 0 || (v >= 100 && v % 100 === 0), {
+      message: '100원 단위로 입력해주세요',
+    }),
   ageRating: z.enum(['all', 'adult']),
 });
 

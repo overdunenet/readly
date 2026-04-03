@@ -118,6 +118,7 @@ const PostListItem = ({
                           | 'subscriber'
                           | 'purchaser'),
                   price: post.price,
+                  ageRating: post.ageRating,
                 }
           }
           isRepublish={post.status === 'published'}

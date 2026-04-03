@@ -225,9 +225,9 @@ export class PostService {
     postId: string,
     authorId: string,
     options?: {
-      accessLevel?: string;
+      accessLevel?: PostAccessLevel;
       price?: number;
-      ageRating?: string;
+      ageRating?: AgeRating;
     }
   ) {
     const post =
@@ -252,9 +252,9 @@ export class PostService {
     // 발행 시 메타데이터 업데이트
     if (options) {
       post.edit({
-        accessLevel: options.accessLevel as PostAccessLevel | undefined,
+        accessLevel: options.accessLevel,
         price: options.price,
-        ageRating: options.ageRating as AgeRating | undefined,
+        ageRating: options.ageRating,
       });
     }
 

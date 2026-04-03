@@ -49,6 +49,7 @@ export class PostEntity extends BaseEntity {
   price: number;
 
   @Column({
+    name: 'age_rating',
     type: 'varchar',
     default: AgeRating.ALL,
     comment: '연령 등급 (전체/성인)',
@@ -132,6 +133,10 @@ export class PostEntity extends BaseEntity {
     }
     if (input.price !== undefined) {
       this.price = input.price || 0;
+    }
+    // accessLevel이 public이면 가격을 0으로 강제 보정
+    if (this.accessLevel === 'public') {
+      this.price = 0;
     }
     if (input.ageRating !== undefined) {
       this.ageRating = input.ageRating || AgeRating.ALL;
