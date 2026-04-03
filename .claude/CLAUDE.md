@@ -210,6 +210,7 @@ Plan 파일의 Context 섹션에 위 내용을 명시하여 작업 목적이 희
 - [ ] 독립적으로 빌드 가능한 단위로 작업
 - [ ] 한 번에 하나의 기능/수정만 진행
 - [ ] 빌드 가능 상태를 유지
+- [ ] **Read-before-Write**: 파일 수정 전 반드시 Read로 해당 파일을 읽기
 
 ### Step 3.1.5: 빌드/테스트 검증 — 커밋 전 필수
 
@@ -332,17 +333,36 @@ YES인 Agent는 Task 도구로 호출하세요.
 
 </evaluation_protocol>
 
+<compact_instructions>
+
+## Compact Instructions (Context 압축 시 보존 대상)
+
+Context 압축(Compaction) 시 아래 항목을 반드시 보존하세요.
+
+1. **위임 규칙**: Main Agent는 직접 코드를 읽거나 쓰지 않는다. 모든 작업은 subagent에 위임.
+2. **Agent 역할 구분**:
+   - 탐색: `explore`(haiku) / 분석: `context-collector`(opus) / Context 문서: `project-context-collector`(sonnet)
+   - 코드: `code-writer`(opus) / `simple-code-writer`(haiku, 1-2파일)
+   - Git: `git-manager`(sonnet) -- Main Agent는 git 명령 직접 실행 금지
+3. **워크플로우**: Context 수집 → TaskList → task-enricher → Plan 문서 → 사용자 Confirm → 검증 → 구현 → 커밋 → 리뷰
+4. **Plan 문서**: `.claude/plan/`에 plan.md, context.md, checklist.md 3개 필수
+5. **Skill Preload**: Agent의 `skills` 필드로 자동 preload. 프롬프트에 규칙 직접 작성 금지
+6. **Execution Plan**: TaskList의 각 task에 `## Execution Plan` 섹션 존재. Main Agent는 이에 따라 subagent 조율
+
+</compact_instructions>
+
 ## 문서 참조
 
 <reference>
 
-| 유형               | 위치                                                |
-| ------------------ | --------------------------------------------------- |
-| PM 기획 문서       | `.claude/context/planning/`                         |
-| 프로젝트 배경 정보 | `.claude/context/`                                  |
-| 공통 코딩 원칙     | `.claude/skills/Coding/SKILL.md`                    |
-| Git 규칙           | `.claude/skills/Git/SKILL.md`                       |
-| 문서 작성 가이드   | `.claude/skills/Documentation/SKILL.md`             |
-| 현재 작업 계획     | `.claude/plan/` (plan.md, context.md, checklist.md) |
+| 유형                            | 위치                                                 |
+| ------------------------------- | ---------------------------------------------------- |
+| PM 기획 문서                    | `.claude/context/planning/`                          |
+| 프로젝트 배경 정보              | `.claude/context/`                                   |
+| 공통 코딩 원칙                  | `.claude/skills/Coding/SKILL.md`                     |
+| Git 규칙                        | `.claude/skills/Git/SKILL.md`                        |
+| 문서 작성 가이드                | `.claude/skills/Documentation/SKILL.md`              |
+| 현재 작업 계획                  | `.claude/plan/` (plan.md, context.md, checklist.md)  |
+| 고급 모드 가이드 (Experimental) | `.claude/skills/PromptStructuring/advanced-modes.md` |
 
 </reference>
