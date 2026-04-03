@@ -3,19 +3,32 @@ import { useEffect, useState } from 'react';
 import SnappyModal from 'react-snappy-modal';
 import tw from 'tailwind-styled-components';
 
+import PublishSheet, {
+  PublishSheetResult,
+} from '@/components/posts/manage/PublishSheet';
 import { PostStatus } from '@/components/posts/manage/types';
 import { ConfirmModal } from '@/shared/modal/ConfirmModal';
 
+export interface PublishOptions {
+  accessLevel: 'public' | 'subscriber' | 'purchaser';
+  price: number;
+  ageRating: 'all' | 'adult';
+}
+
 interface PostActionsProps {
   status: PostStatus;
+  publishDefaults?: Partial<PublishSheetResult>;
+  isRepublish?: boolean;
   onEdit: () => void;
-  onPublish: () => void;
+  onPublish: (options: PublishOptions) => void;
   onUnpublish: () => void;
   onDelete: () => void;
 }
 
 const PostActions = ({
   status,
+  publishDefaults,
+  isRepublish,
   onEdit,
   onPublish,
   onUnpublish,
@@ -45,7 +58,17 @@ const PostActions = ({
     if (status === 'published') {
       onUnpublish();
     } else {
-      onPublish();
+      SnappyModal.show(
+        <PublishSheet
+          defaultValues={publishDefaults}
+          isRepublish={isRepublish}
+        />,
+        { position: 'bottom-center' },
+      ).then((result) => {
+        if (result) {
+          onPublish(result as PublishOptions);
+        }
+      });
     }
   };
 
