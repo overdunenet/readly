@@ -39,11 +39,16 @@ const PostListItem = ({
   onDelete,
 }: PostListItemProps) => {
   const displayDate =
-    post.status === 'published' ? post.publishedAt : post.createdAt;
-  const dateLabel = post.status === 'published' ? '발행' : '작성';
+    post.status === 'published'
+      ? post.publishedAt
+      : post.updatedAt || post.createdAt;
+  const dateLabel = post.status === 'published' ? '발행' : '저장';
 
   return (
-    <Card>
+    <Card
+      $clickable={post.status === 'draft'}
+      onClick={post.status === 'draft' ? () => onEdit(post.id) : undefined}
+    >
       <ThumbnailContainer>
         {post.thumbnail ? (
           <ThumbnailImage src={post.thumbnail} alt={post.title} />
@@ -72,7 +77,7 @@ const PostListItem = ({
         </MetaRow>
       </ContentArea>
 
-      <ActionsContainer>
+      <ActionsContainer onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <PostActions
           status={post.status}
           onEdit={() => onEdit(post.id)}
@@ -88,7 +93,7 @@ const PostListItem = ({
 export default PostListItem;
 
 // Styled Components
-const Card = tw.article`
+const Card = tw.article<{ $clickable: boolean }>`
   bg-white
   rounded-lg
   shadow-sm
@@ -98,6 +103,7 @@ const Card = tw.article`
   flex
   items-center
   gap-4
+  ${({ $clickable }) => $clickable && 'cursor-pointer hover:border-gray-300'}
 `;
 
 const ThumbnailContainer = tw.div`
