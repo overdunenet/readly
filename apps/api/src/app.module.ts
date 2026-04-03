@@ -7,6 +7,7 @@ import { AuthModule } from '@src/module/auth/auth.module';
 import { CashModule } from '@src/module/cash/cash.module';
 import { PaymentModule } from '@src/module/payment/payment.module';
 import { BookstoreModule } from '@src/module/bookstore/bookstore.module';
+import { UploadModule } from '@src/module/upload/upload.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { BookstoreModule } from '@src/module/bookstore/bookstore.module';
     CashModule,
     PaymentModule,
     BookstoreModule,
+    UploadModule,
   ],
   controllers: [],
   providers: [],

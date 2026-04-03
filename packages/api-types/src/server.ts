@@ -515,6 +515,15 @@ cash: t.router({
         }),
       }))).query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
     }),
+      upload: t.router({
+        getPresignedUrl: publicProcedure.input(z.object({
+          key: z.string().min(1),
+          contentType: z.string().min(1),
+        })).output(z.object({
+          presignedUrl: z.string(),
+          cdnUrl: z.string(),
+        })).mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+      }),
       user: t.router({
         refreshToken: publicProcedure.input(z.object({})).output(z.object({
           accessToken: z.string(),

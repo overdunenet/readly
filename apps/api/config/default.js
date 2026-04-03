@@ -60,6 +60,11 @@ module.exports = {
   client: {
     url: 'https://post.readly.co.kr',
   },
+  s3: {
+    bucket: process.env.S3_BUCKET_NAME,
+    region: process.env.AWS_REGION || 'ap-northeast-2',
+    cdnUrl: process.env.CDN_URL,
+  },
   cors: {
     origin: [
       /\.readly\.co\.kr$/,

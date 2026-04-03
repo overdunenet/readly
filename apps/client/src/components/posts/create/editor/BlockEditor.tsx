@@ -16,6 +16,8 @@ import {
 } from '@blocknote/react';
 import { memo, useCallback, useEffect, useRef } from 'react';
 
+import { uploadFile, createUploadKey } from '@/lib/upload';
+
 import { schema, insertDividerItem } from './schema';
 
 interface BlockEditorProps {
@@ -23,16 +25,12 @@ interface BlockEditorProps {
   paidContent: string | null;
   onChange: (freeContent: string, paidContent: string | null) => void;
   placeholder?: string;
+  keyPrefix: string;
 }
 
-function uploadFile(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-}
+// 모듈 레벨 ref — BlockEditorInner에서 설정, DirectFileReplaceButton/useDirectFileUpload에서 사용
+let _uploadWithKey: (file: File) => Promise<string> = () =>
+  Promise.reject(new Error('Upload not initialized'));
 
 function pickImageFile(): Promise<File | null> {
   return new Promise((resolve) => {
@@ -64,9 +62,9 @@ function DirectFileReplaceButton() {
   const handleClick = async () => {
     const file = await pickImageFile();
     if (!file) return;
-    const dataUrl = await uploadFile(file);
+    const url = await _uploadWithKey(file);
     editor.updateBlock(selectedBlocks[0].id, {
-      props: { url: dataUrl, name: file.name } as Record<string, string>,
+      props: { url, name: file.name } as Record<string, string>,
     });
   };
 
@@ -118,9 +116,9 @@ function useDirectFileUpload(
       const file = await pickImageFile();
       if (!file) return;
 
-      const dataUrl = await uploadFile(file);
+      const url = await _uploadWithKey(file);
       editor.updateBlock(blockId, {
-        props: { url: dataUrl, name: file.name } as Record<string, string>,
+        props: { url, name: file.name } as Record<string, string>,
       });
     },
     [editor],
@@ -140,14 +138,21 @@ function BlockEditorInner({
   paidContent,
   onChange,
   placeholder,
+  keyPrefix,
 }: BlockEditorProps) {
   const initialLoadedRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // keyPrefix를 포함한 upload 함수 설정
+  _uploadWithKey = (file: File) => {
+    const key = createUploadKey(keyPrefix, file);
+    return uploadFile(file, key);
+  };
+
   const editor = useCreateBlockNote(
     {
       schema,
-      uploadFile,
+      uploadFile: _uploadWithKey,
       placeholders: {
         default: placeholder ?? '내용을 입력하세요',
       },
