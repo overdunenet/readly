@@ -85,7 +85,7 @@ export class BookstoreEntity extends BaseEntity {
 | 라우트                   | 파일                                    | 설명                                            |
 | ------------------------ | --------------------------------------- | ----------------------------------------------- |
 | `/my-bookstore/`         | routes/\_auth/my-bookstore/index.tsx    | 서점 메인 (미보유 시 오픈 폼, 보유 시 대시보드) |
-| `/my-bookstore/settings` | routes/\_auth/my-bookstore/settings.tsx | 서점 프로필 편집 (BookstoreForm mode="edit")     |
+| `/my-bookstore/settings` | routes/\_auth/my-bookstore/settings.tsx | 서점 프로필 편집 (BookstoreForm mode="edit")    |
 
 > 개인 프로필 편집은 `/my/profile`로 분리됨 → [user-profile-ui.md](./user-profile-ui.md)
 

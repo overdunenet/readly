@@ -14,9 +14,9 @@ related_contexts:
 
 ## 파일 구조
 
-| 파일                                                | 역할                                         | 핵심 함수/클래스                  |
-| --------------------------------------------------- | -------------------------------------------- | --------------------------------- |
-| apps/client/src/routes/_auth/my/profile.tsx         | 개인 프로필 편집 페이지                      | SettingsPage(), profileFormSchema |
+| 파일                                                 | 역할                                         | 핵심 함수/클래스                  |
+| ---------------------------------------------------- | -------------------------------------------- | --------------------------------- |
+| apps/client/src/routes/\_auth/my/profile.tsx         | 개인 프로필 편집 페이지                      | SettingsPage(), profileFormSchema |
 | apps/client/src/components/editor/EditorLeftMenu.tsx | 에디터 좌측 네비게이션 (내 프로필 링크 포함) | menuItems[]                       |
 
 ## 라우트
