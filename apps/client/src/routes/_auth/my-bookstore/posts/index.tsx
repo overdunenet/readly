@@ -2,8 +2,10 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { FileText, Plus, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import SnappyModal from 'react-snappy-modal';
+import { toast } from 'sonner';
 import tw from 'tailwind-styled-components';
 
+import { PublishOptions } from '@/components/posts/manage/PostActions';
 import PostListItem from '@/components/posts/manage/PostListItem';
 import { trpc } from '@/shared';
 import { AlertModal } from '@/shared/modal/AlertModal';
@@ -20,6 +22,7 @@ function PostsPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: posts, isLoading } = trpc.post.getMy.useQuery();
+  const { data: bookstoreSettings } = trpc.bookstore.getSettings.useQuery();
   const utils = trpc.useUtils();
 
   const createDraftMutation = trpc.post.create.useMutation({
@@ -40,7 +43,10 @@ function PostsPage() {
   });
 
   const publishMutation = trpc.post.publish.useMutation({
-    onSuccess: () => utils.post.getMy.invalidate(),
+    onSuccess: () => {
+      utils.post.getMy.invalidate();
+      toast.success('포스트가 발행되었습니다');
+    },
     onError: (error) => {
       SnappyModal.show(
         <AlertModal title="발행 실패" message={error.message} />,
@@ -83,8 +89,8 @@ function PostsPage() {
     navigate({ to: '/my-bookstore/posts/$postId/edit', params: { postId } });
   };
 
-  const handlePublish = (postId: string) => {
-    publishMutation.mutate({ postId });
+  const handlePublish = (postId: string, options: PublishOptions) => {
+    publishMutation.mutate({ postId, ...options });
   };
 
   const handleUnpublish = (postId: string) => {
@@ -177,6 +183,7 @@ function PostsPage() {
             <PostListItem
               key={post.id}
               post={post}
+              bookstoreDefaults={bookstoreSettings}
               onEdit={handleEdit}
               onPublish={handlePublish}
               onUnpublish={handleUnpublish}

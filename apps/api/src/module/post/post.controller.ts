@@ -9,6 +9,8 @@ import {
   SaveDraftInput,
 } from './post.service';
 import { SaveType, FlattenedPost } from '../domain/post-version.entity';
+import { PostAccessLevel } from '../domain/post.entity';
+import { AgeRating } from '../domain/enums';
 
 @Controller()
 export class PostController {
@@ -58,9 +60,20 @@ export class PostController {
 
   @MessagePattern('post.publish')
   async publishPost(
-    @Payload() data: { postId: string; authorId: string }
+    @Payload()
+    data: {
+      postId: string;
+      authorId: string;
+      accessLevel?: PostAccessLevel;
+      price?: number;
+      ageRating?: AgeRating;
+    }
   ): Promise<FlattenedPost> {
-    return this.postService.publishPost(data.postId, data.authorId);
+    return this.postService.publishPost(data.postId, data.authorId, {
+      accessLevel: data.accessLevel,
+      price: data.price,
+      ageRating: data.ageRating,
+    });
   }
 
   @MessagePattern('post.unpublish')

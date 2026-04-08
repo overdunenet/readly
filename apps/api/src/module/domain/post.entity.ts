@@ -12,6 +12,7 @@ import { BaseEntity } from '@src/module/shared/entity/base.entity';
 import { UserEntity } from './user.entity';
 import { BookstoreEntity } from './bookstore.entity';
 import { PostVersionEntity } from './post-version.entity';
+import { AgeRating } from './enums';
 import { TransactionService } from '../shared/transaction/transaction.service';
 import { getEntityManager } from '@src/database/datasources';
 
@@ -46,6 +47,14 @@ export class PostEntity extends BaseEntity {
     comment: '포스트 가격 (유료 포스트인 경우)',
   })
   price: number;
+
+  @Column({
+    name: 'age_rating',
+    type: 'varchar',
+    default: AgeRating.ALL,
+    comment: '연령 등급 (전체/성인)',
+  })
+  ageRating: AgeRating;
 
   @Column({ type: 'timestamptz', nullable: true, comment: '포스트 발행 일시' })
   publishedAt: Date | null;
@@ -95,6 +104,7 @@ export class PostEntity extends BaseEntity {
     bookstoreId?: string;
     accessLevel?: PostAccessLevel;
     price?: number;
+    ageRating?: AgeRating;
   }): PostEntity {
     const post = new PostEntity();
     post.status = POST_STATUS.DRAFT;
@@ -106,18 +116,30 @@ export class PostEntity extends BaseEntity {
     post.edit({
       accessLevel: input.accessLevel,
       price: input.price,
+      ageRating: input.ageRating,
     });
 
     return post;
   }
 
   // 포스트 메타데이터 수정
-  edit(input: { accessLevel?: PostAccessLevel; price?: number }): void {
+  edit(input: {
+    accessLevel?: PostAccessLevel;
+    price?: number;
+    ageRating?: AgeRating;
+  }): void {
     if (input.accessLevel !== undefined) {
       this.accessLevel = input.accessLevel || 'public';
     }
     if (input.price !== undefined) {
       this.price = input.price || 0;
+    }
+    // accessLevel이 public이면 가격을 0으로 강제 보정
+    if (this.accessLevel === 'public') {
+      this.price = 0;
+    }
+    if (input.ageRating !== undefined) {
+      this.ageRating = input.ageRating || AgeRating.ALL;
     }
   }
 
@@ -210,6 +232,7 @@ export const getPostRepository = (
         bookstoreId?: string;
         accessLevel?: PostAccessLevel;
         price?: number;
+        ageRating?: AgeRating;
       }): Promise<PostEntity> {
         const post = PostEntity.create(input);
         return this.save(post);

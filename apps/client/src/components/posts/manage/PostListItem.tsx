@@ -2,14 +2,23 @@ import { FileText } from 'lucide-react';
 import tw from 'tailwind-styled-components';
 
 import PostAccessBadge from '@/components/posts/manage/PostAccessBadge';
-import PostActions from '@/components/posts/manage/PostActions';
+import PostActions, {
+  PublishOptions,
+} from '@/components/posts/manage/PostActions';
 import PostStatusBadge from '@/components/posts/manage/PostStatusBadge';
 import { PostItem } from '@/components/posts/manage/types';
 
+interface BookstoreDefaults {
+  defaultAccessLevel: 'public' | 'subscriber' | 'purchaser';
+  defaultPrice: number;
+  defaultAgeRating: 'all' | 'adult';
+}
+
 interface PostListItemProps {
   post: PostItem;
+  bookstoreDefaults?: BookstoreDefaults;
   onEdit: (postId: string) => void;
-  onPublish: (postId: string) => void;
+  onPublish: (postId: string, options: PublishOptions) => void;
   onUnpublish: (postId: string) => void;
   onDelete: (postId: string) => void;
 }
@@ -33,6 +42,7 @@ function formatRelativeTime(date: string | Date | null | undefined): string {
 
 const PostListItem = ({
   post,
+  bookstoreDefaults,
   onEdit,
   onPublish,
   onUnpublish,
@@ -92,8 +102,28 @@ const PostListItem = ({
       <ActionsContainer onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <PostActions
           status={post.status}
+          publishDefaults={
+            isDraft && bookstoreDefaults
+              ? {
+                  accessLevel: bookstoreDefaults.defaultAccessLevel,
+                  price: bookstoreDefaults.defaultPrice,
+                  ageRating: bookstoreDefaults.defaultAgeRating,
+                }
+              : {
+                  accessLevel:
+                    post.accessLevel === 'private'
+                      ? 'public'
+                      : (post.accessLevel as
+                          | 'public'
+                          | 'subscriber'
+                          | 'purchaser'),
+                  price: post.price,
+                  ageRating: post.ageRating,
+                }
+          }
+          isRepublish={post.status === 'published'}
           onEdit={() => onEdit(post.id)}
-          onPublish={() => onPublish(post.id)}
+          onPublish={(options) => onPublish(post.id, options)}
           onUnpublish={() => onUnpublish(post.id)}
           onDelete={() => onDelete(post.id)}
         />

@@ -9,6 +9,7 @@ export interface PostItem {
   accessLevel: PostAccessLevel;
   status: PostStatus;
   price: number;
+  ageRating: 'all' | 'adult';
   publishedAt?: Date | string | null;
   updatedAt: Date | string;
   createdAt: Date | string;
