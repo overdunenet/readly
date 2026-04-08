@@ -6,6 +6,7 @@ import { TRPCAppContext } from '@src/module/trpc/trpcAppContext';
 import { AppController } from '@src/app.controller';
 import { NicepayCallbackController } from '@src/module/trpc/controllers/nicepay-callback.controller';
 import { CookieService } from '@src/module/trpc/services/cookie.service';
+import { UploadModule } from '@src/module/upload/upload.module';
 
 @Global()
 @Module({
@@ -18,6 +19,7 @@ class TrpcModuleExport {}
 @Module({
   imports: [
     TrpcModuleExport,
+    UploadModule,
     TRPCModule.forRoot({
       autoSchemaFile:
         process.env.NODE_ENV === 'production'
