@@ -30,6 +30,7 @@ export class UploadService {
       Bucket: this.bucket,
       Key: key,
       ContentType: contentType,
+      ACL: 'public-read',
     });
 
     return getSignedUrl(this.s3Client, command, {
@@ -39,7 +40,8 @@ export class UploadService {
         presignedUrl,
         cdnUrl: `${this.cdnUrl}/${key}`,
       }))
-      .catch(() => {
+      .catch((error: unknown) => {
+        console.error('S3 presigned URL generation failed:', error);
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to generate presigned URL',
