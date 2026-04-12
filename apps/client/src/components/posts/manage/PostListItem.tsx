@@ -1,4 +1,5 @@
 import { FileText } from 'lucide-react';
+import SnappyModal from 'react-snappy-modal';
 import tw from 'tailwind-styled-components';
 
 import PostAccessBadge from '@/components/posts/manage/PostAccessBadge';
@@ -7,6 +8,7 @@ import PostActions, {
 } from '@/components/posts/manage/PostActions';
 import PostStatusBadge from '@/components/posts/manage/PostStatusBadge';
 import { PostItem } from '@/components/posts/manage/types';
+import { AlertModal } from '@/shared/modal/AlertModal';
 
 interface BookstoreDefaults {
   defaultAccessLevel: 'public' | 'subscriber' | 'purchaser';
@@ -55,6 +57,16 @@ const PostListItem = ({
   const dateLabel = post.status === 'published' ? '발행' : '저장';
 
   const isDraft = post.status === 'draft';
+  const canPublish = isDraft ? !!post.title.trim() : true;
+
+  const handlePublishBlocked = () => {
+    SnappyModal.show(
+      <AlertModal
+        title="발행할 수 없습니다"
+        message="제목과 내용을 입력한 후 발행해주세요."
+      />,
+    );
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -122,8 +134,10 @@ const PostListItem = ({
                 }
           }
           isRepublish={post.status === 'published'}
+          canPublish={canPublish}
           onEdit={() => onEdit(post.id)}
           onPublish={(options) => onPublish(post.id, options)}
+          onPublishBlocked={handlePublishBlocked}
           onUnpublish={() => onUnpublish(post.id)}
           onDelete={() => onDelete(post.id)}
         />
