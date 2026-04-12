@@ -57,11 +57,14 @@ const PostListItem = ({
   const dateLabel = post.status === 'published' ? '발행' : '저장';
 
   const isDraft = post.status === 'draft';
-  const canPublish = !!post.title.trim();
+  const canPublish = isDraft ? !!post.title.trim() : true;
 
   const handlePublishBlocked = () => {
     SnappyModal.show(
-      <AlertModal title="발행할 수 없습니다" message="제목을 입력해주세요." />,
+      <AlertModal
+        title="발행할 수 없습니다"
+        message="제목과 내용을 입력한 후 발행해주세요."
+      />,
     );
   };
 

@@ -255,7 +255,12 @@ export class PostService {
       throw new BadRequestException('제목을 입력해주세요');
     }
 
-    const textContent = latest.freeContent.replace(/<[^>]*>/g, '').trim();
+    const textContent = latest.freeContent
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&#\d+;/g, '')
+      .replace(/&\w+;/g, '')
+      .trim();
     if (textContent === '') {
       throw new BadRequestException('내용을 입력해주세요');
     }
