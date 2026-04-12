@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { In } from 'typeorm';
 import { RepositoryProvider } from '../shared/transaction/repository.provider';
@@ -247,6 +248,16 @@ export class PostService {
 
     if (!latest) {
       throw new NotFoundException('No version found for this post');
+    }
+
+    // 빈 제목/내용 검증
+    if (latest.title.trim() === '') {
+      throw new BadRequestException('제목을 입력해주세요');
+    }
+
+    const textContent = latest.freeContent.replace(/<[^>]*>/g, '').trim();
+    if (textContent === '') {
+      throw new BadRequestException('내용을 입력해주세요');
     }
 
     // 발행 시 메타데이터 업데이트

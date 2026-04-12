@@ -19,8 +19,10 @@ interface PostActionsProps {
   status: PostStatus;
   publishDefaults?: Partial<PublishSheetResult>;
   isRepublish?: boolean;
+  canPublish?: boolean;
   onEdit: () => void;
   onPublish: (options: PublishOptions) => void;
+  onPublishBlocked?: () => void;
   onUnpublish: () => void;
   onDelete: () => void;
 }
@@ -29,8 +31,10 @@ const PostActions = ({
   status,
   publishDefaults,
   isRepublish,
+  canPublish = true,
   onEdit,
   onPublish,
+  onPublishBlocked,
   onUnpublish,
   onDelete,
 }: PostActionsProps) => {
@@ -57,6 +61,8 @@ const PostActions = ({
     handleClose();
     if (status === 'published') {
       onUnpublish();
+    } else if (!canPublish) {
+      onPublishBlocked?.();
     } else {
       SnappyModal.show(
         <PublishSheet
