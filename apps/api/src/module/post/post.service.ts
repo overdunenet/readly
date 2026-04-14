@@ -142,11 +142,27 @@ export class PostService {
         );
       if (!retryLatest) throw error;
 
+      // 경쟁 save가 만든 새 latest 기준으로 머지를 재계산하여 필드 유실 방지
+      const retryMerged = {
+        title: input.title ?? retryLatest.title,
+        freeContent: input.freeContent ?? retryLatest.freeContent,
+        paidContent:
+          input.paidContent !== undefined
+            ? input.paidContent
+            : retryLatest.paidContent,
+        excerpt:
+          input.excerpt !== undefined ? input.excerpt : retryLatest.excerpt,
+        thumbnail:
+          input.thumbnail !== undefined
+            ? input.thumbnail
+            : retryLatest.thumbnail,
+      };
+
       const retryVersion = PostVersionEntity.createNext(
         postId,
         retryLatest.versionNumber + 1,
         saveType,
-        mergedInput
+        retryMerged
       );
       const savedVersion =
         await this.repositoryProvider.PostVersionRepository.save(retryVersion);
