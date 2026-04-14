@@ -46,9 +46,6 @@ export const useAutoSave = ({
 
   const saveDraftMutation = trpc.post.saveDraft.useMutation();
 
-  const saveDraftMutationRef = useRef(saveDraftMutation);
-  saveDraftMutationRef.current = saveDraftMutation;
-
   const isDirty = useCallback((): boolean => {
     const prev = prevRef.current;
     return (
@@ -72,7 +69,7 @@ export const useAutoSave = ({
       clearTimer();
       const payload: ContentSnapshot = { title, freeContent, paidContent };
       setSaveStatus('saving');
-      saveDraftMutationRef.current.mutate(
+      saveDraftMutation.mutate(
         {
           postId,
           data: payload,
@@ -92,7 +89,15 @@ export const useAutoSave = ({
         },
       );
     },
-    [postId, title, freeContent, paidContent, isDirty, clearTimer],
+    [
+      postId,
+      title,
+      freeContent,
+      paidContent,
+      isDirty,
+      clearTimer,
+      saveDraftMutation,
+    ],
   );
 
   const saveNow = useCallback(() => {
