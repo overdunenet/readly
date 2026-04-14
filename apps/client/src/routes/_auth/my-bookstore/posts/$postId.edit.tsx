@@ -20,14 +20,16 @@ function WritePage() {
   const [title, setTitle] = useState('');
   const [freeContent, setFreeContent] = useState('');
   const [paidContent, setPaidContent] = useState<string | null>(null);
+  const [dataReady, setDataReady] = useState(false);
 
   useEffect(() => {
-    if (post) {
+    if (post && !dataReady) {
       setTitle(post.title);
       setFreeContent(post.freeContent);
       setPaidContent(post.paidContent);
+      setDataReady(true);
     }
-  }, [post]);
+  }, [post, dataReady]);
 
   const { saveStatus, lastSavedAt, saveNow } = useAutoSave({
     postId,
@@ -62,7 +64,7 @@ function WritePage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || !dataReady) {
     return <LoadingArea>로딩 중...</LoadingArea>;
   }
 
