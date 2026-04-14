@@ -44,23 +44,7 @@ export const useAutoSave = ({
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isMountedRef = useRef(true);
 
-  const saveDraftMutation = trpc.post.saveDraft.useMutation({
-    onSuccess: () => {
-      if (!isMountedRef.current) return;
-
-      prevRef.current = {
-        title,
-        freeContent,
-        paidContent,
-      };
-      setSaveStatus('saved');
-      setLastSavedAt(new Date());
-    },
-    onError: () => {
-      if (!isMountedRef.current) return;
-      setSaveStatus('error');
-    },
-  });
+  const saveDraftMutation = trpc.post.saveDraft.useMutation();
 
   const saveDraftMutationRef = useRef(saveDraftMutation);
   saveDraftMutationRef.current = saveDraftMutation;
@@ -86,12 +70,27 @@ export const useAutoSave = ({
       if (!isDirty()) return;
 
       clearTimer();
+      const payload: ContentSnapshot = { title, freeContent, paidContent };
       setSaveStatus('saving');
-      saveDraftMutationRef.current.mutate({
-        postId,
-        data: { title, freeContent, paidContent },
-        saveType,
-      });
+      saveDraftMutationRef.current.mutate(
+        {
+          postId,
+          data: payload,
+          saveType,
+        },
+        {
+          onSuccess: () => {
+            if (!isMountedRef.current) return;
+            prevRef.current = payload;
+            setSaveStatus('saved');
+            setLastSavedAt(new Date());
+          },
+          onError: () => {
+            if (!isMountedRef.current) return;
+            setSaveStatus('error');
+          },
+        },
+      );
     },
     [postId, title, freeContent, paidContent, isDirty, clearTimer],
   );
