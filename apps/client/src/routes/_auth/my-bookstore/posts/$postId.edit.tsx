@@ -16,6 +16,7 @@ function WritePage() {
   const navigate = Route.useNavigate();
 
   const { data: post, isLoading } = trpc.post.getOne.useQuery({ postId });
+  const utils = trpc.useUtils();
 
   const [title, setTitle] = useState('');
   const [freeContent, setFreeContent] = useState('');
@@ -39,6 +40,9 @@ function WritePage() {
   });
 
   const deleteMutation = trpc.post.delete.useMutation({
+    onSuccess: () => {
+      utils.post.getMy.invalidate();
+    },
     onError: (error) => {
       console.error('Draft 삭제 실패:', error.message);
     },

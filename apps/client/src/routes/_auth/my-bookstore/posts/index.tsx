@@ -43,8 +43,9 @@ function PostsPage() {
   });
 
   const publishMutation = trpc.post.publish.useMutation({
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       utils.post.getMy.invalidate();
+      utils.post.getOne.invalidate({ postId: variables.postId });
       toast.success('포스트가 발행되었습니다');
     },
     onError: (error) => {
@@ -55,7 +56,10 @@ function PostsPage() {
   });
 
   const unpublishMutation = trpc.post.unpublish.useMutation({
-    onSuccess: () => utils.post.getMy.invalidate(),
+    onSuccess: (_data, variables) => {
+      utils.post.getMy.invalidate();
+      utils.post.getOne.invalidate({ postId: variables.postId });
+    },
     onError: (error) => {
       SnappyModal.show(
         <AlertModal title="발행 취소 실패" message={error.message} />,
