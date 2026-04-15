@@ -44,6 +44,7 @@ export const useAutoSave = ({
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isMountedRef = useRef(true);
 
+  const utils = trpc.useUtils();
   const saveDraftMutation = trpc.post.saveDraft.useMutation();
 
   const isDirty = useCallback((): boolean => {
@@ -76,11 +77,13 @@ export const useAutoSave = ({
           saveType,
         },
         {
-          onSuccess: () => {
+          onSuccess: (response) => {
             if (!isMountedRef.current) return;
             prevRef.current = payload;
             setSaveStatus('saved');
             setLastSavedAt(new Date());
+            utils.post.getOne.setData({ postId }, response);
+            utils.post.getMy.invalidate();
           },
           onError: () => {
             if (!isMountedRef.current) return;
@@ -97,6 +100,7 @@ export const useAutoSave = ({
       isDirty,
       clearTimer,
       saveDraftMutation,
+      utils,
     ],
   );
 
