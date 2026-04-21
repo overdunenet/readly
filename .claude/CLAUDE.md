@@ -94,6 +94,17 @@ Agent frontmatter에 `skills` 필드가 설정되어 있으면 별도 지시 불
 
 <workflow_protocol>
 
+### 슬래시 커맨드 예외 (최우선 적용)
+
+사용자 입력이 `/pm`, `/gpm`, `/tasks`, `/pm-planner`, `/gpm-pm` 등 **의도가 명확한 슬래시 커맨드**로 시작하는 경우:
+
+- Phase 1~4 워크플로우를 **모두 건너뛴다**
+- Skill/Agent 평가 출력을 **수행하지 않는다**
+- Plan 문서 생성, Context 수집, TaskList 생성 등 **모든 전처리를 생략**한다
+- 해당 슬래시 커맨드에 매핑된 Agent/Skill로 **즉시 위임**한다
+
+이 예외는 코드 작업이 아닌 "의도 명시된 워크플로우 호출"이기 때문에 적용된다.
+
 ## 워크플로우 상세 프로토콜
 
 코드 작업 시 아래 Phase 순서를 따르세요.
@@ -300,6 +311,8 @@ Plan 파일의 Context 섹션에 위 내용을 명시하여 작업 목적이 희
 ## Skill/Agent 평가 프로토콜
 
 응답 시작 시 아래 Skill/Agent 평가를 출력하세요.
+
+**예외**: 사용자 입력이 `/pm`, `/gpm`, `/tasks`, `/pm-planner`, `/gpm-pm`으로 시작하면 이 평가를 출력하지 않고 해당 Agent로 즉시 위임한다.
 
 ### Skill 평가
 

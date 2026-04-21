@@ -16,6 +16,17 @@ if [ -f "$SCRIPT_DIR/_dedup.sh" ]; then
   _hook_dedup_check "${BASH_SOURCE[0]}" || exit 0
 fi
 
+# /pm, /gpm, /tasks 슬래시 커맨드는 리마인더 없이 즉시 Agent로 위임되도록 스킵
+INPUT_JSON=$(cat)
+if command -v jq >/dev/null 2>&1; then
+  USER_PROMPT=$(echo "$INPUT_JSON" | jq -r '.prompt // empty' 2>/dev/null)
+else
+  USER_PROMPT=$(echo "$INPUT_JSON" | grep -oE '"prompt"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"prompt"[[:space:]]*:[[:space:]]*"//;s/"$//')
+fi
+case "$USER_PROMPT" in
+  /pm*|/gpm*|/tasks*|/pm-planner*|/gpm-pm*) exit 0 ;;
+esac
+
 echo "✅ [Hook] 워크플로우 리마인더"
 
 cat << 'EOF'

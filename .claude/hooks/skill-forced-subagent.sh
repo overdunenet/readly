@@ -16,6 +16,17 @@ if [ -f "$SCRIPT_DIR/_dedup.sh" ]; then
   _hook_dedup_check "${BASH_SOURCE[0]}" || exit 0
 fi
 
+# pm-planner, gpm-pm 등 의도가 명확한 Agent는 Skill 평가 리마인더 스킵
+INPUT_JSON=$(cat)
+if command -v jq >/dev/null 2>&1; then
+  SUBAGENT_TYPE=$(echo "$INPUT_JSON" | jq -r '.subagent_type // empty' 2>/dev/null)
+else
+  SUBAGENT_TYPE=$(echo "$INPUT_JSON" | grep -oE '"subagent_type"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"subagent_type"[[:space:]]*:[[:space:]]*"//;s/"$//')
+fi
+case "$SUBAGENT_TYPE" in
+  pm-planner|gpm-pm|project-task-manager) exit 0 ;;
+esac
+
 echo "✅ [Hook] Subagent Skill 평가 프로토콜 실행됨"
 
 cat << 'EOF'
